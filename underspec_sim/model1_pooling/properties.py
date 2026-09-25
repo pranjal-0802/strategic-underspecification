@@ -107,91 +107,130 @@ class BiasDirectionSweepResult:
     lambda_A_values: List[float]
     a_SE_values: List[float]
     regimes: List[str]
-    regularity_condition_holds: List[bool]
-    predicted_signs: List[float]
+    soc_values: List[float]
+    analytical_derivatives: List[float]
     empirical_slopes: List[float]
+    max_derivative_error: float
     passed: bool
     summary: str
     detailed_records: List[Dict[str, Any]]
 
 
 def test_bias_direction(
-    F_samples: Sequence[float],
+    F_samples: Optional[Sequence[float]] = None,
     params: Optional[ModelParams] = None,
     lambda_A_sweep: Optional[Sequence[float]] = None,
 ) -> BiasDirectionSweepResult:
     r"""
-    Checks Corollary 2: Sweeps \lambda_A above and below c_Q.
-    Reports direction of movement, tracks regime transitions (corner vs interior),
-    and verifies the FOC sign prediction.
+    Checks Corollary 2 (Corrected in v4):
+    On the interior branch (\Delta \bar\gamma > 0),
+      \partial a^{SE} / \partial \lambda_A = \mu_A \Lambda / [2 (\mu_A \Lambda - \lambda_A)^2] > 0.
+    Verifies that:
+    1. The parameters yield \Delta \bar\gamma > 0 (SOC holds, regime is strictly interior).
+    2. a^{SE} is strictly interior (in (0, 1)) across the entire sweep.
+    3. The empirical slope \Delta a^{SE} / \Delta \lambda_A is strictly positive everywhere.
+    4. The empirical slope matches the closed-form analytical derivative within tolerance.
     """
+    if F_samples is None:
+        F_samples = np.linspace(0.8, 1.25, 200)
+
+    kappa_arr = np.asarray(F_samples, dtype=float)
+    inv_mean = float(np.mean(1.0 / kappa_arr))
+
     if params is None:
-        params = ModelParams()
+        # Calibrated primitives where Delta * gamma_bar > 0 and a^SE in (0.2, 0.85)
+        # Lambda = 2.0, c_Q = 1.0, mu_A = 1.0
+        # gamma_bar = (Lambda - c_Q) * inv_mean = 1.0 * inv_mean
+        # k = Lambda * inv_mean - 1.90 * gamma_bar
+        Lambda = 2.0
+        c_Q = 1.0
+        mu_A = 1.0
+        gamma_bar = (Lambda - c_Q) * inv_mean
+        k = float(Lambda * inv_mean - 1.90 * gamma_bar)
+        params = ModelParams(k=k, g=0.5, L=4.0, c_Q=c_Q, mu_A=mu_A, V=100.0)
 
+    Lambda = params.Lambda
+    mu_A = params.mu_A
     c_Q = params.c_Q
-    if lambda_A_sweep is None:
-        lambda_A_sweep = [c_Q * 0.5, c_Q * 0.8, c_Q, c_Q * 1.5, c_Q * 2.5, c_Q * 4.0]
 
-    records = []
-    a_list = []
-    regimes = []
-    reg_list = []
-    pred_signs = []
+    if lambda_A_sweep is None:
+        # Sweeping lambda_A in [3.5, 12.0] guarantees Delta = lambda_A - mu_A*Lambda in [1.5, 10.0] > 0
+        lambda_A_sweep = np.linspace(3.5, 12.0, 20)
+
+    records: List[Dict[str, Any]] = []
+    a_list: List[float] = []
+    regimes: List[str] = []
+    soc_list: List[float] = []
+    deriv_list: List[float] = []
 
     for lam in lambda_A_sweep:
         res = solve_pooling_equilibrium(
             F_samples=F_samples,
-            mu_A=params.mu_A,
+            mu_A=mu_A,
             lambda_A=lam,
             c_Q=c_Q,
             params=params,
         )
         a_list.append(res.a_SE)
         regimes.append(res.regime)
+        soc_list.append(res.soc_value)
 
-        a_eval = res.a_SE
-        R_a = res.R0_bar + a_eval * res.gamma_bar
-        reg_holds = bool(R_a > 0.5 * res.R0_bar) if res.R0_bar > 0 else False
-        reg_list.append(reg_holds)
-
-        foc_sign = 2.0 * res.gamma_bar * a_eval - res.R0_bar
-        pred_signs.append(float(foc_sign))
+        # Closed-form analytical derivative from Corollary 2 (v4)
+        analytical_deriv = float(mu_A * Lambda / (2.0 * (lam - mu_A * Lambda) ** 2))
+        deriv_list.append(analytical_deriv)
 
         records.append({
-            "lambda_A": lam,
-            "c_Q": c_Q,
-            "a_SE": res.a_SE,
-            "a_SE_grid": res.a_SE_grid,
+            "lambda_A": float(lam),
+            "c_Q": float(c_Q),
+            "mu_A": float(mu_A),
+            "Lambda": float(Lambda),
+            "a_SE": float(res.a_SE),
             "regime": res.regime,
-            "a_SE_closed": res.a_SE_closed,
-            "soc_value": res.soc_value,
-            "is_concave": res.is_concave,
-            "R0_bar": res.R0_bar,
-            "gamma_bar": res.gamma_bar,
-            "R_a": R_a,
-            "regularity_condition": reg_holds,
-            "foc_sign_predicted": foc_sign,
+            "soc_value": float(res.soc_value),
+            "analytical_derivative": analytical_deriv,
+            "R0_bar": float(res.R0_bar),
+            "gamma_bar": float(res.gamma_bar),
         })
 
-    slopes = []
+    # Compute empirical finite-difference slopes
+    slopes: List[float] = []
+    relative_errors: List[float] = []
     for i in range(len(lambda_A_sweep) - 1):
-        d_lam = lambda_A_sweep[i+1] - lambda_A_sweep[i]
-        d_a = a_list[i+1] - a_list[i]
-        slopes.append(d_a / d_lam)
+        d_lam = float(lambda_A_sweep[i + 1] - lambda_A_sweep[i])
+        d_a = float(a_list[i + 1] - a_list[i])
+        slope = d_a / d_lam
+        slopes.append(slope)
+
+        # Midpoint analytical derivative
+        mid_deriv = 0.5 * (deriv_list[i] + deriv_list[i + 1])
+        rel_err = abs(slope - mid_deriv) / mid_deriv
+        relative_errors.append(rel_err)
+
+    all_interior = all(r == "interior" for r in regimes)
+    all_positive_slopes = all(s > 0.0 for s in slopes)
+    all_soc_positive = all(s > 0.0 for s in soc_list)
+    max_err = float(np.max(relative_errors)) if relative_errors else 0.0
+    deriv_matches = max_err < 0.06  # Within 6% finite difference tolerance
+
+    passed = all_interior and all_positive_slopes and all_soc_positive and deriv_matches
 
     summary = (
-        f"Bias direction sweep across {len(lambda_A_sweep)} values: "
-        f"regimes={[r for r in set(regimes)]}."
+        f"Corollary 2 (v4 Corrected): Swept lambda_A in [{lambda_A_sweep[0]:.2f}, {lambda_A_sweep[-1]:.2f}] "
+        f"across {len(lambda_A_sweep)} points. All {len(a_list)} points strictly interior (a_SE in [{min(a_list):.3f}, {max(a_list):.3f}]). "
+        f"All empirical slopes strictly positive (min slope={min(slopes):.4f}). "
+        f"Matches analytical derivative mu_A*Lambda/[2*(lambda_A-mu_A*Lambda)^2] (max rel err={max_err:.2%}). "
+        f"Passed: {passed}."
     )
 
     return BiasDirectionSweepResult(
-        lambda_A_values=list(lambda_A_sweep),
+        lambda_A_values=[float(x) for x in lambda_A_sweep],
         a_SE_values=a_list,
         regimes=regimes,
-        regularity_condition_holds=reg_list,
-        predicted_signs=pred_signs,
+        soc_values=soc_list,
+        analytical_derivatives=deriv_list,
         empirical_slopes=slopes,
-        passed=True,
+        max_derivative_error=max_err,
+        passed=passed,
         summary=summary,
         detailed_records=records,
     )

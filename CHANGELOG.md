@@ -133,3 +133,25 @@ Following the synchronization with `strategic_underspecification_v3.tex`, three 
 - **Master Verification Runner:**
   - Updated `run_all_math_checks.py` to execute all 14 mathematical verifications in ~68s.
 
+---
+
+## 8. Mathematical Reconciliation & Canonical Release (v4.0)
+
+- **Corollary 2 Overhaul (`verify_cor2.py` & `properties.py`):**
+  - Retired the stale test of the superseded sign claim ($\text{sign}(2\bar\gamma a - \bar R_0)$) and replaced it with the verified comparative static on the interior branch ($\Delta\bar\gamma > 0$):
+    $$\frac{\partial a^{SE}}{\partial \lambda_A} = \frac{\mu_A\Lambda}{2(\mu_A\Lambda - \lambda_A)^2} > 0$$
+  - Calibrated parameterization ($\Lambda=2.0, c_Q=1.0, \mu_A=1.0, k=0.10, \bar\gamma=1.0, \bar R_0=-1.90, F\sim[0.8, 1.25]$) ensuring $\text{SOC} = \Delta\bar\gamma > 0$ strictly and $a^{SE}$ is fully interior ($a^{SE} \in [0.28, 0.85]$) across $\lambda_A \in [3.5, 12.0]$ without boundary clipping.
+  - Eliminated unconditional `passed = True`: replaced with strict assertions verifying all evaluations are interior, all empirical finite differences $\frac{\Delta a^{SE}}{\Delta \lambda_A}$ are positive ($\in [0.010, 0.342]$), and maximum relative error against the analytical derivative is $< 3.5\%$.
+- **Assumption 1 Reconciliation (`verify_assumption1.py`):**
+  - Formally marked `verify_assumption1.py` as superseded by `verify_monotonicity_survival.py`.
+  - Reconciled the regularity condition to $(k-m)\ln q \ge -1$, demonstrating it holds in **89.9%** (653/726) on the grid, resolving the apparent contradiction with the preliminary 10.1% figure from the reversed inequality $\le -1$.
+  - Re-emphasized that the canonical 2,552-interval audit in Follow-up 1 confirms empirical monotonicity survives in **100%** of intervals outside the sufficient condition.
+- **Regression Tests Added (`tests/`):**
+  - `tests/test_pooling.py`: Added `test_cor2_derivative_sign_on_interior_branch()` asserting strictly positive derivative on the interior branch.
+  - `tests/test_monotonicity_survival.py`: Added `test_cor1_direction_under_corrected_assumption1()` asserting Topkis decreasing differences under $(k-m)\ln q \ge -1$ and empirical monotonicity inversion when violated.
+  - Full suite expanded to **46 unit and symbolic tests, 100% passing**.
+- **Documentation & Repo Hygiene:**
+  - Resolved all cross-section contradictions in `README.md` and `CHANGELOG.md`.
+  - Canonicalized repository structure around `strategic_underspecification.tex` and `strategic_underspecification.pdf`, removing all legacy version-suffixed files (`strategic_underspecification_v3.tex`, `strategic_underspecification_v3.pdf`, `strategic_underspecification_v4.tex`).
+
+

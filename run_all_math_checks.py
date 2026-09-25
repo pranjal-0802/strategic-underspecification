@@ -79,14 +79,14 @@ def main():
     })
 
     # 3. Cor 2
-    print("[3/14] Verifying Corollary 2 (Bias Shifts Pooling Rate)...")
+    print("[3/14] Verifying Corollary 2 (Bias Shifts Pooling Rate on Interior Branch)...")
     res_c2 = verify_cor2(output_dir=args.output_dir)
     results.append({
         "item": "Cor 2",
         "name": "Bias Direction on Pooling Rate",
-        "verdict": "PASS" if res_c2["passed"] else "FAIL",
+        "verdict": res_c2["verdict"],
         "passed": res_c2["passed"],
-        "note": f"Reg. holds in {res_c2['reg_holding_pct']:.0f}% of sweep; FOC sign tracks slope",
+        "note": f"Interior branch: da/dlam > 0 strictly (slopes in [{res_c2['min_slope']:.3f}, {res_c2['max_slope']:.3f}], max err: {res_c2['max_rel_err']:.1%})",
     })
 
     # 4. Cor 3
@@ -150,7 +150,7 @@ def main():
         "name": "Assumption 1 Characterization",
         "verdict": res_assump1["verdict"],
         "passed": res_assump1["passed"],
-        "note": f"Holds in {res_assump1['holds_fraction']*100:.1f}% of grid; restrictive when kappa<0.6 or q>0.90",
+        "note": f"Corrected (>= -1) holds in {res_assump1['holds_fraction']*100:.1f}%; canonical audit in Foll 1",
     })
 
     # 11. Robustness Task 3: mu_A Comparative Statics

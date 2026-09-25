@@ -110,3 +110,24 @@ def test_unbiased_pooling_always_corner_matching_formula():
 
                     assert res.a_SE == expected_corner
                     assert res.a_SE == pytest.approx(res.a_SE_grid, abs=1e-2)
+
+
+def test_cor2_derivative_sign_on_interior_branch():
+    r"""
+    Regression Test for Corollary 2 (Corrected in v4):
+    On the interior branch (\Delta \bar\gamma > 0),
+      \partial a^{SE} / \partial \lambda_A = \mu_A \Lambda / [2 (\mu_A \Lambda - \lambda_A)^2] > 0
+    strictly. Tests that:
+    1. The analytical derivative is strictly positive for all valid \lambda_A.
+    2. Empirical finite-difference slopes \Delta a^{SE} / \Delta \lambda_A are strictly positive.
+    3. Empirical slopes match the analytical formula within numerical tolerance.
+    """
+    from underspec_sim.model1_pooling.properties import test_bias_direction
+
+    res = test_bias_direction()
+    assert res.passed is True
+    assert all(r == "interior" for r in res.regimes)
+    assert all(s > 0.0 for s in res.soc_values)
+    assert all(s > 0.0 for s in res.empirical_slopes)
+    assert all(d > 0.0 for d in res.analytical_derivatives)
+    assert res.max_derivative_error < 0.06

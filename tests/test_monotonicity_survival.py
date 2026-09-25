@@ -74,3 +74,36 @@ def test_monotonicity_survival_runner():
     assert res["verdict"] in ("PASS", "CAUTION")
     assert res["ass1_fails_mono_fails"] == 0
     assert res["pct_ass1_fails_mono_survives"] == pytest.approx(100.0, rel=1e-3)
+
+
+def test_cor1_direction_under_corrected_assumption1():
+    r"""
+    Regression Test for Corollary 1 under Corrected Assumption 1 (v4):
+    In strategic_underspecification_v4.tex, Assumption 1 is (k - m)*ln(q) >= -1.
+    1. When (k - m)*ln(q) >= -1:
+       Cross-partial d^2 U / (dm dq) <= 0 (decreasing differences).
+       m*(q) is weakly decreasing in q: Topkis's theorem holds.
+    2. When (k - m)*ln(q) < -1:
+       Cross-partial d^2 U / (dm dq) > 0 (increasing differences).
+       m*(q) increases in q locally, causing the monotonicity inversion.
+    """
+    k = 10.0
+    V = 100.0
+
+    # Region 1: Satisfies corrected Assumption 1: (k - m)*ln(q) >= -1
+    # Example: moderate kappa = 0.8, q in [0.85, 0.95]
+    kap1 = 0.8
+    m_85 = solve_optimal_m(k=k, q=0.85, kappa=kap1, V=V)
+    m_95 = solve_optimal_m(k=k, q=0.95, kappa=kap1, V=V)
+    lhs_85 = (k - m_85) * np.log(0.85)
+    assert lhs_85 >= -1.0  # Corrected Assumption 1 holds
+    assert m_95 <= m_85    # Monotonicity holds: m* decreases with q!
+
+    # Region 2: Violates corrected Assumption 1 (i.e. satisfies old reversed condition): (k - m)*ln(q) < -1
+    # Example: high kappa = 2.0, low q in [0.70, 0.75]
+    kap2 = 2.0
+    m_70 = solve_optimal_m(k=k, q=0.70, kappa=kap2, V=V)
+    m_75 = solve_optimal_m(k=k, q=0.75, kappa=kap2, V=V)
+    lhs_70 = (k - m_70) * np.log(0.70)
+    assert lhs_70 < -1.0   # Corrected Assumption 1 FAILS (< -1)
+    assert m_75 > m_70     # Monotonicity genuinely breaks: m* INCREASES with q!

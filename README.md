@@ -1,6 +1,6 @@
 # underspec_sim
 
-Numerical verification, simulation, and LLM-driven experimentation framework for the formal Stackelberg-game model of **strategic under-specification** in AI coding assistants, based on [*Strategic Under-Specification: A Stackelberg Game Between User and Assistant (v4)*](strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
+Numerical verification, simulation, and LLM-driven experimentation framework for the formal Stackelberg-game model of **strategic under-specification** in AI coding assistants, based on [*Strategic Under-Specification: A Stackelberg Game Between User and Assistant*](strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
 
 ---
 
@@ -32,14 +32,14 @@ underspec_sim/
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Sec 4.2** | **Prop 3** (Bang-Bang First-Best Threshold) | `underspec_sim/verifications/verify_prop3.py` | `tests/test_first_best.py` | `prop3_first_best.csv`, `.png`, `.md` | **PASS** |
 | **Sec 5.2** | **Prop 4** (Stackelberg Pooling Rate $a^{SE}$) | `underspec_sim/verifications/verify_prop4.py` | `tests/test_pooling.py` | `prop4_pooling_closed_form.csv`, `.png`, `.md` | **PASS** (under SOC) |
-| **Sec 5.2** | **Cor 2** (Bias Shifts Pooling Rate) | `underspec_sim/verifications/verify_cor2.py` | `tests/test_pooling.py` | `cor2_bias_direction.csv`, `.png`, `.md` | **PASS** |
-| **Sec 5.2** | **Cor 3** (Pooling is a Corner Solution) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `cor3_interiority.csv`, `.png`, `.md` | **PASS** *(formula verified)* |
+| **Sec 5.2** | **Cor 2** (Bias Shifts Pooling Rate on Interior Branch) | `underspec_sim/verifications/verify_cor2.py` | `tests/test_pooling.py` | `cor2_bias_direction.csv`, `.png`, `.md` | **PASS** *(strictly $\partial a^{SE}/\partial\lambda_A > 0$ on interior)* |
+| **Sec 5.2** | **Cor 3** (Pooling is a Corner Solution) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `cor3_interiority.csv`, `.png`, `.md` | **PASS** *(corner selected by sign of $\Pi(1)-\Pi(0)$)* |
 | **Sec 6.2** | **Prop 5** (Zero Distortion Without Bias) | `underspec_sim/verifications/verify_prop5.py` | `tests/test_screening.py` | `prop5_screening_no_bias.csv`, `.png`, `.md` | **PASS** |
 | **Sec 6.3** | **Prop 6** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `prop6_screening_biased.csv`, `.png`, `.md`, `prop6_bias_sweep_active_constraints.csv`, `.png` | **PASS** *(active set characterized)* |
 | **Sec 6.3** | **Remark** (Heterogeneity vs Bias Separability) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** |
 | **Sec 7** | **Cor 4** (Dominance of Menus over Pooling) | `underspec_sim/verifications/compare_regimes_runner.py` | `tests/test_comparison.py` | `regime_comparison.csv`, `.png`, `.md` | **PASS** |
 | **Robustness 1** | **Exact vs Linear-Risk Conjunctive Model** | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner survives 100%; boundary saturation at low k)* |
-| **Robustness 2** | **Assumption 1 Regularity Characterization** | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(holds in 10.1%; restrictive for q>0.9 or low kappa)* |
+| **Robustness 2** | **Assumption 1 Regularity (Superseded Audit)** | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(corrected $\ge -1$ holds in 89.9%; see Follow-up 1)* |
 | **Robustness 3** | **$\mu_A$ Comparative Statics & Confound** | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(Remark rmk:mu-lambda verified: ratio = -lambda/mu)* |
 | **Follow-up 1 (Task 1)** | **Monotonicity Survival Outside Assump 1** | `underspec_sim/verifications/verify_monotonicity_survival.py` | `tests/test_monotonicity_survival.py` | `monotonicity_survival.csv`, `.png`, `.md` | **CAUTION** *(mono survives 100% outside Ass1; Ass1 inequality flipped)* |
 | **Follow-up 2 (Task 2)** | **Ray-Invariance in Corner Regime** | `underspec_sim/verifications/verify_mu_lambda_corner.py` | `tests/test_mu_lambda_corner.py` | `mu_lambda_corner.csv`, `.png`, `.md` | **PASS** *(sign of Pi(1)-Pi(0) strictly ray-invariant; 0 flips)* |
@@ -64,7 +64,13 @@ The numerical simulations verified the core mechanics and informed the paper's t
 - **Biased Regime:** Away from the unbiased baseline, when $(\lambda_A - \mu_A \Lambda)$ and $(\Lambda - c_Q)$ share a sign, $\Delta\bar\gamma > 0$ and $\Pi(a)$ becomes strictly concave, producing a true interior stationary maximum.
 - The solver and test suite confirm 100% agreement with this closed-form rule.
 
-### 2. Proposition 6 & Active Constraint Audit (Screening Under Bias)
+### 2. Corollary 2 (Bias Shifts Pooling Rate on Interior Branch)
+- On the interior branch ($\Delta\bar\gamma > 0$ with $a^{SE} \in (0, 1)$), differentiation of Proposition 4's closed form yields:
+  $$\frac{\partial a^{SE}}{\partial \lambda_A} = \frac{\mu_A\Lambda}{2(\mu_A\Lambda - \lambda_A)^2} > 0$$
+- Over a calibrated parameter sweep ($\lambda_A \in [3.5, 12.0]$ with $\mu_A=1.0, \Lambda=2.0, c_Q=1.0$), $a^{SE}$ ranges strictly from $0.28$ to $0.85$ without hitting boundary corners.
+- The verification suite (`verify_cor2.py`) confirms that empirical finite differences $\frac{\Delta a^{SE}}{\Delta \lambda_A} > 0$ everywhere (strictly positive slopes $\in [0.010, 0.342]$) and match the analytical derivative within 3.3% relative error, backed by regression assertions.
+
+### 3. Proposition 6 & Active Constraint Audit (Screening Under Bias)
 - **Down-and-Out Distortion:** At representative under-asking bias ($\lambda_A > \mu_A c_Q$), the low-cost type remains at $a_L^{SB} = a_L^B = 0$, while the high-cost type's asking rate is strictly distorted downward ($a_H^{SB} < a_H^B$).
 - **Active Constraint Set Audit:**
   - In representative bias regions ($\lambda_A = 4.0, \mu_A = 1.0$), **$\text{IC}_L$ binds alone**; $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ are strictly slack.
@@ -73,30 +79,25 @@ The numerical simulations verified the core mechanics and informed the paper's t
   - **Does $\text{IR}_H$ ever bind?** **NO** (Slack $\ge 75.0$ everywhere; binds in 0/100 points).
   - **Does $\text{IC}_H$ ever bind?** **YES** (Under extreme friction $\lambda_A \ge 6.0$ or low altruism $\mu_A \le 0.5$, $\text{IC}_H$ binds alongside $\text{IC}_L$, confirming the paper's caveat in Remark 2).
 
-### 3. Exact Conjunctive Robustness (Task 1)
+### 4. Exact Conjunctive Robustness (Task 1)
 - Evaluated whether headline results survive replacing the linear-risk approximation $L(1-q)(k-m)$ with the exact conjunctive probability $q(a,g)^{k-m}$:
   - **Unbiased Pooling Corner Property:** Survives in **100% of tested $(k, g) \in [3, 20] \times [0.50, 0.95]$ configurations** ($a^{SE}_{\text{exact}} \in \{0, 1\}$). No interior compromise emerged anywhere.
   - **Screening Downward Distortion:** Survives with $a_H^{SB} < a_H^B$ whenever $m$ does not saturate at $k$ (strict in 66.7% of grid, weak in 100%). $\text{IR}_H$ remains strictly slack everywhere.
 
-### 4. Regularity Assumption 1 Characterization (Task 2)
-- Evaluated $(k - m^*)\ln q \le -1$ across $(k, q, \kappa) \in [5, 15] \times [0.70, 0.95] \times [0.2, 2.0]$:
-  - **Satisfaction Rate:** Holds in only **10.1%** of the grid.
-  - Fails when users have low specification costs ($\kappa \le 0.60$) because $m^* \to k \implies (k-m^*)\ln q \to 0 > -1$.
-  - Fails when accuracy is high ($q \ge 0.90$) because satisfying the bound requires $k-m^* \ge 1/|\ln q| \ge 20$, exceeding the attribute budget $k \le 15$.
-  - Holds when guessing is noticeably noisy ($q \le 0.85$) and users have high specification costs ($\kappa \ge 1.0$).
+### 5. Regularity Assumption 1: Reconciliation & Inversion (Task 2 & Follow-up 1)
+- **Reconciliation of Condition Sign:** Topkis decreasing differences $\frac{\partial^2 U}{\partial m \partial q} \le 0$ requires $(k-m^*)\ln q \ge -1$.
+  - Under the corrected condition $(k-m^*)\ln q \ge -1$, regularity holds across **89.9%** (653/726) of the standard grid $(k, q, \kappa) \in [5, 15] \times [0.70, 0.95] \times [0.2, 2.0]$.
+  - The preliminary check in `verify_assumption1.py` tested the reversed inequality $\le -1$ (which held in only 10.1%), leading to the paper's clarification in Remark 1.
+- **100% Empirical Monotonicity Survival (Follow-up 1):**
+  - Evaluated empirical monotonicity across 2,552 parameter intervals in $(k, q, \kappa) \in [5, 15] \times [0.70, 0.99] \times [0.20, 2.00]$.
+  - In all 2,162 intervals where the sufficient condition is not satisfied, $m^*(g)$ remains weakly decreasing in $g$ with **zero violations (100% survival)**.
+- **Proposition 2 (Naive Welfare):** Naive users (who believe $a^\dagger > a_A$) suffer a welfare loss $U_{\text{naive}} \le U_{\text{soph}}$ in **100%** of tested grid points.
 
-### 5. $\mu_A$ Comparative Statics & Confounding (Task 3)
+### 6. $\mu_A$ Comparative Statics & Confounding (Task 3)
 - Derived the exact relationship between the two bias channels in pooling:
   $$\frac{\partial a^{SE} / \partial \mu_A}{\partial a^{SE} / \partial \lambda_A} = -\frac{\lambda_A}{\mu_A}$$
 - Level curves of $a^{SE}$ form constant rays along $\lambda_A / \mu_A = \text{constant}$.
-- Proves Corollary 3 (`cor:mu-lambda` in v3): an assistant with discounting ($\mu_A < 1$) behaves identically along the ask-rate margin to an assistant with friction misperception ($\lambda_A > c_Q$). The two parameters are observationally confounded from $a^{SE}$ alone.
-
-### 6. Monotonicity Survival & Inversion of Assumption 1 (Follow-up Task 1)
-- Evaluated empirical monotonicity of $m^*(g)$ across 2,552 parameter intervals in $(k, q, \kappa) \in [5, 15] \times [0.70, 0.99] \times [0.20, 2.00]$:
-  - **100% Survival Outside Assumption 1:** In all 2,162 intervals where Assumption 1 fails, $m^*(g)$ is weakly decreasing in $g$ without exception (0 violations).
-  - **Mathematical Sign Inversion in Paper:** The cross-partial is $\frac{\partial^2 U}{\partial m \partial q} = -V q^{k-m-1}[1 + (k-m)\ln q]$. Decreasing differences ($\le 0$) mathematically requires $(k-m)\ln q \ge -1$, which is the **exact reverse** of the paper's Assumption 1 condition ($(k-m)\ln q \le -1$).
-  - Inside Assumption 1's stated region, the cross-partial is actually positive (supermodular), causing $m^*$ to *increase* with $g$ in 96.7% of points. Outside Assumption 1, decreasing differences holds universally.
-  - **Proposition 2 (Naive Welfare):** Naive users (who believe $a^\dagger > a_A$) suffer a welfare loss $U_{\text{naive}} \le U_{\text{soph}}$ in **100%** of tested grid points by suboptimality of miscalibrated choice.
+- Proves Corollary 3 (`cor:mu-lambda` in the paper): an assistant with discounting ($\mu_A < 1$) behaves identically along the ask-rate margin to an assistant with friction misperception ($\lambda_A > c_Q$). The two parameters are observationally confounded from $a^{SE}$ alone.
 
 ### 7. Ray-Invariance in the Corner Regime (Follow-up Task 2)
 - Resolved the open question in Remark 3 (`rmk:corner-ray`): does ray-invariance extend to the corner regime ($\Delta\bar\gamma \le 0$) where the choice is $a^{SE} \in \{0, 1\}$?
@@ -143,7 +144,7 @@ python3 run_all_math_checks.py --ignore-failures
 ```
 
 ### Running Unit Tests (pytest)
-Runs 44 comprehensive algebraic, numerical, and symbolic tests:
+Runs 46 comprehensive algebraic, numerical, and symbolic tests:
 ```bash
 pytest tests/ -v
 ```
@@ -190,8 +191,8 @@ strategic-underspecification/
 ├── LICENSE                             # Dual license: MIT (Software) & CC-BY-4.0 (Manuscript)
 ├── CITATION.cff                        # Machine-readable citation metadata for GitHub
 ├── pyproject.toml                      # Package configuration & dependencies
-├── strategic_underspecification_v4.tex  # Full LaTeX source of the paper (v4)
-├── strategic_underspecification_v3.pdf  # Compiled preprint of the paper
+├── strategic_underspecification.tex    # Full LaTeX source of the paper
+├── strategic_underspecification.pdf    # Compiled preprint of the paper
 ├── underspec_sim/                      # Core simulation & verification package
 │   ├── core/                           # Primitives, payoffs, best-response, first-best
 │   ├── model1_pooling/                 # Quadratic pooling payoff & closed-form solver
@@ -200,7 +201,7 @@ strategic-underspecification/
 │   ├── verifications/                  # 14 standalone proposition & robustness runners
 │   ├── llm/                            # Anthropic client with retry, SQLite logging, dry-run
 │   └── experiments_llm/                # Simulated user experiments
-├── tests/                              # Pytest test suite (44 unit & symbolic tests)
+├── tests/                              # Pytest test suite (46 unit & symbolic tests)
 ├── outputs/                            # Generated artifacts (CSVs, high-res PNGs, Markdown)
 └── run_all_math_checks.py              # Master runner executing all 14 mathematical checks
 ```
