@@ -1,6 +1,6 @@
 # underspec_sim
 
-Numerical verification, simulation, and LLM-driven experimentation framework for the formal Stackelberg-game model of **strategic under-specification** in AI coding assistants, based on [*Strategic Under-Specification: A Stackelberg Game Between User and Assistant (v3)*](strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
+Numerical verification, simulation, and LLM-driven experimentation framework for the formal Stackelberg-game model of **strategic under-specification** in AI coding assistants, based on [*Strategic Under-Specification: A Stackelberg Game Between User and Assistant (v4)*](strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
 
 ---
 
@@ -190,8 +190,8 @@ strategic-underspecification/
 ├── LICENSE                             # Dual license: MIT (Software) & CC-BY-4.0 (Manuscript)
 ├── CITATION.cff                        # Machine-readable citation metadata for GitHub
 ├── pyproject.toml                      # Package configuration & dependencies
-├── strategic_underspecification_v3.tex  # Full LaTeX source of the paper (v3)
-├── strategic_underspecification_v3.pdf  # Compiled preprint of the paper (v3)
+├── strategic_underspecification_v4.tex  # Full LaTeX source of the paper (v4)
+├── strategic_underspecification_v3.pdf  # Compiled preprint of the paper
 ├── underspec_sim/                      # Core simulation & verification package
 │   ├── core/                           # Primitives, payoffs, best-response, first-best
 │   ├── model1_pooling/                 # Quadratic pooling payoff & closed-form solver

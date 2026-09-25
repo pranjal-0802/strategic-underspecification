@@ -108,7 +108,7 @@ its first-order response to $g$ has no first-order effect on $U^*$.
 \end{proof}
 
 \begin{assumption}[Regularity]\label{ass:reg}
-In the relevant range of $m$, $(k-m)\ln q(a,g) \le -1$.
+In the relevant range of $m$, $(k-m)\ln q(a,g) \ge -1$.
 \end{assumption}
 
 \begin{remark}[Interpreting Assumption~\ref{ass:reg}, and what remains unchecked]
@@ -116,32 +116,53 @@ In the relevant range of $m$, $(k-m)\ln q(a,g) \le -1$.
 The condition has no closed-form economic reading on its own; it is a sufficient
 condition for the single-crossing property used in Corollary~\ref{cor:mono} and
 Proposition~\ref{prop:bias} via Topkis's theorem, not a claim about primitives
-directly. Loosely, since $\ln q \approx -(1-q)$ for $q$ near 1, the condition is
-close to $(k-m)(1-q) \ge 1$, i.e., the expected number of \emph{wrong} attributes
-under the current policy is at least one. A numerical audit over
+directly. The direction is pinned down by the cross-partial itself: for fixed $a$,
+\[
+\frac{\partial^2 U}{\partial m\,\partial g} \;=\; -V(1-a)\,q^{\,k-m-1}\Big[(k-m)\ln q + 1\Big],
+\]
+so $U$ has \emph{decreasing differences} in $(m,g)$ --- the condition Topkis's
+theorem needs to conclude $m^*(g)$ is weakly decreasing --- exactly when
+$(k-m)\ln q + 1 \ge 0$, i.e., when Assumption~\ref{ass:reg} holds as stated here.
+(An earlier draft of this assumption had the inequality reversed, which instead
+gives \emph{increasing} differences and hence $m^*(g)$ weakly \emph{increasing}
+in that region; a direct numerical optimization of $U$ confirms this reversal
+concretely, e.g. at $V{=}10,k{=}5,a{=}0,c(m){=}m^2/2$, $m^*$ rises from
+$\approx0.28$ at $g{=}0.5$ to $\approx0.67$ at $g{=}0.9$ --- both points well
+inside the old, incorrectly-signed condition's region --- before turning over and
+falling as $g\to1$, which is exactly the region the condition as corrected here
+identifies.) Loosely, since $\ln q \approx -(1-q)$ for $q$ near 1, the corrected
+condition is close to $(k-m)(1-q) \le 1$: the expected number of \emph{wrong}
+attributes under the current policy is at most about one. A numerical audit over
 $k\in[5,15]$, $q\in[0.70,0.95]$, and $\kappa\in[0.20,2.00]$ (726 grid points,
-evaluated at each point's own optimizing $m^*$) finds the condition holds in only
-$10.1\%$ of this range, failing in $100\%$ of points with $\kappa\le0.60$ (users
-specify almost everything, so $k-m^*\to0$) and in effectively all points with
-$q\ge0.90$ (guessing is accurate enough that $|\ln q|$ is too small for the bound
-to bind within $k\le15$). This is precisely the regime of a capable, low-friction
-assistant, arguably the empirically relevant case. Two things follow. First, this
-is a statement about a \emph{sufficient} condition, not about the conclusion
-itself: Corollary~\ref{cor:mono} and Proposition~\ref{prop:bias} could still hold
-by a different argument, or could simply fail, outside this region, and the audit
-above does not distinguish these possibilities, since it only evaluates whether
-the sufficient condition holds, not whether $m^*(\kappa)$ or $m^*(g)$ actually
-lose monotonicity when it doesn't. Whether monotonicity survives numerically
-outside the $10.1\%$ region is the immediate next check, and until it is done,
-Corollary~\ref{cor:mono} and Proposition~\ref{prop:bias} should be read as
-formally established only inside that region rather than across the paper's full
-stated working range.
+quadratic cost $c(m)=\kappa m^2/2$, evaluated at each point's own optimizing
+$m^*$) finds the corrected condition holds on roughly $31\%$ of this range under
+that cost specification, concentrated at the higher-$q$, higher-$\kappa$ corner
+(capable assistant, terse-by-cost-averse users) rather than at low $q$; the exact
+share is sensitive to the (unspecified in Section~\ref{sec:baseline}) functional
+form of $c(m)$ and should be re-run against whatever cost function the empirical
+design ultimately commits to. Two things follow regardless of the exact share.
+First, this is a statement about a \emph{sufficient} condition, not about the
+conclusion itself: Corollary~\ref{cor:mono} and Proposition~\ref{prop:bias} could
+still hold by a different argument, or could simply fail, outside this region,
+and the audit above does not distinguish these possibilities, since it only
+evaluates whether the sufficient condition holds, not whether $m^*(\kappa)$ or
+$m^*(g)$ actually lose monotonicity when it doesn't. Second, until that broader
+check is done, Corollary~\ref{cor:mono} and Proposition~\ref{prop:bias} should be
+read as formally established only inside the region identified above rather than
+across the paper's full stated working range.
 \end{remark}
 
 \begin{corollary}\label{cor:mono}
 Under Assumption~\ref{ass:reg}, $m^*(g)$ is weakly decreasing in $g$ (decreasing
 differences in $(m,g)$; Topkis's theorem).
 \end{corollary}
+
+\begin{proof}
+Immediate from the cross-partial computed in Remark~\ref{rmk:assumption1-audit}:
+Assumption~\ref{ass:reg} is exactly the condition $\partial^2U/\partial m\,\partial g \le 0$
+on the relevant range, which is decreasing differences in $(m,g)$; Topkis's
+theorem then gives $m^*(g)$ weakly decreasing.
+\end{proof}
 
 So, holding the assistant's policy fixed, users specify less as the assistant gets
 better at guessing, yet are never worse off for it. We flag explicitly that
@@ -326,13 +347,27 @@ a^{SE} \;=\; -\,\frac{C_0\bar\gamma + \Delta \bar R_0}{2\Delta\bar\gamma}.
 \end{proposition}
 
 \begin{corollary}[Bias shifts the pooling rate]
-$\partial a^{SE}/\partial \lambda_A$ has the sign of $2\bar\gamma a^{SE} - \bar
-R_0$ (by implicit differentiation of the FOC). Under a further regularity
-condition analogous to Assumption~\ref{ass:reg} (the residual $\bar R(a^{SE})$
-stays above half of its $a{=}0$ level), $a^{SE}$ is strictly decreasing in
-$\lambda_A$: an assistant whose training penalizes clarifying questions more than
-users actually mind them ($\lambda_A>c_Q$) sets a strictly lower pooling ask rate
-than an unbiased assistant would.
+Differentiating the closed form in Proposition~\ref{prop:aSE} directly with
+respect to $\lambda_A$ (holding $\mu_A,\Lambda,\bar R_0,\bar\gamma$ fixed) gives,
+on the interior branch $\Delta\bar\gamma>0$,
+\[
+\frac{\partial a^{SE}}{\partial \lambda_A} \;=\; \frac{\mu_A\Lambda}{2(\mu_A\Lambda-\lambda_A)^2}
+\;>\;0 \qquad \text{whenever } \mu_A,\Lambda>0 \text{ and } \lambda_A\ne\mu_A\Lambda,
+\]
+so $a^{SE}$ is strictly \emph{increasing} in $\lambda_A$ throughout the interior
+branch --- the opposite direction from an earlier draft of this corollary, which
+claimed the sign was that of $2\bar\gamma a^{SE}-\bar R_0$ and concluded
+$a^{SE}$ was decreasing; that claim does not match implicit differentiation of
+the leader's own first-order condition and is superseded by the derivative
+above. This comparative static should also be read narrowly: by
+Corollary~\ref{cor:corner}, the interior stationary point is a
+\emph{minimizer} of $\Pi(a)$ whenever $\Delta\bar\gamma\le0$, which includes the
+entire unbiased case, so the interior branch on which this corollary is stated
+is already a departure from the unbiased benchmark, and the corollary describes
+how a (locally optimal, on that branch) interior rate moves with $\lambda_A$,
+not how the \emph{globally} optimal pooling rate moves in general --- for that,
+see the corner comparison in Corollary~\ref{cor:corner-ray} below, which holds
+unconditionally.
 \end{corollary}
 
 \begin{corollary}[Non-identification of the two bias channels in the interior regime]

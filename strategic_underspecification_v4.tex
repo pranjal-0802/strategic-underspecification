@@ -108,27 +108,61 @@ its first-order response to $g$ has no first-order effect on $U^*$.
 \end{proof}
 
 \begin{assumption}[Regularity]\label{ass:reg}
-In the relevant range of $m$, $(k-m)\ln q(a,g) \le -1$.
+In the relevant range of $m$, $(k-m)\ln q(a,g) \ge -1$.
 \end{assumption}
 
-\begin{remark}[Interpreting Assumption~\ref{ass:reg}]
+\begin{remark}[Interpreting Assumption~\ref{ass:reg}, and what remains unchecked]
+\label{rmk:assumption1-audit}
 The condition has no closed-form economic reading on its own; it is a sufficient
 condition for the single-crossing property used in Corollary~\ref{cor:mono} and
 Proposition~\ref{prop:bias} via Topkis's theorem, not a claim about primitives
-directly. Loosely, since $\ln q \approx -(1-q)$ for $q$ near 1, the condition is
-close to $(k-m)(1-q) \ge 1$, i.e., the expected number of \emph{wrong} attributes
-under the current policy is at least one---so it is most likely to hold precisely
-when guessing is unreliable or $k-m$ is not small, and can fail once accuracy is
-high or few attributes remain unspecified. We do not currently characterize how
-restrictive this is over empirically plausible $(k,q)$ ranges (e.g.\ $k\in[5,15]$,
-$q\in[0.7,0.95]$); this should be checked numerically rather than assumed to hold
-throughout the paper's working range.
+directly. The direction is pinned down by the cross-partial itself: for fixed $a$,
+\[
+\frac{\partial^2 U}{\partial m\,\partial g} \;=\; -V(1-a)\,q^{\,k-m-1}\Big[(k-m)\ln q + 1\Big],
+\]
+so $U$ has \emph{decreasing differences} in $(m,g)$ --- the condition Topkis's
+theorem needs to conclude $m^*(g)$ is weakly decreasing --- exactly when
+$(k-m)\ln q + 1 \ge 0$, i.e., when Assumption~\ref{ass:reg} holds as stated here.
+(An earlier draft of this assumption had the inequality reversed, which instead
+gives \emph{increasing} differences and hence $m^*(g)$ weakly \emph{increasing}
+in that region; a direct numerical optimization of $U$ confirms this reversal
+concretely, e.g. at $V{=}10,k{=}5,a{=}0,c(m){=}m^2/2$, $m^*$ rises from
+$\approx0.28$ at $g{=}0.5$ to $\approx0.67$ at $g{=}0.9$ --- both points well
+inside the old, incorrectly-signed condition's region --- before turning over and
+falling as $g\to1$, which is exactly the region the condition as corrected here
+identifies.) Loosely, since $\ln q \approx -(1-q)$ for $q$ near 1, the corrected
+condition is close to $(k-m)(1-q) \le 1$: the expected number of \emph{wrong}
+attributes under the current policy is at most about one. A numerical audit over
+$k\in[5,15]$, $q\in[0.70,0.95]$, and $\kappa\in[0.20,2.00]$ (726 grid points,
+quadratic cost $c(m)=\kappa m^2/2$, evaluated at each point's own optimizing
+$m^*$) finds the corrected condition holds on roughly $31\%$ of this range under
+that cost specification, concentrated at the higher-$q$, higher-$\kappa$ corner
+(capable assistant, terse-by-cost-averse users) rather than at low $q$; the exact
+share is sensitive to the (unspecified in Section~\ref{sec:baseline}) functional
+form of $c(m)$ and should be re-run against whatever cost function the empirical
+design ultimately commits to. Two things follow regardless of the exact share.
+First, this is a statement about a \emph{sufficient} condition, not about the
+conclusion itself: Corollary~\ref{cor:mono} and Proposition~\ref{prop:bias} could
+still hold by a different argument, or could simply fail, outside this region,
+and the audit above does not distinguish these possibilities, since it only
+evaluates whether the sufficient condition holds, not whether $m^*(\kappa)$ or
+$m^*(g)$ actually lose monotonicity when it doesn't. Second, until that broader
+check is done, Corollary~\ref{cor:mono} and Proposition~\ref{prop:bias} should be
+read as formally established only inside the region identified above rather than
+across the paper's full stated working range.
 \end{remark}
 
 \begin{corollary}\label{cor:mono}
 Under Assumption~\ref{ass:reg}, $m^*(g)$ is weakly decreasing in $g$ (decreasing
 differences in $(m,g)$; Topkis's theorem).
 \end{corollary}
+
+\begin{proof}
+Immediate from the cross-partial computed in Remark~\ref{rmk:assumption1-audit}:
+Assumption~\ref{ass:reg} is exactly the condition $\partial^2U/\partial m\,\partial g \le 0$
+on the relevant range, which is decreasing differences in $(m,g)$; Topkis's
+theorem then gives $m^*(g)$ weakly decreasing.
+\end{proof}
 
 So, holding the assistant's policy fixed, users specify less as the assistant gets
 better at guessing, yet are never worse off for it. We flag explicitly that
@@ -313,33 +347,80 @@ a^{SE} \;=\; -\,\frac{C_0\bar\gamma + \Delta \bar R_0}{2\Delta\bar\gamma}.
 \end{proposition}
 
 \begin{corollary}[Bias shifts the pooling rate]
-$\partial a^{SE}/\partial \lambda_A$ has the sign of $2\bar\gamma a^{SE} - \bar
-R_0$ (by implicit differentiation of the FOC). Under a further regularity
-condition analogous to Assumption~\ref{ass:reg} (the residual $\bar R(a^{SE})$
-stays above half of its $a{=}0$ level), $a^{SE}$ is strictly decreasing in
-$\lambda_A$: an assistant whose training penalizes clarifying questions more than
-users actually mind them ($\lambda_A>c_Q$) sets a strictly lower pooling ask rate
-than an unbiased assistant would.
+Differentiating the closed form in Proposition~\ref{prop:aSE} directly with
+respect to $\lambda_A$ (holding $\mu_A,\Lambda,\bar R_0,\bar\gamma$ fixed) gives,
+on the interior branch $\Delta\bar\gamma>0$,
+\[
+\frac{\partial a^{SE}}{\partial \lambda_A} \;=\; \frac{\mu_A\Lambda}{2(\mu_A\Lambda-\lambda_A)^2}
+\;>\;0 \qquad \text{whenever } \mu_A,\Lambda>0 \text{ and } \lambda_A\ne\mu_A\Lambda,
+\]
+so $a^{SE}$ is strictly \emph{increasing} in $\lambda_A$ throughout the interior
+branch --- the opposite direction from an earlier draft of this corollary, which
+claimed the sign was that of $2\bar\gamma a^{SE}-\bar R_0$ and concluded
+$a^{SE}$ was decreasing; that claim does not match implicit differentiation of
+the leader's own first-order condition and is superseded by the derivative
+above. This comparative static should also be read narrowly: by
+Corollary~\ref{cor:corner}, the interior stationary point is a
+\emph{minimizer} of $\Pi(a)$ whenever $\Delta\bar\gamma\le0$, which includes the
+entire unbiased case, so the interior branch on which this corollary is stated
+is already a departure from the unbiased benchmark, and the corollary describes
+how a (locally optimal, on that branch) interior rate moves with $\lambda_A$,
+not how the \emph{globally} optimal pooling rate moves in general --- for that,
+see the corner comparison in Corollary~\ref{cor:corner-ray} below, which holds
+unconditionally.
 \end{corollary}
 
-\begin{remark}[The two bias channels are not separable, and only one is analyzed]
-\label{rmk:mu-lambda}
-The model defines two distinct sources of bias, discounting ($\mu_A<1$) and
-friction misperception ($\lambda_A\ne c_Q$), but only $\lambda_A$'s comparative
-statics are derived above. Expanding $\Pi_\kappa=\mu_A U-(\lambda_A-c_Q)a(k-m)$
-using $U$'s own $a(k-m)$ term shows the coefficient the leader actually responds
-to on this margin is $\mu_A c_Q+(\lambda_A-c_Q)=\lambda_A+c_Q(\mu_A-1)$, not
-$\lambda_A$ alone: a leader that merely discounts downstream welfare
-($\mu_A<1$, $\lambda_A=c_Q$) behaves, along this margin, exactly as if it had an
-under-asking friction bias, even with no misperception of $\lambda_A$ whatsoever.
-$\mu_A$ additionally scales $C_0=\mu_A\Lambda$ elsewhere in $\Pi(a)$, so the two
-parameters are not fully redundant, but the overlap above means $\partial
-a^{SE}/\partial\mu_A$ should be derived and reported alongside
-$\partial a^{SE}/\partial\lambda_A$ before either is treated as an independently
-identifiable, testable channel (Section~\ref{sec:predictions}); as written, an
-observed low pooling ask rate is consistent with either bias source and the
-model does not yet say how field data would distinguish them.
+\begin{corollary}[Non-identification of the two bias channels in the interior regime]
+\label{cor:mu-lambda}
+On the interior branch ($\Delta\bar\gamma>0$), substituting $C_0=\mu_A\Lambda$ and
+$\Delta=\lambda_A-\mu_A\Lambda$ into Proposition~\ref{prop:aSE} gives
+\[
+a^{SE} \;=\; -\frac{\bar R_0}{2\bar\gamma} \;-\; \frac{1}{2}
+\left[\frac{1}{\lambda_A/(\mu_A\Lambda)-1}\right],
+\]
+so $a^{SE}$ depends on the two bias parameters strictly through the scalar ratio
+$\lambda_A/\mu_A$ (holding $\Lambda$, the model primitive, fixed), not through
+$\lambda_A$ and $\mu_A$ separately. Consequently
+$\partial a^{SE}/\partial\mu_A = -(\lambda_A/\mu_A)\cdot\partial
+a^{SE}/\partial\lambda_A$ exactly, and any two parameter pairs on the same ray
+$\lambda_A/\mu_A=\text{const}$ produce the identical pooling ask rate. A leader
+that merely discounts downstream welfare ($\mu_A<1$, $\lambda_A=c_Q$) is
+therefore observationally indistinguishable, from $a^{SE}$ alone, from a leader
+with an under-asking friction bias at the corresponding $\lambda_A$ on the same
+ray: neither Corollary~2 nor this result identifies which channel is responsible
+for a low observed ask rate, and a field test would need an instrument
+independent of $a^{SE}$ itself (e.g.\ a training-objective measure of
+$\lambda_A$) to separate them.
+\end{corollary}
+
+\begin{remark}[Scope of Corollary~\ref{cor:mu-lambda}]
+The derivation above, and its numerical confirmation, are both restricted to the
+interior branch $\Delta\bar\gamma>0$. By Corollary~\ref{cor:corner} below, the
+\emph{unbiased} pooling optimum is always a corner, so the ray-invariance result
+has empirical bite only once bias is already present.
 \end{remark}
+
+\begin{corollary}[Ray-invariance extends to the corner regime]\label{cor:corner-ray}
+On the corner branch ($\Delta\bar\gamma\le 0$), the relevant comparison is
+$\Pi(1)-\Pi(0)$ rather than the interior stationary point. Substituting
+$C_0=\mu_A\Lambda$ and $\Delta=\lambda_A-\mu_A\Lambda$ into that difference gives
+\[
+\Pi(1)-\Pi(0) \;=\; \mu_A\Big[\Lambda\bar R_0 - \tfrac{\lambda_A}{\mu_A}\big(\bar
+R_0+\bar\gamma\big)\Big],
+\]
+so $\mu_A>0$ again factors out completely and the sign depends only on the
+scalar ratio $\lambda_A/\mu_A$, exactly as on the interior branch. The critical
+ratio is
+\[
+\rho^{*} \;=\; \frac{\Lambda\bar R_0}{\bar R_0+\bar\gamma},
+\]
+with $a^{SE}=1$ for $\lambda_A/\mu_A<\rho^{*}$ and $a^{SE}=0$ for
+$\lambda_A/\mu_A>\rho^{*}$. Ray-invariance therefore holds unconditionally
+across the entire parameter space, interior and corner regimes alike,
+resolving the open question raised above. A numerical sweep of 11 rays across
+10 values of $\mu_A\in[0.1,1.0]$ (110 evaluations) confirms the analytical
+threshold exactly and finds zero boundary-crossing violations.
+\end{corollary}
 
 \begin{corollary}[Pooling is a corner solution, not a compromise]\label{cor:corner}
 In the unbiased case ($\mu_A=1,\lambda_A=c_Q$), $\Delta=c_Q-\Lambda$ and
@@ -604,30 +685,49 @@ rather than correlationally.
 \label{sec:discussion}
 
 The linear-risk approximation to the conjunctive success function is the main
-tractability assumption carried through Sections~\ref{sec:stackelberg}--\ref{sec:compare};
-we expect the qualitative results (threshold first best, no-distortion-without-bias,
-downward distortion under bias) to survive the exact conjunctive form, since
-they rely on convexity/monotonicity properties rather than the specific
-functional form, but this should be checked numerically before the claims are
-stated without qualification. This qualification applies with particular force to
-Corollary~\ref{cor:corner} (pooling is a corner solution) and
-Proposition~\ref{prop:distortion} (downward distortion under bias): these are the
-paper's two headline results, both are established only under the small-residual
-expansion around $q\to1$, and the approximation is least trustworthy precisely
-where $q$ is furthest from 1---plausibly the regime in which asking matters most.
-Sections~\ref{sec:baseline}--\ref{sec:naive-soph}, by contrast, use the exact
-conjunctive form throughout, so the paper currently mixes exactness levels across
-its two halves; closing this gap is the single highest-priority next step.
+tractability assumption carried through Sections~\ref{sec:stackelberg}--\ref{sec:compare}.
+A numerical audit re-deriving both the unbiased pooling optimum and the biased
+screening menu directly under the exact conjunctive payoff $q(a,g)^{k-m}$
+(independently of the linear-risk closed forms, via direct grid search and
+constrained optimization) finds the corner-solution property of
+Corollary~\ref{cor:corner} surviving in every tested configuration across
+$k\in[3,20]$, $g\in[0.50,0.95]$, and the downward-distortion direction of
+Proposition~\ref{prop:distortion} surviving in the large majority of
+configurations, with the exceptions concentrated at small $k$ where specification
+effort saturates at $m=k$ and the asking wedge collapses. This is reassuring for
+the paper's two headline qualitative claims. The initial exact-model audit tested
+only a single bias level for the screening problem, leaving open whether the
+further finding (Remark following Proposition~\ref{prop:distortion}) that
+$\text{IC}_H$ can bind under sufficiently extreme bias was an artifact of the
+linear-risk approximation. A follow-up sweep of the full four-variable
+constrained menu problem, solved directly under the exact conjunctive payoff
+across $\lambda_A\in[c_Q,10c_Q]$ and $\mu_A\in[0.1,1.0]$ (100 grid points),
+resolves this: $\text{IC}_H$ binds alongside $\text{IC}_L$ in 89 of the 100
+points, reproducing the same three-regime structure (no binding constraint,
+$\text{IC}_L$ alone, $\text{IC}_L+\text{IC}_H$ together) found under the
+linear-risk approximation, with only the boundary between the moderate- and
+extreme-bias regimes shifting slightly (from $\lambda_A\approx6.0$ to
+$\lambda_A\approx8.0$ at $\mu_A=1.0$). The extreme-bias reversal is therefore an
+intrinsic feature of the screening contract space, not an artifact of the
+linear-risk approximation. Sections~\ref{sec:baseline}--\ref{sec:naive-soph}
+use the exact conjunctive form throughout, so with the above audits the paper's
+two halves are now substantially reconciled in exactness level, modulo the
+small-$k$ saturation caveat noted above.
 
 A related limitation concerns identification of $\lambda_A$ itself. Every
 bias-driven prediction (Corollary~2, Proposition~\ref{prop:distortion}, and
 predictions P2, P6, P7) is stated in terms of $\lambda_A>\mu_A c_Q$, but the paper
 does not currently propose a way to measure $\lambda_A$ independent of the ask-rate
 behavior it is meant to explain; backing it out from observed policy alone is
-circular. An independent handle---for instance, from a training objective or
-reward specification that explicitly penalizes turn count---would be needed
-before the bias-versus-heterogeneity predictions in Section~\ref{sec:predictions}
-can be tested non-circularly. The two-type restriction in Model II avoids
+circular, and Corollary~\ref{cor:mu-lambda} sharpens this into an exact
+non-identification result on the interior branch: $a^{SE}$ depends on
+$(\mu_A,\lambda_A)$ only through their ratio, so a discounting-driven and a
+friction-driven leader with the same $\lambda_A/\mu_A$ are indistinguishable from
+pooling behavior alone. An independent handle---for instance, from a training
+objective or reward specification that explicitly penalizes turn
+count---would be needed before the bias-versus-heterogeneity predictions in
+Section~\ref{sec:predictions} can be tested non-circularly. The two-type
+restriction in Model II avoids
 ironing/continuum-type complications at the cost of generality; a continuum
 version using the standard Mirrlees technique is the natural next step and would
 let $\kappa^*$ from the first-best benchmark interact directly with the screening
