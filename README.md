@@ -1,6 +1,6 @@
-# underspec_sim
+# Strategic Under-Specification
 
-Numerical verification, simulation, and LLM-driven experimentation framework for the formal Stackelberg-game model of **strategic under-specification** in AI coding assistants, based on [*Strategic Under-Specification: A Stackelberg Game Between User and Assistant*](paper/strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
+Numerical verification, simulation, and LLM-based experimentation framework for [*"Strategic Under-Specification: A Stackelberg Game Between User and Assistant"*](paper/strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
 
 ---
 
