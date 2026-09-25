@@ -72,3 +72,23 @@ Following the updates to the foundational paper [*Strategic Under-Specification:
   - Prop 5 (Screening Recovers First Best): **PASS**
   - Prop 6 (Screening Distortion Under Bias): **PASS**
 - Process exits with return code `0`.
+
+---
+
+## 6. Strategic Underspecification v2 Robustness Checks Added
+
+- **`verify_exact_conjunctive.py` (Task 1 Robustness):**
+  - Swept $k \in [3, 20]$ and $g \in [0.50, 0.95]$ under exact non-linear success probability $q(a,g)^{k-m}$.
+  - Confirmed Corollary 3 corner-solution property ($a^{SE} \in \{0, 1\}$) survives in **100% of tested grid points**; no interior compromise emerged.
+  - Confirmed Proposition 6 downward distortion ($a_H^{SB} < a_H^B$) and slack $\text{IR}_H$ survive under exact conjunctive payoffs.
+  - Verdict: **CAUTION** (Headline properties survive; boundary saturation at low $k \le 5$ dampens distortion).
+- **`verify_assumption1.py` (Task 2 Robustness):**
+  - Characterized Assumption 1 ($(k-m^*)\ln q \le -1$) across $(k, q, \kappa) \in [5, 15] \times [0.70, 0.95] \times [0.20, 2.00]$.
+  - Found assumption holds in **10.1%** of grid points; fails when accuracy is high ($q \ge 0.90$) or user specification costs are low ($\kappa \le 0.60$).
+  - Verdict: **CAUTION** (Confirms the paper's Remark 1 that Assumption 1 is restrictive).
+- **`verify_mu_comparative_statics.py` (Task 3 Robustness):**
+  - Derived and numerically confirmed the analytical ratio $\frac{\partial a^{SE}/\partial\mu_A}{\partial a^{SE}/\partial\lambda_A} = -\frac{\lambda_A}{\mu_A}$.
+  - Plotted level curves showing that discounting ($\mu_A < 1$) and friction misperception ($\lambda_A > c_Q$) produce identical pooling ask rates along rays of constant $\lambda_A / \mu_A$.
+  - Verdict: **PASS** (Confirms Remark `rmk:mu-lambda`).
+- **Added 10 new pytest tests** in `tests/test_exact_conjunctive.py`, `tests/test_assumption1.py`, and `tests/test_mu_comparative_statics.py` (total test suite: 33 tests, 100% passing).
+

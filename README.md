@@ -38,6 +38,9 @@ underspec_sim/
 | **Sec 6.3** | **Prop 6** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `prop6_screening_biased.csv`, `.png`, `.md`, `prop6_bias_sweep_active_constraints.csv`, `.png` | **PASS** *(active set characterized)* |
 | **Sec 6.3** | **Remark** (Heterogeneity vs Bias Separability) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** |
 | **Sec 7** | **Cor 4** (Dominance of Menus over Pooling) | `underspec_sim/verifications/compare_regimes_runner.py` | `tests/test_comparison.py` | `regime_comparison.csv`, `.png`, `.md` | **PASS** |
+| **Robustness 1** | **Exact vs Linear-Risk Conjunctive Model** | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner survives 100%; boundary saturation at low k)* |
+| **Robustness 2** | **Assumption 1 Regularity Characterization** | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(holds in 10.1%; restrictive for q>0.9 or low kappa)* |
+| **Robustness 3** | **$\mu_A$ Comparative Statics & Confound** | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(Remark rmk:mu-lambda verified: ratio = -lambda/mu)* |
 
 ---
 
@@ -63,9 +66,27 @@ The numerical simulations verified the core mechanics and informed the paper's t
 - **Active Constraint Set Audit:**
   - In representative bias regions ($\lambda_A = 4.0, \mu_A = 1.0$), **$\text{IC}_L$ binds alone**; $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ are strictly slack.
   - *Economic Intuition:* Unlike classical Baron--Myerson transfer models where the principal pays cash rents, here $\Pi_{\kappa_H}$ directly contains user utility $\mu_A U(\cdot;\kappa_H)$. The leader has no rent-minimization incentive to push $U_H$ down to $\underline{U}$.
-- **Task 4 Extended Sweep (100 configurations in $(\lambda_A, \mu_A)$ plane):**
+- **Extended Sweep (100 configurations in $(\lambda_A, \mu_A)$ plane):**
   - **Does $\text{IR}_H$ ever bind?** **NO** (Slack $\ge 75.0$ everywhere; binds in 0/100 points).
   - **Does $\text{IC}_H$ ever bind?** **YES** (Under extreme friction $\lambda_A \ge 6.0$ or low altruism $\mu_A \le 0.5$, $\text{IC}_H$ binds alongside $\text{IC}_L$, confirming the paper's caveat in Remark 2).
+
+### 3. Exact Conjunctive Robustness (Task 1)
+- Evaluated whether headline results survive replacing the linear-risk approximation $L(1-q)(k-m)$ with the exact conjunctive probability $q(a,g)^{k-m}$:
+  - **Unbiased Pooling Corner Property:** Survives in **100% of tested $(k, g) \in [3, 20] \times [0.50, 0.95]$ configurations** ($a^{SE}_{\text{exact}} \in \{0, 1\}$). No interior compromise emerged anywhere.
+  - **Screening Downward Distortion:** Survives with $a_H^{SB} < a_H^B$ whenever $m$ does not saturate at $k$ (strict in 66.7% of grid, weak in 100%). $\text{IR}_H$ remains strictly slack everywhere.
+
+### 4. Regularity Assumption 1 Characterization (Task 2)
+- Evaluated $(k - m^*)\ln q \le -1$ across $(k, q, \kappa) \in [5, 15] \times [0.70, 0.95] \times [0.2, 2.0]$:
+  - **Satisfaction Rate:** Holds in only **10.1%** of the grid.
+  - Fails when users have low specification costs ($\kappa \le 0.60$) because $m^* \to k \implies (k-m^*)\ln q \to 0 > -1$.
+  - Fails when accuracy is high ($q \ge 0.90$) because satisfying the bound requires $k-m^* \ge 1/|\ln q| \ge 20$, exceeding the attribute budget $k \le 15$.
+  - Holds when guessing is noticeably noisy ($q \le 0.85$) and users have high specification costs ($\kappa \ge 1.0$).
+
+### 5. $\mu_A$ Comparative Statics & Confounding (Task 3)
+- Derived the exact relationship between the two bias channels in pooling:
+  $$\frac{\partial a^{SE} / \partial \mu_A}{\partial a^{SE} / \partial \lambda_A} = -\frac{\lambda_A}{\mu_A}$$
+- Level curves of $a^{SE}$ form constant rays along $\lambda_A / \mu_A = \text{constant}$.
+- Proves Remark `rmk:mu-lambda`: an assistant with discounting ($\mu_A < 1$) behaves identically along the ask-rate margin to an assistant with friction misperception ($\lambda_A > c_Q$). The two parameters are observationally confounded from $a^{SE}$ alone.
 
 ---
 
