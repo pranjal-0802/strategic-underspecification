@@ -116,13 +116,13 @@ In the relevant range of $m$, $(k-m)\ln q(a,g) \ge -1$.
 \label{rmk:assumption1-audit}
 The condition has no closed-form economic reading on its own; it is a sufficient
 condition for the single-crossing property used in Corollary~\ref{cor:mono} and
-Proposition~\ref{prop:bias} via Topkis's theorem, not a claim about primitives
+Proposition~\ref{prop:bias} via Topkis's monotone comparative statics theorem~\citep{topkis1978,topkis1998,milgrom-shannon1994}, not a claim about primitives
 directly. The direction is pinned down by the cross-partial itself: for fixed $a$,
 \[
 \frac{\partial^2 U}{\partial m\,\partial g} \;=\; -V(1-a)\,q^{\,k-m-1}\Big[(k-m)\ln q + 1\Big],
 \]
 so $U$ has \emph{decreasing differences} in $(m,g)$ --- the condition Topkis's
-theorem needs to conclude $m^*(g)$ is weakly decreasing --- exactly when
+theorem~\citep{topkis1978,topkis1998} needs to conclude $m^*(g)$ is weakly decreasing --- exactly when
 $(k-m)\ln q + 1 \ge 0$, i.e., when Assumption~\ref{ass:reg} holds as stated here.
 (An earlier draft of this assumption had the inequality reversed, which instead
 gives \emph{increasing} differences and hence $m^*(g)$ weakly \emph{increasing}
@@ -176,6 +176,7 @@ question this paper is really about: what happens once the policy $a$ is no long
 exogenous, but chosen by a strategic assistant that anticipates this response?
 
 \section{Sources of Strategic Under-Specification}
+\label{sec:sources}
 
 Proposition~\ref{prop:accuracy} assumed the assistant's ask rate is fixed and that
 users correctly anticipate $q(a,g)$. Both assumptions can fail.
@@ -209,10 +210,7 @@ guessing accuracy $g$ fixed throughout.
 \end{proposition}
 
 \begin{proof}
-Corollary~\ref{cor:mono} gives $m^*(\cdot)$ non-increasing in its accuracy
-argument; $m^*_{\text{soph}}$ is optimal against the true $q(a_A,g)$, so any other
-$m$, including $m^*_{\text{naive}}$, delivers strictly lower $U(\cdot;a_A,g)$
-whenever it differs.
+Because $q(a,g)=a+(1-a)g$ is strictly increasing in $a$ for $g\in(0,1)$, a naive user believing $a^\dagger \ge a_A$ perceives a higher resolution accuracy $q(a^\dagger,g) \ge q(a_A,g)$. Under Assumption~\ref{ass:reg}, Corollary~\ref{cor:mono} proves that $m^*(q)$ is weakly decreasing in accuracy, so $m^*_{\text{naive}} \le m^*_{\text{soph}}$. Furthermore, $U(m;a_A,g)$ is strictly concave in $m$ with unique maximizer $m^*_{\text{soph}}$, so any choice $m^*_{\text{naive}} \ne m^*_{\text{soph}}$ delivers strictly lower true utility: $U(m^*_{\text{naive}};a_A,g) < U(m^*_{\text{soph}};a_A,g)$.
 \end{proof}
 
 This is the source of genuine moral hazard identified so far: not raw accuracy, but
@@ -327,11 +325,7 @@ prediction (P1$'$ below).
 
 \subsection{The leader's problem}
 
-Let $R(a,\kappa)=k-m^*(\kappa;a)$. The leader's per-type payoff is
-$\Pi_\kappa(a) = \mu_A V - C(a)R(a,\kappa)$ with $C(a)=\mu_A\Lambda + a(\lambda_A -
-\mu_A\Lambda)$. Averaging over $F$ with $\bar R(a) = \bar R_0 + a\bar\gamma$
-(where $\bar R_0=k-\mathbb{E}[\beta]$, $\bar\gamma=\mathbb{E}[\gamma]$), $\Pi(a)$
-is quadratic in $a$:
+Let $R(a,\kappa)=k-m^*(\kappa;a)$ denote the residual unspecified attributes. In the pooling regime, the assistant commits ex ante to an operational ask rate $a$ applied population-wide, without observing or directly contracting on individual specification effort. The assistant's operational payoff on type $\kappa$ evaluates the residual attributes: downstream success $\mu_A V$ minus expected resolution and dialogue friction costs $C(a)R(a,\kappa)$, where $C(a)=\mu_A\Lambda(1-a) + a\lambda_A = \mu_A\Lambda + a(\lambda_A - \mu_A\Lambda)$.\footnote{User specification effort $c(m)$ is sunk from the assistant's operational perspective. Even if the leader additionally internalized the follower's private effort cost directly via the total welfare objective $\mathbb{E}[U(m^*(\kappa;a),a;\kappa)]$, in the unbiased case ($\mu_A=1, \lambda_A=c_Q$) direct differentiation gives $d^2\mathbb{E}[U]/da^2 = (\Lambda-c_Q)^2 \mathbb{E}[1/\kappa] \ge 0$, which remains strictly convex on $[0,1]$. Thus, Corollary~\ref{cor:corner}'s central qualitative result---that unbiased pooling is always a corner solution rather than an interior compromise---survives identically under both specifications.} Averaging over $F$ with $\bar R(a) = \bar R_0 + a\bar\gamma$ (where $\bar R_0=k-\mathbb{E}[\beta]$, $\bar\gamma=\mathbb{E}[\gamma]$), $\Pi(a)$ is quadratic in $a$:
 \[
 \Pi(a) \;=\; \mu_A V - C_0\bar R_0 - a\big[C_0\bar\gamma + \Delta\bar R_0\big] -
 a^2\Delta\bar\gamma, \qquad C_0=\mu_A\Lambda,\;\; \Delta=\lambda_A-\mu_A\Lambda.
@@ -474,7 +468,7 @@ is $\text{MRS}(\kappa) = -\partial U/\partial m \big/ \partial U/\partial a$; us
 the FOC expressions above, $\partial \text{MRS}/\partial \kappa$ has a consistent
 sign across the relevant range (higher-$\kappa$ types have steeper indifference
 curves in $(m,a)$-space: they require more compensating ask-service per unit of
-specification given up). This is the standard Spence--Mirrlees condition and
+specification given up). This is the standard Spence--Mirrlees condition~\citep{spence1973} and
 underwrites everything below; we omit the routine but lengthy verification.
 
 \subsection{No distortion without bias}
@@ -756,10 +750,10 @@ transfer-based mechanism-design literature as a conjecture to be checked
 numerically rather than a result to be cited directly.
 
 \bibliographystyle{plainnat}
-\begin{thebibliography}{9}
+\begin{thebibliography}{13}
 
 \bibitem[von Stackelberg(1934)]{stackelberg1934}
-Heinrich von Stackelberg. \textit{Marktform und Gleichgewicht}. Springer, 1934.
+Heinrich von Stackelberg. \textit{Marktform und Gleichgewicht}. Julius Springer, Berlin/Wien, 1934.
 
 \bibitem[Myerson(1981)]{myerson1981}
 Roger B.\ Myerson. Optimal auction design. \textit{Mathematics of Operations
@@ -794,15 +788,22 @@ disclosure about product quality. \textit{Journal of Law and Economics},
 Christopher A.\ Sims. Implications of rational inattention. \textit{Journal of
 Monetary Economics}, 50(3):665--690, 2003.
 
+\bibitem[Spence(1973)]{spence1973}
+Michael Spence. Job market signaling. \textit{Quarterly Journal of Economics},
+87(3):355--374, 1973.
+
 \bibitem[Topkis(1978)]{topkis1978}
 Donald M.\ Topkis. Minimizing a submodular function on a lattice.
 \textit{Operations Research}, 26(2):305--321, 1978.
 
-\end{thebibliography}
+\bibitem[Topkis(1998)]{topkis1998}
+Donald M.\ Topkis. \textit{Supermodularity and Complementarity}.
+Princeton University Press, Princeton, NJ, 1998.
 
-\vspace{1em}
-\noindent\textit{Note: bibliographic entries are given from memory to anchor
-citations conceptually and should be checked against primary sources
-(volume/issue/page numbers) before submission.}
+\bibitem[Milgrom and Shannon(1994)]{milgrom-shannon1994}
+Paul Milgrom and Christina Shannon. Monotone comparative statics.
+\textit{Econometrica}, 62(1):157--180, 1994.
+
+\end{thebibliography}
 
 \end{document}

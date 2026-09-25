@@ -97,22 +97,19 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     plt.savefig(png_path, dpi=150)
     plt.close()
 
-    # Check monotonicity in heterogeneity
-    mono_in_het = True
-    for b in bias_values:
-        sub = df[df["bias"] == b].sort_values("delta_kappa")
-        diffs = np.diff(sub["distortion"])
-        if np.any(diffs < -1e-3):
-            mono_in_het = False
+    # Check downward distortion whenever type H's biased benchmark prefers asking (a_H_B = 1)
+    sub_h_asks = df[df["a_H_B"] > 0.5]
+    downward_when_asks = bool((sub_h_asks["distortion"] >= -1e-4).all()) if len(sub_h_asks) > 0 else True
 
     # Check dominance
     all_dominate = bool((df["payoff_gap"] >= -1e-4).all())
     regimes_count = df["pooling_regime"].value_counts().to_dict()
 
-    passed = True
+    passed = bool(all_dominate and downward_when_asks)
+    verdict = "PASS" if passed else "FAIL"
     md_content = fr"""# Verification Report: Heterogeneity vs Bias Distortion & Welfare Sweep
 
-**Status:** **PASS**
+**Status:** **{verdict}**
 
 ### 1. Analysis of Section 7 Remark (Separability / Compounding):
 - **Heterogeneity Range:** $\\Delta\\kappa \\in [{df['delta_kappa'].min():.2f}, {df['delta_kappa'].max():.2f}]$.
@@ -140,7 +137,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     return {
         "sweep": "distortion_2d",
         "passed": passed,
-        "mono_in_het": mono_in_het,
+        "downward_when_asks": downward_when_asks,
         "all_dominate": all_dominate,
         "csv_path": csv_path,
         "png_path": png_path,

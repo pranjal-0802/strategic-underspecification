@@ -132,8 +132,8 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
         f.write(md_content)
 
     return {
-        "verdict": "CAUTION",
-        "passed": True,
+        "verdict": "CAUTION" if 0.80 <= holds_fraction <= 0.95 else "FAIL",
+        "passed": 0.80 <= holds_fraction <= 0.95,
         "holds_fraction": holds_fraction,
         "holds_count": holds_count,
         "legacy_holds_count": legacy_count,

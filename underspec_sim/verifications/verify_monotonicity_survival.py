@@ -281,7 +281,8 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     # When Ass1 holds ((k-m)ln q <= -1), the cross-partial is positive (increasing differences),
     # causing monotonicity to FAIL. Outside Ass1 ((k-m)ln q >= -1), decreasing differences holds
     # and monotonicity survives 100%.
-    verdict = "CAUTION"  # Indicates critical finding on the mathematical formulation of Assumption 1
+    passed = bool(cross_tab_mono["ass1_fails_mono_fails"] == 0)
+    verdict = "CAUTION" if passed else "FAIL"  # Indicates critical finding on the mathematical formulation of Assumption 1
 
     # Generate Markdown Report
     md_content = f"""# Verification Report: Monotonicity Survival Outside Assumption 1
@@ -353,6 +354,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 
     return {
         "verdict": verdict,
+        "passed": passed,
         "total_pairs": total_pairs,
         "ass1_fails_total": ass1_fails_total,
         "ass1_fails_mono_holds": cross_tab_mono["ass1_fails_mono_holds"],

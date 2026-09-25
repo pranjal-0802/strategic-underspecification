@@ -164,7 +164,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     max_ratio_err = float(df_mu[df_mu["regime"] == "interior"]["ratio_error"].max())
     ratios_match = bool(max_ratio_err < 1e-2)
 
-    verdict = "PASS"
+    verdict = "PASS" if ratios_match else "FAIL"
 
     md_content = f"""# Robustness Report: $\\mu_A$ Comparative Statics & Bias Confounding
 

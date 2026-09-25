@@ -379,7 +379,12 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 
     # Verdict:
     # If corner solution survives 100% and downward distortion survives in relevant range, PASS / CAUTION
-    verdict = "PASS" if corner_rate >= 0.99 and downward_dist_rate >= 0.80 else "CAUTION"
+    if corner_rate >= 0.99 and downward_dist_rate >= 0.60:
+        verdict = "PASS" if downward_dist_rate >= 0.80 else "CAUTION"
+        passed = True
+    else:
+        verdict = "FAIL"
+        passed = False
 
     md_content = fr"""# Robustness Report: Exact Conjunctive Model vs. Linear-Risk Approximation
 
@@ -415,7 +420,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 
     return {
         "verdict": verdict,
-        "passed": (verdict in ("PASS", "CAUTION")),
+        "passed": passed,
         "corner_rate": corner_rate,
         "downward_dist_rate": downward_dist_rate,
         "ir_h_never_binds": ir_h_never_binds,

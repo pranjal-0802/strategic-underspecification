@@ -171,7 +171,7 @@ def main():
         "item": "Foll 1",
         "name": "Monotonicity Survival (Assump 1)",
         "verdict": res_mono_surv["verdict"],
-        "passed": True,
+        "passed": res_mono_surv["passed"],
         "note": f"Mono survives 100% outside Ass1 ({res_mono_surv['ass1_fails_mono_holds']}/{res_mono_surv['ass1_fails_total']}); Ass1 inequality mathematically flipped",
     })
 
@@ -193,7 +193,7 @@ def main():
         "item": "Foll 3",
         "name": "Exact Bias Sweep & IC_H Binding",
         "verdict": res_exact_sweep["verdict"],
-        "passed": True,
+        "passed": res_exact_sweep["passed"],
         "note": f"Extreme-bias reversal confirmed under exact payoff: IC_H binds in {res_exact_sweep['both_ic_count']}/{res_exact_sweep['total_points']} points",
     })
 

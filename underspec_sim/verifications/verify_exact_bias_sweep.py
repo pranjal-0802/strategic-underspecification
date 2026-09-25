@@ -283,7 +283,8 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     # The paper's caveat stated: "IC_H could plausibly bind under extreme bias".
     # Since IC_H indeed binds under extreme bias in the exact conjunctive payoff,
     # the paper's caveat is verified on the tested grid.
-    verdict = "PASS"
+    passed = bool(both_ic_count > 0)
+    verdict = "PASS" if passed else "FAIL"
 
     # Generate Markdown Report
     md_content = f"""# Verification Report: Constraint Binding Under Exact Conjunctive Payoff
@@ -348,6 +349,7 @@ The extreme-bias binding of $\\text{{IC}}_H$ is NOT an artifact of the linear-ri
 
     return {
         "verdict": verdict,
+        "passed": passed,
         "total_points": total_points,
         "none_active_count": none_active_count,
         "ic_l_only_count": ic_l_only_count,
