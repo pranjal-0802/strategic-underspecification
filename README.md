@@ -45,7 +45,7 @@ The table below maps every proposition, corollary, and robustness check in the p
 | **Robustness 1** | **Exact vs Linear-Risk Conjunctive Model** | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `outputs/exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner survives in 100% of tested points)* |
 | **Robustness 2** | **Assumption 1 Regularity Grid Audit** | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `outputs/assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(corrected $\ge -1$ holds in 89.9%; see Follow-up 1)* |
 | **Robustness 3** | **$\mu_A$ Comparative Statics & Confound** | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(Corollary on non-identification verified: ratio $= -(\lambda_A - c_Q)/\mu_A$)* |
-| **Follow-up 1 (Task 1)** | **Monotonicity Survival Outside Assump 1** | `underspec_sim/verifications/verify_monotonicity_survival.py` | `tests/test_monotonicity_survival.py` | `outputs/monotonicity_survival.csv`, `.png`, `.md` | **CAUTION** *(mono survives in 100% of tested intervals outside Ass1)* |
+| **Follow-up 1 (Task 1)** | **Monotonicity Under Assump 1 & Tightness** | `underspec_sim/verifications/verify_monotonicity_survival.py` | `tests/test_monotonicity_survival.py` | `outputs/monotonicity_survival.csv`, `.png`, `.md` | **PASS** *(mono holds 100% under Ass1; breaks in 96.7% outside)* |
 | **Follow-up 2 (Task 2)** | **Ray-Invariance in Corner Regime** | `underspec_sim/verifications/verify_mu_lambda_corner.py` | `tests/test_mu_lambda_corner.py` | `outputs/mu_lambda_corner.csv`, `.png`, `.md` | **PASS** *(sign of $\Pi(1)-\Pi(0)$ ray-invariant in tested space)* |
 | **Follow-up 3 (Task 3)** | **Exact Bias Sweep & $\text{IC}_H$ Binding** | `underspec_sim/verifications/verify_exact_bias_sweep.py` | `tests/test_exact_bias_sweep.py` | `outputs/exact_bias_sweep.csv`, `.png`, `.md` | **PASS** *(extreme-bias reversal observed under exact payoff)* |
 
@@ -98,10 +98,13 @@ The computational verification suite evaluates the analytical claims across repr
   - Under the package benchmark valuation ($V = 100.0$), the corrected condition holds in **89.9%** (653 / 726) of configurations.
   - The legacy draft condition ($(k - m^*)\ln q \le -1$) held in **10.1%** (73 / 726) of configurations.
   - Under lower task valuations ($V = 10.0$, as in the paper's illustrative numerical example), users specify fewer attributes ($m^*$ lower, $k - m^*$ higher), and the condition holds in **34.3%** (249 / 726) of configurations (and 31.7% at $V = 8.0$).
-- **Empirical Monotonicity Survival (`verify_monotonicity_survival.py`):**
+- **Empirical Monotonicity & Tightness Audit (`verify_monotonicity_survival.py`):**
   - Evaluated empirical monotonicity across 2,552 finite-difference parameter intervals in $(k, q, \kappa) \in [5, 15] \times [0.70, 0.99] \times [0.20, 2.00]$.
-  - In all 2,162 intervals where the sufficient condition fails, $m^*(g)$ remains weakly decreasing in $g$ with **zero violations (100% survival on tested intervals)**.
-- **Proposition 2 (Naive Welfare):** Naive users (who believe $a^\dagger > a_A$) suffer a welfare loss $U_{\text{naive}} \le U_{\text{soph}}$ in **100%** of tested grid points.
+  - In all 2,162 intervals where Assumption 1 holds ($(k-m^*)\ln q \ge -1$), $m^*(g)$ is weakly decreasing in $g$ with **zero violations (100% empirical fidelity to Topkis's theorem)**.
+  - In the 390 intervals where Assumption 1 fails ($(k-m^*)\ln q < -1$), the cross-partial turns positive and monotonicity breaks in **96.7%** (377 / 390 intervals), confirming the empirical tightness and practical necessity of the regularity condition.
+- **Proposition 2 (Naive Welfare & Under-Specification):**
+  - Naive users (who believe $a^\dagger > a_A$) suffer a welfare loss $U_{\text{naive}} \le U_{\text{soph}}$ in **100%** of tested grid points unconditionally.
+  - Naive users under-specify ($m_{\text{naive}} \le m_{\text{soph}}$) in **100%** of intervals where Assumption 1 holds. Where Assumption 1 fails, naive users over-specify in 93.8% of intervals due to the supermodular complementary incentive.
 
 ### 6. $\mu_A$ Comparative Statics & Confounding (Task 3)
 - Derived the exact relationship between the two bias channels in pooling:

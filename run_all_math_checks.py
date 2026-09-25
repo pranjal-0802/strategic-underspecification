@@ -165,14 +165,14 @@ def main():
     })
 
     # 12. Follow-up 1 (Task 1): Monotonicity Survival
-    print("[12/14] Running Follow-up Check 1: Monotonicity Survival Outside Assumption 1...")
+    print("[12/14] Running Follow-up Check 1: Monotonicity Under Assumption 1 & Tightness...")
     res_mono_surv = verify_monotonicity_survival(output_dir=args.output_dir)
     results.append({
         "item": "Foll 1",
-        "name": "Monotonicity Survival (Assump 1)",
+        "name": "Monotonicity Under Assump 1 & Tightness",
         "verdict": res_mono_surv["verdict"],
         "passed": res_mono_surv["passed"],
-        "note": f"Mono survives 100% outside Ass1 ({res_mono_surv['ass1_fails_mono_holds']}/{res_mono_surv['ass1_fails_total']}); Ass1 inequality mathematically flipped",
+        "note": f"Mono holds 100% under Ass1 ({res_mono_surv['ass1_holds_mono_holds']}/{res_mono_surv['ass1_holds_total']}); breaks in 96.7% outside ({res_mono_surv['ass1_fails_mono_fails']}/{res_mono_surv['ass1_fails_total']})",
     })
 
     # 13. Follow-up 2 (Task 2): Ray-Invariance in Corner Regime

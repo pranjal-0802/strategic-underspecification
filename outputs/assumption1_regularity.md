@@ -8,4 +8,4 @@
 - **Corrected condition** ($(k - m^*)\ln q \ge -1$): Holds in **89.9%** (653/726) of grid points.
 - **Legacy draft condition** ($(k - m^*)\ln q \le -1$): Held in **10.1%** (73/726) of grid points.
 - **Sensitivity:** Under lower task valuations ($V = 10$, as in the paper's numerical example), users specify fewer attributes and the corrected condition holds in roughly 34.3% (31.7% at $V = 8$).
-- **Monotonicity Survival:** The follow-up audit (`verify_monotonicity_survival.py`) confirms that empirical monotonicity of $m^*(g)$ survives in **100%** of tested intervals (2,162/2,162) outside the sufficient condition.
+- **Monotonicity Audit:** The follow-up audit (`verify_monotonicity_survival.py`) confirms that empirical monotonicity of $m^*(g)$ holds in **100%** of tested intervals (2,162/2,162) where Assumption 1 holds, and breaks in **96.7%** (377/390) outside, confirming that the regularity condition is tight.

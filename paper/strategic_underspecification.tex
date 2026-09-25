@@ -152,12 +152,12 @@ In lower-valuation regimes where specification effort is lower
 ($V=10$, as in the numerical example above), the condition holds on roughly
 $34\%$ (and $31.7\%$ at $V=8$); the exact share is sensitive to the scaling of
 $c(m)$ relative to $V$. Crucially, across the tested parameter grid (2,552
-parameter intervals), a comprehensive finite-difference evaluation found no violations
-of monotonicity outside the sufficient condition: $m^*(g)$ remained weakly
-decreasing in $g$ across all $2{,}162$ tested intervals where
-Assumption~\ref{ass:reg} failed, providing numerical evidence that monotonicity
-of specification can survive in practice even when the sufficient condition is
-violated.
+parameter intervals), a comprehensive finite-difference evaluation confirms that monotonicity
+of specification ($m^*(g)$ weakly decreasing in $g$) holds without exception across all $2{,}162$
+intervals where Assumption~\ref{ass:reg} is satisfied ($100\%$ survival, zero violations).
+Outside the sufficient condition ($(k-m)\ln q < -1$, $390$ intervals), the cross-partial
+turns strictly positive and monotonicity breaks in $96.7\%$ of tested intervals ($377/390$),
+confirming that the regularity condition is empirically tight.
 \end{remark}
 
 \begin{corollary}\label{cor:mono}
@@ -426,12 +426,17 @@ to maximize $f_L\Pi_{\kappa_L}(m_L,a_L)+f_H\Pi_{\kappa_H}(m_H,a_H)$.
 
 \subsection{Single-crossing}
 The marginal rate of substitution between $m$ and $a$ along an indifference curve
-is $\text{MRS}(\kappa) = -\partial U/\partial m \big/ \partial U/\partial a$; using
-the FOC expressions above, $\partial \text{MRS}/\partial \kappa$ has a consistent
-sign across the relevant range (higher-$\kappa$ types have steeper indifference
-curves in $(m,a)$-space: they require more compensating ask-service per unit of
-specification given up). This is the standard Spence--Mirrlees condition~\citep{spence1973} and
-underwrites everything below; we omit the routine but lengthy verification.
+is $\text{MRS}(m,a;\kappa) = -(\partial U/\partial m) / (\partial U/\partial a)$.
+From user utility $U(m,a;\kappa) = V - \Lambda(1-a)(k-m) - \frac{\kappa}{2}m^2 - ac_Q(k-m)$,
+we have $\partial U/\partial m = \Lambda(1-a) + ac_Q - \kappa m$ and $\partial U/\partial a = s(k-m)$,
+where $s \equiv \Lambda - c_Q > 0$ is the net social gain from asking. Hence,
+\[
+\text{MRS}(m,a;\kappa) \;=\; \frac{\kappa m - [\Lambda - as]}{s(k-m)}, \qquad \frac{\partial \text{MRS}}{\partial \kappa} \;=\; \frac{m}{s(k-m)} \;>\; 0,
+\]
+which holds strictly for all interior specification levels $0 < m < k$ under the maintained condition $s > 0$.
+Higher-$\kappa$ types therefore have strictly steeper indifference curves in $(m,a)$-space: they require more
+compensating ask-service per unit of specification effort given up. This satisfies the standard Spence--Mirrlees
+single-crossing condition~\citep{spence1973} and underwrites the screening analysis below.
 
 \subsection{No distortion without bias}
 

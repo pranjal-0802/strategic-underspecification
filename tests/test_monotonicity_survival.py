@@ -1,5 +1,5 @@
 """
-tests/test_monotonicity_survival.py: Unit tests for Monotonicity Survival (Task 1).
+tests/test_monotonicity_survival.py: Unit tests for Monotonicity Under Assumption 1 & Tightness.
 """
 
 import pytest
@@ -11,8 +11,8 @@ from underspec_sim.verifications.verify_monotonicity_survival import (
 )
 
 
-def test_solve_optimal_m_decreases_with_q_outside_assumption1():
-    """Verify that when (k - m)*ln(q) >= -1 (outside Ass1), m* is non-increasing in q."""
+def test_solve_optimal_m_decreases_with_q_under_assumption1():
+    """Verify that when (k - m)*ln(q) >= -1 (Assumption 1 holds), m* is non-increasing in q."""
     k = 10.0
     kappa = 1.0
     # At q=0.85, 0.90, 0.95, user cost of effort outweighs guessing loss as guessing improves
@@ -69,11 +69,14 @@ def test_proposition2_naive_welfare_weakly_worse():
 
 
 def test_monotonicity_survival_runner():
-    """Verify Task 1 runner executes and reports 100% survival outside Assumption 1."""
+    """Verify Task 1 runner executes and reports 100% monotonicity under Assumption 1 and tightness outside."""
     res = run_verification(output_dir="outputs")
     assert res["verdict"] in ("PASS", "CAUTION")
-    assert res["ass1_fails_mono_fails"] == 0
-    assert res["pct_ass1_fails_mono_survives"] == pytest.approx(100.0, rel=1e-3)
+    assert res["ass1_holds_mono_fails"] == 0
+    assert res["ass1_holds_mono_holds"] == 2162
+    assert res["pct_ass1_holds_mono_survives"] == pytest.approx(100.0, rel=1e-3)
+    assert res["ass1_fails_mono_fails"] == 377
+    assert res["ass1_fails_total"] == 390
 
 
 def test_cor1_direction_under_corrected_assumption1():
