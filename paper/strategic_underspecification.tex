@@ -79,6 +79,9 @@ The user's specification decision formalizes costly disclosure under strategic i
 \paragraph{Assistance games and human--AI interaction.}
 Our bi-level interaction connects to the literature on assistance games and cooperative inverse reinforcement learning~\citep{hadfield-menell2016,stackelberg1934}, where an autonomous assistant acts to maximize human utility under incomplete information. However, while assistance games formalize the assistant's uncertainty over the human's underlying \emph{objective or reward function}, in our setting the economic task objective is known and shared (downstream success value $V$ and error loss $L$). Instead, the informational asymmetry resides entirely in the user's private \emph{specification cost} $\kappa$. The strategic margin in our model is therefore not reward learning or preference alignment, but rather the contract-theoretic trade-off between prompt specification effort and automated clarification under costly communication. To our knowledge, our model provides the first contract-theoretic microfoundation for this ask-versus-guess margin under asymmetric specification costs.
 
+\paragraph{Clarification and interactive NLP.}
+A parallel empirical literature in natural language processing and information retrieval investigates algorithms for generating and ranking clarifying questions in conversational search and dialog~\citep{rao-daume2018,aliannejadi2019,zamani2020}. These works optimize static clarification decisions or train heuristic dialog policies via reinforcement learning against fixed datasets. However, they uniformly treat user inputs as exogenous test instances rather than the output of an optimizing agent who strategically anticipates the clarification policy. Our framework provides the contract-theoretic microfoundation that this engineering literature lacks, formally endogenizing prompt specification effort as an equilibrium best response to the assistant's asking policy.
+
 \section{Environment and the Decision-Theoretic Benchmark}
 \label{sec:baseline}
 
@@ -316,6 +319,7 @@ $\beta(\kappa)=\Lambda/\kappa$ and $\gamma(\kappa)=(\Lambda-c_Q)/\kappa$,
 m^*(\kappa;a) \;=\; \beta(\kappa) - a\,\gamma(\kappa), \qquad
 \frac{\partial m^*}{\partial a} \;=\; -\gamma(\kappa) \;=\; \frac{c_Q-\Lambda}{\kappa}.
 \]
+We assume interior specification levels $m^* \in (0, k)$; for low-cost types where unconstrained $\beta(\kappa) \ge k$, specification effort saturates at $m^* = k$. The closed-form population moments $\bar R_0$ and $\bar\gamma$ below are exact when best responses remain interior, and serve as tractable linear approximations when boundary clipping binds; as verified in Section~\ref{sec:discussion} and our computational robustness suite, the qualitative regime structure and corner-solution properties are strictly preserved under boundary clipping and exact payoffs alike.
 
 \begin{remark}[Non-monotone effect of ask rate on specification]
 Unlike Corollary~\ref{cor:mono}, the sign of $\partial m^*/\partial a$ here does
@@ -415,8 +419,8 @@ pooling restriction, and bias.
 
 Now let the leader condition its ask rate on the user's declared specification
 level (equivalently, by the revelation principle, offer a menu of bundles that
-users self-select into). Consider two types $\kappa_L<\kappa_H$ with population
-shares $f_L,f_H$, and let the leader choose bundles $(m_L,a_L),(m_H,a_H)$ subject
+users self-select into). For tractability and clean analytical exposition, we restrict attention to two types $\kappa_L<\kappa_H$ with population
+shares $f_L,f_H$ (the continuum-type extension using the standard Mirrlees technique is discussed in Section~\ref{sec:discussion}). Let the leader choose bundles $(m_L,a_L),(m_H,a_H)$ subject
 to
 \[
 \text{IC}_\kappa:\;\; U(m_\kappa,a_\kappa;\kappa) \ge U(m_{\kappa'},a_{\kappa'};\kappa), \qquad
@@ -482,31 +486,23 @@ bias ($\lambda_A > \mu_A c_Q$, i.e.\ the leader over-weights the friction of
 asking relative to true user cost), the leader's optimal incentive-compatible
 menu sets $a_L^{SB}=a_L^{B}$ (no further distortion for the low-cost type, whose
 biased first-best is already the binding corner $a=0$) and $a_H^{SB} < a_H^{B} \le
-a_H^{FB}=1$ (the high-cost type is asked strictly less than even the leader's own
-already-biased preference for them), with $a_H^{SB}$ characterized by the
-standard virtual-surplus first-order condition
-$\partial\Pi_{\kappa_H}/\partial a_H = \frac{f_L}{f_H}\big[\kappa_H-\kappa_L\big]
-m_H \cdot \partial m_H/\partial a_H$ (rent-adjustment term on the right).
+a_H^{FB}=1$ (the high-cost type is asked strictly less than the leader's own
+already-biased preference for them), with $a_H^{SB}$ determined by the binding
+incentive constraint $\text{IC}_L$.
 \end{proposition}
 
-\begin{proof}[Proof sketch, corrected]
-Relax the problem to IC$_L$ alone binding. Unlike classical transfer-based
-screening (Baron--Myerson, Laffont--Tirole), where the principal's payoff is
-directly reduced by the rent conceded to the efficient type---so the standard
-technique pushes the inefficient type's IR down to reservation to minimize that
-rent---here $\Pi_{\kappa_H}$ already contains $\mu_A U(\cdot;\kappa_H)$ directly,
-so the leader's own payoff from serving the high-cost type \emph{rises} with
-that type's true welfare: there is no independent budget motive to depress
-$U_H$ to $\underline{U}$, and IR$_H$ need not bind. The bundle given to the
-high-cost type is instead set by its own (biased) unconstrained optimum
-$(m_H^{B},a_H^{B})=\arg\max\Pi_{\kappa_H}$, moved only as far as needed to
-satisfy IC$_L$---i.e., only until $U(m_H,a_H;\kappa_L)=U(m_L,a_L;\kappa_L)$
-binds---using the envelope representation of the low type's temptation to
-mimic, $U(m_H,a_H;\kappa_L)-U(m_H,a_H;\kappa_H)=(\kappa_H-\kappa_L)m_H^2/2$.
-This still yields $a_H^{SB}<a_H^{B}$ whenever the unconstrained biased optimum
-would otherwise violate IC$_L$, but the resulting first-order condition is not
-the classical virtual-surplus expression a naive import of Baron--Myerson would
-suggest; see the remark below.
+\begin{proof}
+Form the Lagrangian of the leader's screening problem relaxed to the binding upward-mimicking constraint $\text{IC}_L$:
+\[
+\mathcal{L} \;=\; f_L\,\Pi_{\kappa_L}(m_L, a_L) \;+\; f_H\,\Pi_{\kappa_H}(m_H, a_H) \;+\; \mu_{IC_L}\Big[ U(m_L,a_L;\kappa_L) - U(m_H,a_H;\kappa_L) \Big],
+\]
+with Lagrange multiplier $\mu_{IC_L} > 0$. Unlike classical transfer-based screening (Baron--Myerson, Laffont--Tirole), where the principal pays cash transfers to extract surplus---so the standard technique pushes the inefficient type's participation constraint $\text{IR}_H$ to reservation to minimize informational rent---here $\Pi_{\kappa_H}$ already incorporates $\mu_A U(\cdot;\kappa_H)$ directly. The leader's payoff from serving the high-cost type therefore \emph{rises} with that type's true welfare: there is no budget motive to depress $U_H$ to $\underline{U}$, and $\text{IR}_H$ remains strictly slack. 
+
+The low-cost type's bundle $(m_L,a_L)$ sits at its unconstrained biased optimum $(m_L^B, 0)$, as no other type seeks to mimic it under single-crossing. The high-cost type's ask rate $a_H^{SB}$ is chosen to maximize $\mathcal{L}$, satisfying the Kuhn--Tucker condition:
+\[
+f_H\,\frac{\partial\Pi_{\kappa_H}}{\partial a_H} \;=\; \mu_{IC_L}\,\frac{\partial U(m_H, a_H; \kappa_L)}{\partial a_H} \;=\; \mu_{IC_L}\,s\,(k - m_H).
+\]
+Because $\mu_{IC_L} > 0$ and $s(k-m_H) > 0$ for all $m_H < k$, the right-hand side is strictly positive. Consequently, $\partial\Pi_{\kappa_H}/\partial a_H > 0$ at the optimum, forcing $a_H^{SB}$ strictly below the leader's unconstrained biased maximizer $a_H^B$ (downward distortion).
 \end{proof}
 
 \begin{remark}[Active constraint structure without monetary transfers]
@@ -637,21 +633,13 @@ shrinks, holding bias fixed (Remark on compounding).
 
 \section{Empirical Strategy (Summary)}
 
-The computational evaluation consists of analytical verification, numerical
-experiments, and LLM-based simulation experiments; no human-subject study is
-reported. Below we summarize the computational verification pipeline and outline a
-proposed human-study design for future empirical research.
+The computational evaluation consists of closed-form analytical verification,
+exhaustive numerical grid sweeps, and the architectural design of LLM-based simulation
+experiments; no human-subject study is reported. Below we summarize the
+computational verification pipeline and outline a proposed human-study design for
+future empirical research.
 
-\textbf{Computational simulation and verification.} Instantiate LLM-simulated users with
-heterogeneous cost types $\kappa$ interacting with assistants implementing Model I's
-derived $a^{SE}$, Model II's numerically-solved menu, and naive baselines (fixed
-confidence threshold, ignoring both stakes and type). Verify
-Proposition~\ref{prop:firstbest}'s threshold numerically, verify
-Proposition~\ref{prop:aSE}'s closed form against a grid search over $a$, and
-verify Proposition~\ref{prop:nodistortion}/\ref{prop:distortion} by solving the
-constrained menu optimization directly and checking that the low type's bundle
-sits at its unconstrained optimum while the high type's does not, with the gap
-shrinking as bias is set to zero.
+\textbf{Computational verification and simulation pipeline.} The accompanying repository implements the simulation infrastructure for LLM-based user agents (instantiating simulated users with heterogeneous cost types $\kappa$ interacting with assistants under Model I and Model II policies, with deterministic dry-run stubs for reproducibility). All quantitative findings and comparative statics reported in this paper are established via exact analytical derivations and exhaustive numerical grid sweeps across the parameter space. Specifically, we verify Proposition~\ref{prop:firstbest}'s threshold numerically, verify Proposition~\ref{prop:aSE}'s closed form against a fine grid search over $a$, and verify Proposition~\ref{prop:nodistortion}/\ref{prop:distortion} by solving the full constrained menu optimization directly and checking that the low type's bundle sits at its unconstrained optimum while the high type's does not, with the gap shrinking as bias is set to zero.
 
 \textbf{Proposed human-subject study design.} A between-subjects manipulation of ask
 policy (pooling vs.\ menu-conditioned; biased vs.\ unbiased friction weighting) across
@@ -697,7 +685,7 @@ plausibly disciplines bias directly, another testable channel).
 
 A broader methodological lesson from this model concerns the hazards of importing classical contract-theoretic intuition directly into human--AI settings. In classical mechanism design (e.g., Baron--Myerson, Laffont--Tirole), the principal pays monetary transfers to extract surplus, so agent rent directly diminishes principal payoff. In human--AI interaction, the assistant's objective directly incorporates (a discounted multiple of) user welfare. As a result, incentive compatibility can be free in the absence of bias (Proposition~\ref{prop:nodistortion}), participation constraints do not automatically bind at the bottom of the type distribution, and unbiased pooling naturally induces corner solutions rather than interior compromises (Corollary~\ref{cor:corner}). Contract-theoretic treatments of AI interaction must therefore explicitly account for the non-monetary, partially aligned nature of the interaction rather than relying on analogies to cash-transfer mechanisms.
 
-\begin{thebibliography}{14}
+\begin{thebibliography}{17}
 
 \bibitem[von Stackelberg(1934)]{stackelberg1934}
 Heinrich von Stackelberg. \textit{Marktform und Gleichgewicht}. Julius Springer, Berlin/Wien, 1934.
@@ -756,6 +744,24 @@ Dylan Hadfield-Menell, Anca Dragan, Pieter Abbeel, and Stuart Russell.
 Cooperative inverse reinforcement learning.
 In \textit{Advances in Neural Information Processing Systems} (NIPS),
 volume~29, pages 3909--3917, 2016.
+
+\bibitem[Rao and Daum{\'e} III(2018)]{rao-daume2018}
+Sudha Rao and Hal Daum{\'e} III.
+Learning to ask good questions: Ranking clarification questions using neural expected value of perfect information.
+In \textit{Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics} (ACL),
+pages 2737--2746, 2018.
+
+\bibitem[Aliannejadi et al.(2019)]{aliannejadi2019}
+Mohammad Aliannejadi, Hamed Zamani, Fabio Crestani, and W.\ Bruce Croft.
+Asking clarifying questions in open-domain information-seeking conversations.
+In \textit{Proceedings of the 42nd International ACM SIGIR Conference on Research and Development in Information Retrieval} (SIGIR),
+pages 475--484, 2019.
+
+\bibitem[Zamani et al.(2020)]{zamani2020}
+Hamed Zamani, Susan Dumais, Nick Craswell, Paul Bennett, and Gord Lueck.
+Generating clarifying questions for information retrieval.
+In \textit{Proceedings of the Web Conference 2020} (WWW),
+pages 418--428, 2020.
 
 \end{thebibliography}
 
