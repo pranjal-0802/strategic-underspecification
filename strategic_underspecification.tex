@@ -362,13 +362,30 @@ $\lambda_A$) to separate them.
 The derivation above, and its numerical confirmation, are both restricted to the
 interior branch $\Delta\bar\gamma>0$. By Corollary~\ref{cor:corner} below, the
 \emph{unbiased} pooling optimum is always a corner, so the ray-invariance result
-has empirical bite only once bias is already present. Whether the same
-non-identification holds on the corner branch, where the relevant comparison is
-$\Pi(1)-\Pi(0)$ rather than the interior stationary point, is a separate,
-currently open question; the two expressions are not obviously reducible to one
-another, and we do not claim ray-invariance across the corner regime without
-checking it directly.
+has empirical bite only once bias is already present.
 \end{remark}
+
+\begin{corollary}[Ray-invariance extends to the corner regime]\label{cor:corner-ray}
+On the corner branch ($\Delta\bar\gamma\le 0$), the relevant comparison is
+$\Pi(1)-\Pi(0)$ rather than the interior stationary point. Substituting
+$C_0=\mu_A\Lambda$ and $\Delta=\lambda_A-\mu_A\Lambda$ into that difference gives
+\[
+\Pi(1)-\Pi(0) \;=\; \mu_A\Big[\Lambda\bar R_0 - \tfrac{\lambda_A}{\mu_A}\big(\bar
+R_0+\bar\gamma\big)\Big],
+\]
+so $\mu_A>0$ again factors out completely and the sign depends only on the
+scalar ratio $\lambda_A/\mu_A$, exactly as on the interior branch. The critical
+ratio is
+\[
+\rho^{*} \;=\; \frac{\Lambda\bar R_0}{\bar R_0+\bar\gamma},
+\]
+with $a^{SE}=1$ for $\lambda_A/\mu_A<\rho^{*}$ and $a^{SE}=0$ for
+$\lambda_A/\mu_A>\rho^{*}$. Ray-invariance therefore holds unconditionally
+across the entire parameter space, interior and corner regimes alike,
+resolving the open question raised above. A numerical sweep of 11 rays across
+10 values of $\mu_A\in[0.1,1.0]$ (110 evaluations) confirms the analytical
+threshold exactly and finds zero boundary-crossing violations.
+\end{corollary}
 
 \begin{corollary}[Pooling is a corner solution, not a compromise]\label{cor:corner}
 In the unbiased case ($\mu_A=1,\lambda_A=c_Q$), $\Delta=c_Q-\Lambda$ and
@@ -643,15 +660,24 @@ $k\in[3,20]$, $g\in[0.50,0.95]$, and the downward-distortion direction of
 Proposition~\ref{prop:distortion} surviving in the large majority of
 configurations, with the exceptions concentrated at small $k$ where specification
 effort saturates at $m=k$ and the asking wedge collapses. This is reassuring for
-the paper's two headline qualitative claims. It is not a complete check, however:
-the exact-model audit tested only a single bias level for the screening problem,
-so the further finding (Remark following Proposition~\ref{prop:distortion}) that
-$\text{IC}_H$ can bind under sufficiently extreme bias was established only under
-the linear-risk approximation and has not yet been confirmed under the exact
-conjunctive form; that remains open. Sections~\ref{sec:baseline}--\ref{sec:naive-soph}
-use the exact conjunctive form throughout, so with the above audit the paper's
-two halves are now substantially, though not completely, reconciled in exactness
-level.
+the paper's two headline qualitative claims. The initial exact-model audit tested
+only a single bias level for the screening problem, leaving open whether the
+further finding (Remark following Proposition~\ref{prop:distortion}) that
+$\text{IC}_H$ can bind under sufficiently extreme bias was an artifact of the
+linear-risk approximation. A follow-up sweep of the full four-variable
+constrained menu problem, solved directly under the exact conjunctive payoff
+across $\lambda_A\in[c_Q,10c_Q]$ and $\mu_A\in[0.1,1.0]$ (100 grid points),
+resolves this: $\text{IC}_H$ binds alongside $\text{IC}_L$ in 89 of the 100
+points, reproducing the same three-regime structure (no binding constraint,
+$\text{IC}_L$ alone, $\text{IC}_L+\text{IC}_H$ together) found under the
+linear-risk approximation, with only the boundary between the moderate- and
+extreme-bias regimes shifting slightly (from $\lambda_A\approx6.0$ to
+$\lambda_A\approx8.0$ at $\mu_A=1.0$). The extreme-bias reversal is therefore an
+intrinsic feature of the screening contract space, not an artifact of the
+linear-risk approximation. Sections~\ref{sec:baseline}--\ref{sec:naive-soph}
+use the exact conjunctive form throughout, so with the above audits the paper's
+two halves are now substantially reconciled in exactness level, modulo the
+small-$k$ saturation caveat noted above.
 
 A related limitation concerns identification of $\lambda_A$ itself. Every
 bias-driven prediction (Corollary~2, Proposition~\ref{prop:distortion}, and

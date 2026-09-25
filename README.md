@@ -179,3 +179,53 @@ Per Section 10 (*Discussion and Limitations*) of the paper:
    The model assumes users truthfully reveal $m$ attributes conditional on choosing to specify them. Adding a cheap-talk layer where users can provide vague or noisy attributes is an open extension.
 4. **Competitive Assistant Market:**
    The current model assumes a monopoly Stackelberg leader assistant. Market competition among assistants could discipline under-asking bias $\lambda_A > c_Q$.
+
+---
+
+## 7. Repository Layout
+
+```
+strategic-underspecification/
+├── README.md                           # Comprehensive documentation & verification mapping
+├── LICENSE                             # Dual license: MIT (Software) & CC-BY-4.0 (Manuscript)
+├── CITATION.cff                        # Machine-readable citation metadata for GitHub
+├── pyproject.toml                      # Package configuration & dependencies
+├── strategic_underspecification_v3.tex  # Full LaTeX source of the paper (v3)
+├── strategic_underspecification_v3.pdf  # Compiled preprint of the paper (v3)
+├── underspec_sim/                      # Core simulation & verification package
+│   ├── core/                           # Primitives, payoffs, best-response, first-best
+│   ├── model1_pooling/                 # Quadratic pooling payoff & closed-form solver
+│   ├── model2_screening/               # Constrained menu solver & active-set audit
+│   ├── comparison/                     # Regime dominance & welfare decomposition
+│   ├── verifications/                  # 14 standalone proposition & robustness runners
+│   ├── llm/                            # Anthropic client with retry, SQLite logging, dry-run
+│   └── experiments_llm/                # Simulated user experiments
+├── tests/                              # Pytest test suite (44 unit & symbolic tests)
+├── outputs/                            # Generated artifacts (CSVs, high-res PNGs, Markdown)
+└── run_all_math_checks.py              # Master runner executing all 14 mathematical checks
+```
+
+---
+
+## 8. Citation
+
+If you use this framework, reproduction code, or cite the formal Stackelberg model, please cite:
+
+```bibtex
+@article{agarwal2026underspec,
+  title={Strategic Under-Specification: A Stackelberg Game Between User and Assistant},
+  author={Agarwal, Pranjal},
+  journal={Working Paper, BITS Pilani},
+  year={2026},
+  url={https://github.com/pranjal-0802/strategic-underspecification}
+}
+```
+
+GitHub also supports direct citation via [`CITATION.cff`](CITATION.cff).
+
+---
+
+## 9. License
+
+- **Software Source Code:** Licensed under the [MIT License](LICENSE).
+- **Manuscript, Preprints & Analytical Documentation:** Licensed under the [Creative Commons Attribution 4.0 International License (CC-BY-4.0)](LICENSE).

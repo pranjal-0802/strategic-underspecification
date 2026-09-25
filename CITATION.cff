@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, simulation framework, or cite the formal Stackelberg model, please cite it as below."
+title: "Strategic Under-Specification: A Stackelberg Game Between User and Assistant"
+authors:
+  - family-names: Agarwal
+    given-names: Pranjal
+    affiliation: "BITS Pilani, Hyderabad Campus"
+version: 1.0.0
+date-released: "2026-09-25"
+repository-code: "https://github.com/pranjal-0802/strategic-underspecification"
+url: "https://github.com/pranjal-0802/strategic-underspecification"
+license: MIT
+keywords:
+  - "stackelberg-game"
+  - "ai-assistants"
+  - "strategic-underspecification"
+  - "contract-theory"
+  - "mechanism-design"
+  - "screening-models"
+  - "human-ai-interaction"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Agarwal
+      given-names: Pranjal
+      affiliation: "BITS Pilani, Hyderabad Campus"
+  title: "Strategic Under-Specification: A Stackelberg Game Between User and Assistant"
+  year: 2026
+  url: "https://github.com/pranjal-0802/strategic-underspecification"
