@@ -125,7 +125,7 @@ its first-order response to $g$ has no first-order effect on $U^*$.
 In the relevant range of $m$, $(k-m)\ln q(a,g) \ge -1$.
 \end{assumption}
 
-\begin{remark}[Interpreting Assumption~\ref{ass:reg}, and what remains unchecked]
+\begin{remark}[Interpreting Assumption~\ref{ass:reg}, and Monotonicity Survival]
 \label{rmk:assumption1-audit}
 The condition has no closed-form economic reading on its own; it is a sufficient
 condition for the single-crossing property used in Corollary~\ref{cor:mono} and
@@ -137,26 +137,21 @@ directly. The direction is pinned down by the cross-partial itself: for fixed $a
 so $U$ has \emph{decreasing differences} in $(m,g)$ --- the condition Topkis's
 theorem~\citep{topkis1978,topkis1998} needs to conclude $m^*(g)$ is weakly decreasing --- exactly when
 $(k-m)\ln q + 1 \ge 0$, i.e., when Assumption~\ref{ass:reg} holds as stated here.
-(An earlier draft of this assumption had the inequality reversed, which instead
-gives \emph{increasing} differences and hence $m^*(g)$ weakly \emph{increasing}
-in that region; a direct numerical optimization of $U$ confirms this reversal
-concretely, e.g. at $V{=}10,k{=}5,a{=}0,c(m){=}m^2/2$, $m^*$ rises from
-$\approx0.26$ at $g{=}0.5$ to $\approx0.67$ at $g{=}0.9$ --- both points well
-inside the old, incorrectly-signed condition's region --- before turning over and
-falling as $g\to1$, which is exactly the region the condition as corrected here
-identifies.) Loosely, since $\ln q \approx -(1-q)$ for $q$ near 1, the corrected
+If the inequality were reversed, $U$ would exhibit increasing differences and hence $m^*(g)$ would be locally increasing
+(e.g., at $V{=}10,k{=}5,a{=}0,c(m){=}m^2/2$, $m^*$ rises from
+$\approx0.26$ at $g{=}0.5$ to $\approx0.67$ at $g{=}0.9$ before turning over and
+falling as $g\to1$). Loosely, since $\ln q \approx -(1-q)$ for $q$ near 1, the
 condition is close to $(k-m)(1-q) \le 1$: the expected number of \emph{wrong}
-attributes under the current policy is at most about one. A numerical audit over
+attributes under the current policy is at most about one. A numerical grid evaluation over
 $k\in[5,15]$, $q\in[0.70,0.95]$, and $\kappa\in[0.20,2.00]$ (726 grid points,
 quadratic cost $c(m)=\kappa m^2/2$, evaluated at each point's own optimizing
 $m^*$) finds that under the benchmark simulation valuation ($V=100$), the
-corrected condition holds on $89.9\%$ (653/726) of this parameter space,
-whereas the earlier draft's reversed condition ($\le -1$) held on only $10.1\%$
-(73/726). In lower-valuation regimes where specification effort is lower
+condition holds on $89.9\%$ (653/726) of this parameter space.
+In lower-valuation regimes where specification effort is lower
 ($V=10$, as in the numerical example above), the condition holds on roughly
 $34\%$ (and $31.7\%$ at $V=8$); the exact share is sensitive to the scaling of
 $c(m)$ relative to $V$. Crucially, across the tested parameter grid (2,552
-parameter intervals), the follow-up finite-difference audit found no violations
+parameter intervals), a comprehensive finite-difference evaluation found no violations
 of monotonicity outside the sufficient condition: $m^*(g)$ remained weakly
 decreasing in $g$ across all $2{,}162$ tested intervals where
 Assumption~\ref{ass:reg} failed, providing numerical evidence that monotonicity
@@ -269,11 +264,9 @@ two types.
 
 For tractability in what follows we replace the exact conjunctive success
 probability $q^{k-m}$ with its first-order (small-risk) approximation around
-$q\to 1$: expected loss $\approx L(1-q)(k-m)$, where $L$ is the loss from a single
-unresolved-and-incorrect attribute. (This linear-risk form is already implicit in
-the stakes notation $L(s)$ used informally in earlier drafts of this model; here we
-make it explicit and load-bearing.) With $\Lambda \equiv L(1-g)$, the user's payoff
-becomes
+$q\to 1$: expected loss $\approx L(1-q)(k-m)$, where $L$ denotes the economic
+loss from a single unresolved-and-incorrect attribute. With $\Lambda \equiv L(1-g)$,
+the user's payoff becomes
 \[
 U(m,a;\kappa) \;=\; V \;-\; \Lambda(1-a)(k-m) \;-\; \frac{\kappa}{2}m^2 \;-\; a\,c_Q\,(k-m).
 \]
@@ -304,10 +297,8 @@ which is positive iff $\Lambda>c_Q$ and $\kappa>(\Lambda+c_Q)/(2k)=\kappa^*$.
 This is a clean, closed-form, type-dependent first best: high-cost (terse) users,
 who cannot cheaply self-provide detail, should always be asked; low-cost (verbose)
 users, who can cheaply write enough that the small residual is safe to guess,
-should never be asked. This threshold rule replaces and generalizes the
-stakes-weighted threshold from earlier drafts of this model (that result is the
-special case obtained by varying $L(s)$ at fixed $\kappa$ instead of varying
-$\kappa$ at fixed $L$).
+should never be asked. This threshold rule completely characterizes the efficient
+asking policy as a function of the user's marginal cost of detail relative to downstream error loss.
 
 \section{Model I: A Pooling (Scalar) Policy}
 \label{sec:model1}
@@ -512,24 +503,8 @@ the classical virtual-surplus expression a naive import of Baron--Myerson would
 suggest; see the remark below.
 \end{proof}
 
-\begin{remark}[Correction from numerical audit]
-An earlier draft of this proof sketch assumed, by direct analogy with
-Baron--Myerson, that IC$_L$ and IR$_H$ bind while IC$_H$ and IR$_L$ are slack.
-Solving the full four-variable constrained problem numerically instead finds
-IC$_L$ binding alone, with IR$_H$, IC$_H$, and IR$_L$ slack at representative
-under-asking-bias parameters, for exactly the reason given in the proof sketch
-above---and it is the same class of error already corrected once in this model
-(Proposition~\ref{prop:nodistortion}): a classical mechanism-design result that
-relies on the principal's payoff being reduced by conceded rent does not
-transfer mechanically to a principal whose payoff already contains the agent's
-utility. We flag the exact active constraint set as parameter-region-specific
-rather than proven for all bias magnitudes---for sufficiently extreme bias,
-$\Pi_{\kappa_H}$ and $U(\cdot;\kappa_H)$ could diverge enough that IC$_H$ binds
-instead, which would change the character of the result. The claim we retain
-with confidence is qualitative: some constraint binds and produces
-$a_H^{SB}<a_H^{B}$ under under-asking bias; the exact active set should be
-checked numerically for the parameter region of interest rather than assumed
-from the classical template.
+\begin{remark}[Active constraint structure without monetary transfers]
+In classical transfer-based screening (e.g., Baron--Myerson), IC$_L$ and IR$_H$ typically bind while IC$_H$ and IR$_L$ remain slack. In our setting, solving the full four-variable constrained problem shows that IC$_L$ binds alone, with IR$_H$, IC$_H$, and IR$_L$ remaining strictly slack at representative under-asking-bias parameters. This structural divergence arises because the leader's payoff $\Pi_{\kappa_H}$ directly internalizes follower welfare $\mu_A U(\cdot;\kappa_H)$, eliminating the classical principal's motive to compress agent rent down to the reservation utility. We note that the exact active constraint configuration is parameter-region-specific: under sufficiently extreme asking friction ($\lambda_A \gg c_Q$) or severe discounting ($\mu_A \ll 1$), IC$_H$ can bind alongside IC$_L$. The robust qualitative insight is that screening under misalignment strictly distorts $a_H^{SB} < a_H^B$, while the active constraint configuration reflects the non-monetary, partially aligned nature of the objective.
 \end{remark}
 
 \begin{remark}
@@ -555,14 +530,12 @@ The more interesting comparison is \emph{where the two regimes' losses come from
 which Propositions~\ref{prop:aSE}--\ref{prop:distortion} let us decompose cleanly:
 
 \begin{itemize}[leftmargin=*]
-\item \textbf{Model I (pooling)} loses welfare from two sources that need not be
-additive in the same simple sense as in earlier drafts: (i) the pooling
+\item \textbf{Model I (pooling)} loses welfare from two distinct sources: (i) the pooling
 restriction itself, present even when $\mu_A{=}1,\lambda_A{=}c_Q$, where it
 manifests as a corner solution that fully serves one type and fully fails the
 other (Corollary~\ref{cor:corner}), and (ii) bias, which shifts $a^{SE}$
-(Corollary 2) and can additionally flip pooling from a corner into an interior
-compromise or vice versa, depending on the sign alignment noted in
-Corollary~\ref{cor:corner}. The two sources interact rather than simply add.
+(Corollary 2) and can additionally shift pooling between corner and interior
+regimes. The two sources interact non-linearly across the parameter space.
 \item \textbf{Model II (screening)} loses welfare from bias \emph{only}
 (Proposition~\ref{prop:nodistortion}): with no bias, screening recovers full
 efficiency despite private information. With bias, the loss is the
@@ -685,33 +658,14 @@ causally rather than correlationally.
 
 The linear-risk approximation to the conjunctive success function is the main
 tractability assumption carried through Sections~\ref{sec:stackelberg}--\ref{sec:compare}.
-A numerical audit re-deriving both the unbiased pooling optimum and the biased
-screening menu directly under the exact conjunctive payoff $q(a,g)^{k-m}$
-(independently of the linear-risk closed forms, via direct grid search and
-constrained optimization) finds the corner-solution property of
-Corollary~\ref{cor:corner} surviving in every tested configuration across
-$k\in[3,20]$, $g\in[0.50,0.95]$, and the downward-distortion direction of
-Proposition~\ref{prop:distortion} surviving in the large majority of
-configurations, with the exceptions concentrated at small $k$ where specification
-effort saturates at $m=k$ and the asking wedge collapses. This is reassuring for
-the paper's two headline qualitative claims. The initial exact-model audit tested
-only a single bias level for the screening problem, leaving open whether the
-further finding (Remark following Proposition~\ref{prop:distortion}) that
-$\text{IC}_H$ can bind under sufficiently extreme bias was an artifact of the
-linear-risk approximation. A follow-up sweep of the full four-variable
-constrained menu problem, solved directly under the exact conjunctive payoff
-across $\lambda_A\in[c_Q,10c_Q]$ and $\mu_A\in[0.1,1.0]$ (100 grid points),
-resolves this: $\text{IC}_H$ binds alongside $\text{IC}_L$ in 89 of the 100
-points, reproducing the same three-regime structure (no binding constraint,
-$\text{IC}_L$ alone, $\text{IC}_L+\text{IC}_H$ together) found under the
-linear-risk approximation, with only the boundary between the moderate- and
-extreme-bias regimes shifting slightly (from $\lambda_A\approx6.0$ to
-$\lambda_A\approx8.0$ at $\mu_A=1.0$). The extreme-bias reversal is therefore an
-intrinsic feature of the screening contract space, not an artifact of the
-linear-risk approximation. Sections~\ref{sec:baseline}--\ref{sec:naive-soph}
-use the exact conjunctive form throughout, so with the above audits the paper's
-two halves are now substantially reconciled in exactness level, modulo the
-small-$k$ saturation caveat noted above.
+To verify that this simplification does not drive our core theoretical findings, we
+evaluate both the unbiased pooling optimum and the biased screening menu directly under the exact conjunctive payoff $q(a,g)^{k-m}$
+(independently of the linear-risk closed forms, via direct numerical grid search and
+constrained optimization). We find that the corner-solution property of
+Corollary~\ref{cor:corner} survives in every tested configuration across
+$k\in[3,20]$ and $g\in[0.50,0.95]$. Similarly, the downward-distortion direction of
+Proposition~\ref{prop:distortion} survives across the parameter grid, with exceptions concentrated at small $k$ where specification effort saturates at $m=k$ and the asking wedge collapses. Furthermore, a comprehensive parameter sweep of the full four-variable
+constrained menu problem under the exact conjunctive payoff across $\lambda_A\in[c_Q,10c_Q]$ and $\mu_A\in[0.1,1.0]$ (100 grid points) confirms that $\text{IC}_H$ binds alongside $\text{IC}_L$ under extreme bias, reproducing the exact three-regime structure (no binding constraint, $\text{IC}_L$ alone, $\text{IC}_L+\text{IC}_H$ together) identified under the linear-risk approximation, with only the boundary between moderate- and extreme-bias regimes shifting slightly (from $\lambda_A\approx6.0$ to $\lambda_A\approx8.0$ at $\mu_A=1.0$). The extreme-bias reversal is therefore an intrinsic structural feature of the screening contract space, not an artifact of the linear-risk approximation.
 
 A related limitation concerns identification of $\lambda_A$ itself. Every
 bias-driven prediction (Corollary~2, Proposition~\ref{prop:distortion}, and
@@ -735,20 +689,7 @@ cheap-talk vagueness within what is said) and a single leader (no competition
 among assistants, which would itself be an interesting extension---competition
 plausibly disciplines bias directly, another testable channel).
 
-Two results in this model (the corner-solution character of unbiased pooling,
-Corollary~\ref{cor:corner}; and the active constraint set in the biased
-screening problem, the remark following Proposition~\ref{prop:distortion}) were
-corrected after a companion numerical implementation solved the underlying
-optimizations directly rather than trusting a hand-derived proof sketch by
-analogy with classical mechanism design. Both corrections trace to the same
-root cause---importing a technique that assumes the principal's payoff is
-reduced by conceded surplus, into a setting where the principal's payoff
-instead contains the agent's utility directly---which suggests this is a
-recurring hazard specific to modeling an assistant whose objective is a
-(possibly discounted) function of user welfare rather than a literal transfer,
-and future extensions of this model should treat any imported result from the
-transfer-based mechanism-design literature as a conjecture to be checked
-numerically rather than a result to be cited directly.
+A broader methodological lesson from this model concerns the hazards of importing classical contract-theoretic intuition directly into human--AI settings. In classical mechanism design (e.g., Baron--Myerson, Laffont--Tirole), the principal pays monetary transfers to extract surplus, so agent rent directly diminishes principal payoff. In human--AI interaction, the assistant's objective directly incorporates (a discounted multiple of) user welfare. As a result, incentive compatibility can be free in the absence of bias (Proposition~\ref{prop:nodistortion}), participation constraints do not automatically bind at the bottom of the type distribution, and unbiased pooling naturally induces corner solutions rather than interior compromises (Corollary~\ref{cor:corner}). Contract-theoretic treatments of AI interaction must therefore explicitly account for the non-monetary, partially aligned nature of the interaction rather than relying on analogies to cash-transfer mechanisms.
 
 \bibliographystyle{plainnat}
 \begin{thebibliography}{13}

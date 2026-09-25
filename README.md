@@ -44,7 +44,7 @@ The table below maps every proposition, corollary, and robustness check in the p
 | **Sec 7** | **Cor 4** (Dominance of Menus over Pooling) | `underspec_sim/verifications/compare_regimes_runner.py` | `tests/test_comparison.py` | `outputs/regime_comparison.csv`, `.png`, `.md` | **PASS** *(dominance verified across grid)* |
 | **Robustness 1** | **Exact vs Linear-Risk Conjunctive Model** | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `outputs/exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner survives in 100% of tested points)* |
 | **Robustness 2** | **Assumption 1 Regularity Grid Audit** | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `outputs/assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(corrected $\ge -1$ holds in 89.9%; see Follow-up 1)* |
-| **Robustness 3** | **$\mu_A$ Comparative Statics & Confound** | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(Remark rmk:mu-lambda verified: ratio $= -\lambda_A/\mu_A$)* |
+| **Robustness 3** | **$\mu_A$ Comparative Statics & Confound** | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(Corollary on non-identification verified: ratio $= -(\lambda_A - c_Q)/\mu_A$)* |
 | **Follow-up 1 (Task 1)** | **Monotonicity Survival Outside Assump 1** | `underspec_sim/verifications/verify_monotonicity_survival.py` | `tests/test_monotonicity_survival.py` | `outputs/monotonicity_survival.csv`, `.png`, `.md` | **CAUTION** *(mono survives in 100% of tested intervals outside Ass1)* |
 | **Follow-up 2 (Task 2)** | **Ray-Invariance in Corner Regime** | `underspec_sim/verifications/verify_mu_lambda_corner.py` | `tests/test_mu_lambda_corner.py` | `outputs/mu_lambda_corner.csv`, `.png`, `.md` | **PASS** *(sign of $\Pi(1)-\Pi(0)$ ray-invariant in tested space)* |
 | **Follow-up 3 (Task 3)** | **Exact Bias Sweep & $\text{IC}_H$ Binding** | `underspec_sim/verifications/verify_exact_bias_sweep.py` | `tests/test_exact_bias_sweep.py` | `outputs/exact_bias_sweep.csv`, `.png`, `.md` | **PASS** *(extreme-bias reversal observed under exact payoff)* |
@@ -56,23 +56,25 @@ The table below maps every proposition, corollary, and robustness check in the p
 The computational verification suite evaluates the analytical claims across representative parameter grids:
 
 ### 1. Corollary 3 (Pooling is a Corner Solution, Not a Compromise)
-- **Proposition 4** provides the closed-form pooling stationary point:
-  $$a^{SE} = -\frac{C_0\bar\gamma + \Delta\bar R_0}{2\Delta\bar\gamma}, \quad \text{provided } \Delta\bar\gamma > 0 \text{ (SOC)}$$
-- In the unbiased baseline ($\mu_A = 1, \lambda_A = c_Q$):
-  $$\Delta = c_Q - \Lambda, \quad \bar\gamma = (\Lambda - c_Q)\mathbb{E}[1/\kappa] \implies \Delta\bar\gamma = -(\Lambda - c_Q)^2 \mathbb{E}[1/\kappa] \le 0$$
-- Because the quadratic term in $\Pi(a)$ is $-a^2 \Delta \bar\gamma \ge 0$, **the leader payoff $\Pi(a)$ is weakly convex in $a$** on $[0, 1]$.
+- **Proposition 4** provides the closed-form pooling stationary point derived directly from primitives:
+  $$\Pi(a) = \text{const} + \bar L\,a + \bar Q\,a^2, \qquad a^{SE} = -\frac{\bar L}{2\bar Q} = -\frac{(\mu_A s - b)\bar R_0}{(\mu_A s - 2b)\bar\gamma}$$
+  provided $\bar Q < 0$ (strict concavity SOC, equivalent to $2(\lambda_A - c_Q) > \mu_A(\Lambda - c_Q)$), where $s \equiv \Lambda - c_Q$ and $b \equiv \lambda_A - c_Q$.
+- In the unbiased baseline ($\mu_A = 1, \lambda_A = c_Q \implies b = 0$):
+  $$\bar Q = \frac{s^2\,\bar\gamma}{2} = \frac{(\Lambda - c_Q)^2\,\mathbb{E}[1/\kappa]}{2} \ge 0 \quad \text{always}$$
+- Because $\bar Q \ge 0$, **the leader payoff $\Pi(a)$ is weakly convex in $a$** on $[0, 1]$.
 - Any weakly convex function on a compact interval achieves its maximum at a **boundary corner** ($a = 0$ or $a = 1$).
-- Direct comparison yields the selection criterion:
-  $$\Pi(1) - \Pi(0) = (\Lambda - c_Q)\Big[\bar R_0 - c_Q \mathbb{E}[1/\kappa]\Big]$$
-  If positive, $a^{SE} = 1$; if negative, $a^{SE} = 0$.
-- **Biased Regime:** Away from the unbiased baseline, when $(\lambda_A - \mu_A \Lambda)$ and $(\Lambda - c_Q)$ share a sign, $\Delta\bar\gamma > 0$ and $\Pi(a)$ becomes strictly concave, producing a true interior stationary maximum.
+- Direct comparison yields the exact selection criterion:
+  $$\Pi(1) - \Pi(0) = \bar L + \bar Q = (\Lambda - c_Q)\left(\bar R_0 + \frac{\bar\gamma}{2}\right) = (\Lambda - c_Q)\left[k - \frac{\Lambda + c_Q}{2}\mathbb{E}\left[\frac{1}{\kappa}\right]\right]$$
+  If $k \ge \frac{\Lambda + c_Q}{2}\mathbb{E}[1/\kappa]$, $a^{SE} = 1$; otherwise, $a^{SE} = 0$. This matches the population first-best expectation $\mathbb{E}[U(1)-U(0)]$ identically.
+- **Biased Regime:** Away from the unbiased baseline, when friction is sufficiently high ($2b > \mu_A s$), $\bar Q < 0$ and $\Pi(a)$ becomes strictly concave, producing a true interior stationary maximum.
 - The solver and automated verification suite agree with this closed-form selection rule across all tested configurations.
 
 ### 2. Corollary 2 (Bias Shifts Pooling Rate on Interior Branch)
-- On the interior branch ($\Delta\bar\gamma > 0$ with $a^{SE} \in (0, 1)$), direct differentiation of Proposition 4's closed form yields:
-  $$\frac{\partial a^{SE}}{\partial \lambda_A} = \frac{\mu_A\Lambda}{2(\mu_A\Lambda - \lambda_A)^2} > 0$$
-- Over a calibrated parameter sweep ($\lambda_A \in [3.5, 12.0]$ with $\mu_A=1.0, \Lambda=2.0, c_Q=1.0$), $a^{SE}$ ranges strictly from $0.28$ to $0.85$ without hitting boundary corners.
-- Verification (`verify_cor2.py`) confirms that empirical finite differences $\frac{\Delta a^{SE}}{\Delta \lambda_A} > 0$ everywhere (slopes $\in [0.010, 0.342]$) and match the analytical derivative within 3.31% relative error.
+- On the interior branch ($\bar Q < 0$ with $a^{SE} \in (0, 1)$), direct differentiation of Proposition 4's closed form yields:
+  $$\frac{\partial a^{SE}}{\partial \lambda_A} = -\frac{\bar R_0}{\bar\gamma}\frac{\mu_A s}{(\mu_A s - 2b)^2} > 0$$
+  which is strictly positive whenever $\bar R_0 < 0$ (the under-specification regime).
+- Over a calibrated parameter sweep ($\lambda_A \in [2.15, 2.70]$ with $\mu_A=1.0, \Lambda=4.0, c_Q=2.0$), $a^{SE}$ ranges strictly from $0.20$ to $0.80$ without hitting boundary corners.
+- Verification (`verify_cor2.py`) confirms that empirical finite differences $\frac{\Delta a^{SE}}{\Delta \lambda_A} > 0$ everywhere (slopes $\in [0.040, 0.801]$) and match the analytical derivative within 1.8% error.
 
 ### 3. Proposition 6 & Active Constraint Audit (Screening Under Bias)
 - **Down-and-Out Distortion:** At representative under-asking bias ($\lambda_A > \mu_A c_Q$), the low-cost type remains at $a_L^{SB} = a_L^B = 0$, while the high-cost type's asking rate is strictly distorted downward ($a_H^{SB} < a_H^B$).
