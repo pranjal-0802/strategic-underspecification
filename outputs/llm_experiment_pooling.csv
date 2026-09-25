@@ -1,0 +1,209 @@
+trial_id,kappa,policy_regime,policy_ask_rate,prescribed_m,realized_m,unspecified_count,questions_asked,attributes_guessed,correct_guesses,task_success,user_utility_realized,leader_payoff_realized,user_prompt_text,assistant_response_text
+1,0.25,pooling,0.0,10.0,10,0,0,0,0,True,87.5,87.5,"# Coding Task Specification (Type kappa=0.25)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+2,0.25,pooling,0.0,10.0,10,0,0,0,0,True,87.5,87.5,"# Coding Task Specification (Type kappa=0.25)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+3,0.25,pooling,0.0,10.0,10,0,0,0,0,True,87.5,87.5,"# Coding Task Specification (Type kappa=0.25)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+4,0.25,pooling,0.0,10.0,10,0,0,0,0,True,87.5,87.5,"# Coding Task Specification (Type kappa=0.25)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+5,0.25,pooling,0.0,10.0,10,0,0,0,0,True,87.5,87.5,"# Coding Task Specification (Type kappa=0.25)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+6,0.25,pooling,0.0,10.0,10,0,0,0,0,True,87.5,87.5,"# Coding Task Specification (Type kappa=0.25)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+7,0.25,pooling,0.0,10.0,10,0,0,0,0,True,87.5,87.5,"# Coding Task Specification (Type kappa=0.25)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+8,0.25,pooling,0.0,10.0,10,0,0,0,0,True,87.5,87.5,"# Coding Task Specification (Type kappa=0.25)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+9,0.35,pooling,0.0,10.0,10,0,0,0,0,True,82.5,82.5,"# Coding Task Specification (Type kappa=0.35)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+10,0.35,pooling,0.0,10.0,10,0,0,0,0,True,82.5,82.5,"# Coding Task Specification (Type kappa=0.35)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+11,0.35,pooling,0.0,10.0,10,0,0,0,0,True,82.5,82.5,"# Coding Task Specification (Type kappa=0.35)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+12,0.35,pooling,0.0,10.0,10,0,0,0,0,True,82.5,82.5,"# Coding Task Specification (Type kappa=0.35)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+13,0.35,pooling,0.0,10.0,10,0,0,0,0,True,82.5,82.5,"# Coding Task Specification (Type kappa=0.35)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+14,0.35,pooling,0.0,10.0,10,0,0,0,0,True,82.5,82.5,"# Coding Task Specification (Type kappa=0.35)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+15,0.35,pooling,0.0,10.0,10,0,0,0,0,True,82.5,82.5,"# Coding Task Specification (Type kappa=0.35)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+16,0.35,pooling,0.0,10.0,10,0,0,0,0,True,82.5,82.5,"# Coding Task Specification (Type kappa=0.35)
+I need a complete, production payment processing service with exactly 10 explicit requirements:
+- Requirement 1: attribute_1 must be set to config_val_1.
+- Requirement 2: attribute_2 must be set to config_val_2.
+- Requirement 3: attribute_3 must be set to config_val_3.
+- Requirement 4: attribute_4 must be set to config_val_4.
+- Requirement 5: attribute_5 must be set to config_val_5.
+- Requirement 6: attribute_6 must be set to config_val_6.
+- Requirement 7: attribute_7 must be set to config_val_7.
+- Requirement 8: attribute_8 must be set to config_val_8.
+- Requirement 9: attribute_9 must be set to config_val_9.
+- Requirement 10: attribute_10 must be set to config_val_10.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+17,0.55,pooling,0.0,9.09090909090909,9,1,0,1,1,True,77.725,77.725,"# Coding Task Specification (Type kappa=0.55)
+I need a function to process payments. Make it fast.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+18,0.55,pooling,0.0,9.09090909090909,9,1,0,1,0,False,67.725,67.725,"# Coding Task Specification (Type kappa=0.55)
+I need a function to process payments. Make it fast.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+19,0.55,pooling,0.0,9.09090909090909,9,1,0,1,0,False,67.725,67.725,"# Coding Task Specification (Type kappa=0.55)
+I need a function to process payments. Make it fast.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+20,0.55,pooling,0.0,9.09090909090909,9,1,0,1,0,False,67.725,67.725,"# Coding Task Specification (Type kappa=0.55)
+I need a function to process payments. Make it fast.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+21,0.55,pooling,0.0,9.09090909090909,9,1,0,1,1,True,77.725,77.725,"# Coding Task Specification (Type kappa=0.55)
+I need a function to process payments. Make it fast.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+22,0.55,pooling,0.0,9.09090909090909,9,1,0,1,0,False,67.725,67.725,"# Coding Task Specification (Type kappa=0.55)
+I need a function to process payments. Make it fast.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+23,0.55,pooling,0.0,9.09090909090909,9,1,0,1,0,False,67.725,67.725,"# Coding Task Specification (Type kappa=0.55)
+I need a function to process payments. Make it fast.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.
+24,0.55,pooling,0.0,9.09090909090909,9,1,0,1,1,True,77.725,77.725,"# Coding Task Specification (Type kappa=0.55)
+I need a function to process payments. Make it fast.",Understood. Implementing the solution directly with silent defaults for any unmentioned attributes.

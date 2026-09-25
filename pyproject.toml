@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "underspec_sim"
+version = "0.1.0"
+description = "Simulation and numerical verification of strategic under-specification in coding assistants"
+authors = [
+    { name = "Pranjal Agarwal" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.30.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.7.0",
+    "sympy>=1.12",
+    "pydantic>=2.0.0",
+    "pytest>=7.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["underspec_sim*"]

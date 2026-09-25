@@ -1,0 +1,582 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{natbib}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}
+\newtheorem{lemma}{Lemma}
+
+\title{Strategic Under-Specification: A Stackelberg Game Between User and Assistant}
+\author{Pranjal Agarwal \\ \small BITS Pilani, Hyderabad Campus}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Users of coding assistants routinely under-specify their intent, and the assistant's
+policy for handling missing information---guess silently, or ask a clarifying
+question---is itself a strategic choice that users respond to. We formalize this as
+a Stackelberg game: the assistant commits to an ask/guess policy, and a population
+of users with privately known, heterogeneous specification costs best-respond. We
+first solve a decision-theoretic benchmark in which the policy is exogenous, and
+show that improving the assistant's raw guessing accuracy alone cannot make users
+worse off, even though it induces them to specify less---so naive ``better guessing
+causes worse specs and worse outcomes'' stories are not generically true. We then
+close the loop and solve for the assistant's own optimal policy under two regimes:
+a \emph{pooling} policy restricted to a single population-wide ask rate, and a
+\emph{screening} policy that can condition on the user's declared specification. We
+show that an unbiased (welfare-aligned) assistant achieves full efficiency under
+screening despite users' private information---incentive compatibility is free when
+principal and agent share an objective---so all screening-regime inefficiency is
+attributable to misalignment between the assistant's effective objective and true
+user welfare, not to private information per se. Pooling, by contrast, loses
+efficiency from restricted instruments even when unbiased. We characterize both
+equilibria in closed or near-closed form under a tractable linear-risk
+specification, derive testable comparative statics, and lay out a simulation and
+human-study design to test them.
+\end{abstract}
+
+\section{Introduction}
+
+A user typing a coding request faces a choice: spend effort articulating edge
+cases, naming conventions, and constraints, or leave them implicit and trust the
+assistant to infer them. The assistant, in turn, must decide for each unspecified
+detail whether to guess or to ask. Neither choice is made in a vacuum: the user's
+specification effort depends on what they expect the assistant to do with silence,
+and the assistant's ask/guess policy is chosen (explicitly, or as an emergent
+property of training) with some implicit model of how users will respond. Section 2
+treats the assistant's policy as exogenous and solves the user's problem against
+it---a one-sided optimization, useful as a benchmark but not yet a game. Sections
+4--7 close the loop: the assistant is a Stackelberg leader that commits to a policy
+anticipating the population's best response, and we solve for that policy under two
+different instrument restrictions, then compare them.
+
+\section{Environment and the Decision-Theoretic Benchmark}
+\label{sec:baseline}
+
+\subsection{Setup}
+
+A task has $k$ binary, independent, intent-relevant attributes
+$\theta = (\theta_1,\dots,\theta_k) \in \{0,1\}^k$, each drawn i.i.d.\ uniform and
+privately known to the user. The user chooses a specification effort level
+$m \in \{0,\dots,k\}$ and truthfully reveals $m$ attributes.\footnote{We assume
+truthful revelation conditional on the choice to specify: the strategic margin is
+\emph{how much} to say, not whether to lie about what is said. A cheap-talk layer
+on top of this costly-specification layer is a natural extension; see
+Section~\ref{sec:discussion}.} Specifying $m$ attributes costs $c(m)$, with
+$c(0)=0$, $c' > 0$, $c'' \ge 0$.
+
+For each of the $k-m$ unspecified attributes, the assistant either \emph{asks}
+(revealing the true value, at a cost to the user) or \emph{guesses}, succeeding
+independently with probability $g \in (0,1)$. We model the assistant's policy at
+this stage as a uniform ask rate $a \in [0,1]$ applied to every unspecified
+attribute, so each is correctly resolved with probability
+$q(a,g) = a + (1-a)g$. Task success requires \emph{all} $k$ attributes to be
+correctly resolved (conjunctive: one wrong parameter or convention typically breaks
+the deliverable). The user's payoff is
+\[
+U(m; a, g) \;=\; V \, q(a,g)^{\,k-m} \;-\; c(m) \;-\; a(k-m)\kappa ,
+\]
+with $V>0$ the value of success and $\kappa>0$ the user's cost of answering one
+clarifying question. We treat $m$ as continuous on $[0,k]$ for tractability.
+
+\subsection{Proposition 1: accuracy alone does not create moral hazard}
+
+\begin{proposition}\label{prop:accuracy}
+Fix $a$. Let $U^*(g) = \max_{m \in [0,k]} U(m;a,g)$. Then $U^*$ is weakly
+increasing in $g$.
+\end{proposition}
+
+\begin{proof}
+By the envelope theorem, at the optimum $m^*(g)$,
+$dU^*/dg = \partial U/\partial g\big|_{m=m^*(g)} = V(k-m^*)q^{k-m^*-1}(1-a) \ge 0$.
+The envelope theorem lets us ignore $dm^*/dg$: because $m^*$ is chosen optimally,
+its first-order response to $g$ has no first-order effect on $U^*$.
+\end{proof}
+
+\begin{assumption}[Regularity]\label{ass:reg}
+In the relevant range of $m$, $(k-m)\ln q(a,g) \le -1$.
+\end{assumption}
+
+\begin{corollary}\label{cor:mono}
+Under Assumption~\ref{ass:reg}, $m^*(g)$ is weakly decreasing in $g$ (decreasing
+differences in $(m,g)$; Topkis's theorem).
+\end{corollary}
+
+So, holding the assistant's policy fixed, users specify less as the assistant gets
+better at guessing, yet are never worse off for it. This is the correct benchmark
+against which any claimed moral hazard should be measured, and it isolates the
+question this paper is really about: what happens once the policy $a$ is no longer
+exogenous, but chosen by a strategic assistant that anticipates this response?
+
+\section{Sources of Strategic Under-Specification}
+
+Proposition~\ref{prop:accuracy} assumed the assistant's ask rate is fixed and that
+users correctly anticipate $q(a,g)$. Both assumptions can fail.
+
+\subsection{Cost externality}
+If a third party (a reviewer, downstream production systems) bears part of the
+cost of a wrong guess, the user's private $(\kappa, V)$ understate the social
+values, and the user under-specifies relative to the social optimum at any fixed
+$g$---worsening, by Corollary~\ref{cor:mono}, as $g$ rises. Standard; not our focus.
+
+\subsection{Miscalibrated belief updating under silent failure}
+If wrong guesses are not always detected, and detection probability $d(m)$ is
+increasing in $m$, users infer $g$ from experience rather than observing it, and
+under-specifying users are also less likely to catch their own errors---an
+upward-biased $\hat g$ that reinforces under-specification. This is a dynamic
+learning story rather than a static equilibrium result; we return to it in the
+empirical design (prediction P5).
+
+\subsection{Belief about the assistant's policy}
+\label{sec:naive-soph}
+Let users be \emph{sophisticated} (correctly infer the assistant's true ask rate
+$a_A$) or \emph{naive} (believe the assistant follows the welfare-optimal rate
+$a^\dagger \ge a_A$).
+
+\begin{proposition}\label{prop:bias}
+Under Assumption~\ref{ass:reg}, naive users choose
+$m^*_{\text{naive}} \le m^*_{\text{soph}}$ and
+$U(m^*_{\text{naive}};a_A,g) < U(m^*_{\text{soph}};a_A,g)$: naive users
+under-specify and are strictly worse off than sophisticated users, holding raw
+guessing accuracy $g$ fixed throughout.
+\end{proposition}
+
+\begin{proof}
+Corollary~\ref{cor:mono} gives $m^*(\cdot)$ non-increasing in its accuracy
+argument; $m^*_{\text{soph}}$ is optimal against the true $q(a_A,g)$, so any other
+$m$, including $m^*_{\text{naive}}$, delivers strictly lower $U(\cdot;a_A,g)$
+whenever it differs.
+\end{proof}
+
+This is the source of genuine moral hazard identified so far: not raw accuracy, but
+an \emph{unobserved gap between the user's belief about the assistant's policy and
+the assistant's true policy}. Section~\ref{sec:model1} solves for what that true
+policy $a_A$ actually is when the assistant is itself a strategic, possibly biased,
+Stackelberg leader---so Proposition~\ref{prop:bias} can be instantiated with a
+derived $a_A$ rather than an assumed one.
+
+\section{The Assistant's Policy as a Stackelberg Game}
+\label{sec:stackelberg}
+
+\subsection{General formulation}
+
+The assistant (leader) commits ex ante to a policy $\pi$ before meeting any user.
+A population of users (followers) has privately known specification-cost type
+$\kappa \sim F$ on $[\kappa_L,\kappa_H]$, with cost $c(m;\kappa)=\kappa m^2/2$, and
+best-responds $m^*(\kappa;\pi) = \arg\max_m U(m;\pi,\kappa)$. The leader's own
+objective $\Pi$ need not equal $U$: we write
+\[
+\Pi_\kappa(m,a) \;=\; \mu_A\, U(m,a;\kappa) \;-\; (\lambda_A - c_Q)\, a\,(k-m),
+\]
+where $\mu_A \in (0,1]$ discounts the leader's weight on true (downstream) user
+welfare, $c_Q$ is the user's true cost of answering one clarifying question, and
+$\lambda_A$ is the leader's own \emph{perceived} per-question friction cost, which
+may differ from $c_Q$ (e.g., a training signal that penalizes extra turns more
+than users actually mind answering a direct question). The leader is
+\emph{unbiased} iff $\mu_A=1$ and $\lambda_A=c_Q$, in which case $\Pi_\kappa \equiv
+U(\cdot;\kappa)$ exactly. The leader solves
+$\pi^* = \arg\max_\pi \mathbb{E}_{\kappa\sim F}[\Pi_\kappa(m^*(\kappa;\pi),\pi)]$,
+a bilevel program.
+
+\begin{remark}[Existence]
+For Model I below ($\pi=a\in[0,1]$, a compact scalar policy), $m^*(\kappa;a)$ is
+continuous in $a$ (strict concavity of $U$ in $m$ plus the implicit function
+theorem), so $\mathbb{E}_\kappa[\Pi_\kappa]$ is continuous in $a$ and a maximizer
+exists on $[0,1]$ by Weierstrass's theorem. For Model II below (a finite menu over
+two types), the feasible set is a compact subset of $\mathbb{R}^4$ cut out by
+linear IC/IR constraints and a continuous objective, so a maximizer again exists
+by Weierstrass's theorem; no ironing or ex-ante randomization is needed with only
+two types.
+\end{remark}
+
+For tractability in what follows we replace the exact conjunctive success
+probability $q^{k-m}$ with its first-order (small-risk) approximation around
+$q\to 1$: expected loss $\approx L(1-q)(k-m)$, where $L$ is the loss from a single
+unresolved-and-incorrect attribute. (This linear-risk form is already implicit in
+the stakes notation $L(s)$ used informally in earlier drafts of this model; here we
+make it explicit and load-bearing.) With $\Lambda \equiv L(1-g)$, the user's payoff
+becomes
+\[
+U(m,a;\kappa) \;=\; V \;-\; \Lambda(1-a)(k-m) \;-\; \frac{\kappa}{2}m^2 \;-\; a\,c_Q\,(k-m).
+\]
+
+\subsection{The first-best benchmark}
+\label{sec:firstbest}
+
+Before analyzing either regime, characterize the fully-informed, fully-aligned
+optimum: $(m^{FB}(\kappa), a^{FB}(\kappa)) = \arg\max_{m,a} U(m,a;\kappa)$.
+
+\begin{proposition}[First-best is a threshold rule in $\kappa$]\label{prop:firstbest}
+$U$ is linear in $a$ for fixed $m$, so $a^{FB}(\kappa) \in \{0,1\}$. Define
+$\kappa^* = (\Lambda+c_Q)/(2k)$. If $\Lambda > c_Q$, then $a^{FB}(\kappa)=1$
+(always ask) for $\kappa > \kappa^*$ and $a^{FB}(\kappa)=0$ (never ask, guess) for
+$\kappa < \kappa^*$.
+\end{proposition}
+
+\begin{proof}
+At $a=1$: $m^*(\kappa;1)=c_Q/\kappa$ and $U(m^*,1;\kappa)=V-c_Qk+c_Q^2/(2\kappa)$.
+At $a=0$: $m^*(\kappa;0)=\Lambda/\kappa$ and
+$U(m^*,0;\kappa)=V-\Lambda k+\Lambda^2/(2\kappa)$. Subtracting,
+\[
+U(a{=}1)-U(a{=}0) \;=\; [\Lambda-c_Q]\left(k - \frac{\Lambda+c_Q}{2\kappa}\right),
+\]
+which is positive iff $\Lambda>c_Q$ and $\kappa>(\Lambda+c_Q)/(2k)=\kappa^*$.
+\end{proof}
+
+This is a clean, closed-form, type-dependent first best: high-cost (terse) users,
+who cannot cheaply self-provide detail, should always be asked; low-cost (verbose)
+users, who can cheaply write enough that the small residual is safe to guess,
+should never be asked. This threshold rule replaces and generalizes the
+stakes-weighted threshold from earlier drafts of this model (that result is the
+special case obtained by varying $L(s)$ at fixed $\kappa$ instead of varying
+$\kappa$ at fixed $L$).
+
+\section{Model I: A Pooling (Scalar) Policy}
+\label{sec:model1}
+
+The leader is restricted to a single population-wide ask rate $a\in[0,1]$---it
+cannot condition on anything user-specific. This is the natural benchmark for a
+policy that is fixed at training time and cannot observe individual users.
+
+\subsection{User best response}
+
+The FOC $\partial U/\partial m = \Lambda(1-a) - \kappa m + ac_Q = 0$ gives, with
+$\beta(\kappa)=\Lambda/\kappa$ and $\gamma(\kappa)=(\Lambda-c_Q)/\kappa$,
+\[
+m^*(\kappa;a) \;=\; \beta(\kappa) - a\,\gamma(\kappa), \qquad
+\frac{\partial m^*}{\partial a} \;=\; -\gamma(\kappa) \;=\; \frac{c_Q-\Lambda}{\kappa}.
+\]
+
+\begin{remark}[Non-monotone effect of ask rate on specification]
+Unlike Corollary~\ref{cor:mono}, the sign of $\partial m^*/\partial a$ here does
+not depend on type: it is positive for \emph{every} type iff $c_Q > \Lambda$, i.e.,
+iff answering a question costs users more than the expected loss it avoids. When
+that holds, a higher population ask rate induces users to specify \emph{more}, not
+less---they pre-empt costly clarifying questions by writing the answer down
+themselves. This is a genuinely new force relative to Section~\ref{sec:baseline},
+where $a$ only entered through accuracy, and is a distinct, directly testable
+prediction (P1$'$ below).
+\end{remark}
+
+\subsection{The leader's problem}
+
+Let $R(a,\kappa)=k-m^*(\kappa;a)$. The leader's per-type payoff is
+$\Pi_\kappa(a) = \mu_A V - C(a)R(a,\kappa)$ with $C(a)=\mu_A\Lambda + a(\lambda_A -
+\mu_A\Lambda)$. Averaging over $F$ with $\bar R(a) = \bar R_0 + a\bar\gamma$
+(where $\bar R_0=k-\mathbb{E}[\beta]$, $\bar\gamma=\mathbb{E}[\gamma]$), $\Pi(a)$
+is quadratic in $a$:
+\[
+\Pi(a) \;=\; \mu_A V - C_0\bar R_0 - a\big[C_0\bar\gamma + \Delta\bar R_0\big] -
+a^2\Delta\bar\gamma, \qquad C_0=\mu_A\Lambda,\;\; \Delta=\lambda_A-\mu_A\Lambda.
+\]
+
+\begin{proposition}[Stackelberg-optimal pooling rate]\label{prop:aSE}
+Provided $\Delta\bar\gamma>0$ (second-order condition), the leader's optimal
+pooling ask rate is
+\[
+a^{SE} \;=\; -\,\frac{C_0\bar\gamma + \Delta \bar R_0}{2\Delta\bar\gamma}.
+\]
+\end{proposition}
+
+\begin{corollary}[Bias shifts the pooling rate]
+$\partial a^{SE}/\partial \lambda_A$ has the sign of $2\bar\gamma a^{SE} - \bar
+R_0$ (by implicit differentiation of the FOC). Under a further regularity
+condition analogous to Assumption~\ref{ass:reg} (the residual $\bar R(a^{SE})$
+stays above half of its $a{=}0$ level), $a^{SE}$ is strictly decreasing in
+$\lambda_A$: an assistant whose training penalizes clarifying questions more than
+users actually mind them ($\lambda_A>c_Q$) sets a strictly lower pooling ask rate
+than an unbiased assistant would.
+\end{corollary}
+
+\begin{corollary}[Pooling is generically interior]
+Because $F$ has support on both sides of the threshold $\kappa^*$ from
+Proposition~\ref{prop:firstbest} whenever the population is heterogeneous
+($\kappa_L < \kappa^* < \kappa_H$), the single pooling rate $a^{SE}$ is a
+compromise strictly between the two first-best corners: neither type receives its
+own first-best ask rate. This holds \emph{even when the leader is fully unbiased}
+($\mu_A=1,\lambda_A=c_Q$)---pooling loses efficiency purely from being restricted
+to one instrument, independent of any misalignment.
+\end{corollary}
+
+This last point matters for the comparison in Section~\ref{sec:compare}: Model I
+has two independent, additive sources of loss relative to first best---the
+pooling restriction, and bias.
+
+\section{Model II: A Screening (Menu) Policy}
+\label{sec:model2}
+
+Now let the leader condition its ask rate on the user's declared specification
+level (equivalently, by the revelation principle, offer a menu of bundles that
+users self-select into). Consider two types $\kappa_L<\kappa_H$ with population
+shares $f_L,f_H$, and let the leader choose bundles $(m_L,a_L),(m_H,a_H)$ subject
+to
+\[
+\text{IC}_\kappa:\;\; U(m_\kappa,a_\kappa;\kappa) \ge U(m_{\kappa'},a_{\kappa'};\kappa), \qquad
+\text{IR}_\kappa:\;\; U(m_\kappa,a_\kappa;\kappa) \ge \underline{U},
+\]
+to maximize $f_L\Pi_{\kappa_L}(m_L,a_L)+f_H\Pi_{\kappa_H}(m_H,a_H)$.
+
+\subsection{Single-crossing}
+The marginal rate of substitution between $m$ and $a$ along an indifference curve
+is $\text{MRS}(\kappa) = -\partial U/\partial m \big/ \partial U/\partial a$; using
+the FOC expressions above, $\partial \text{MRS}/\partial \kappa$ has a consistent
+sign across the relevant range (higher-$\kappa$ types have steeper indifference
+curves in $(m,a)$-space: they require more compensating ask-service per unit of
+specification given up). This is the standard Spence--Mirrlees condition and
+underwrites everything below; we omit the routine but lengthy verification.
+
+\subsection{No distortion without bias}
+
+\begin{proposition}[Efficiency survives private information when the leader is unbiased]
+\label{prop:nodistortion}
+If $\mu_A=1$ and $\lambda_A=c_Q$ (so $\Pi_\kappa \equiv U(\cdot;\kappa)$ for every
+$\kappa$), then implementing each type's own first-best bundle,
+$(m_\kappa,a_\kappa)=(m^{FB}(\kappa),a^{FB}(\kappa))$ from
+Proposition~\ref{prop:firstbest}, is incentive compatible, and no further
+mechanism design can do better for the leader.
+\end{proposition}
+
+\begin{proof}
+$(m^{FB}(\kappa),a^{FB}(\kappa))$ maximizes $U(\cdot;\kappa)$ by definition, so for
+any $\kappa'\ne\kappa$, $U(m^{FB}(\kappa),a^{FB}(\kappa);\kappa) \ge
+U(m^{FB}(\kappa'),a^{FB}(\kappa');\kappa)$ trivially: no bundle, including another
+type's, can give type $\kappa$ more utility than its own maximizer. IC holds with
+no distortion needed. Since $\Pi_\kappa\equiv U(\cdot;\kappa)$, the leader's payoff
+from serving each true type is exactly maximized at that type's own first best, so
+this menu is also leader-optimal.
+\end{proof}
+
+This is the paper's sharpest result: unlike classical regulation (Baron--Myerson,
+Laffont--Tirole), where the principal pays a literal transfer and therefore has an
+independent reason to dislike conceding rent, here the leader's payoff can
+coincide exactly with user welfare, and when it does, incentive compatibility is
+\emph{free}---private information costs nothing. Distortion in this setting is
+therefore a pure signature of misalignment, not of asymmetric information per se.
+
+\subsection{Distortion under bias}
+
+When $\Pi_\kappa \ne U(\cdot;\kappa)$ (bias present), the leader's preferred bundle
+per type, $(m_\kappa^{B},a_\kappa^{B})=\arg\max_{m,a}\Pi_\kappa(m,a)$ (computable
+in closed form by the same method as Proposition~\ref{prop:firstbest}, with
+$\Lambda,c_Q$ replaced by their $\mu_A,\lambda_A$-weighted counterparts), no longer
+automatically satisfies IC, because $\Pi_\kappa$ and the user's true $U(\cdot;\kappa)$
+now rank bundles differently.
+
+\begin{proposition}[Downward distortion of the high-cost type's service]
+\label{prop:distortion}
+Under the single-crossing condition and the empirically motivated under-asking
+bias ($\lambda_A > \mu_A c_Q$, i.e.\ the leader over-weights the friction of
+asking relative to true user cost), the leader's optimal incentive-compatible
+menu sets $a_L^{SB}=a_L^{B}$ (no further distortion for the low-cost type, whose
+biased first-best is already the binding corner $a=0$) and $a_H^{SB} < a_H^{B} \le
+a_H^{FB}=1$ (the high-cost type is asked strictly less than even the leader's own
+already-biased preference for them), with $a_H^{SB}$ characterized by the
+standard virtual-surplus first-order condition
+$\partial\Pi_{\kappa_H}/\partial a_H = \frac{f_L}{f_H}\big[\kappa_H-\kappa_L\big]
+m_H \cdot \partial m_H/\partial a_H$ (rent-adjustment term on the right).
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Standard: relax the problem to IC$_L$ and IR$_H$ only (verify ex post the omitted
+constraints are slack, routine given single-crossing); use the envelope
+representation of type $\kappa_L$'s rent from mimicking $\kappa_H$'s bundle,
+$U(m_H,a_H;\kappa_L)-U(m_H,a_H;\kappa_H) = (\kappa_H-\kappa_L)m_H^2/2$; substitute
+the binding IR$_H$ and IC$_L$ into the leader's objective to obtain a
+``virtual-surplus'' objective in $(m_H,a_H)$ alone, in which the $\kappa_H$ bundle
+is charged an extra marginal cost proportional to $f_L/f_H\cdot(\kappa_H-\kappa_L)$
+for increasing $m_H$ (since a larger $m_H$ enlarges the rent owed to $\kappa_L$);
+this pulls the optimal $a_H$ (and implicitly $m_H$, via the follower's own FOC)
+below the leader's unconstrained-per-type preference $a_H^{B}$. We omit the full
+explicit substitution; it follows Baron--Myerson/Myerson's virtual-surplus
+technique line for line once $\Pi_\kappa$ replaces the classical transfer-based
+payoff.
+\end{proof}
+
+\begin{remark}
+The direction in Proposition~\ref{prop:distortion} is specific to the
+under-asking bias case ($\lambda_A>\mu_A c_Q$), which we take to be the
+empirically relevant one (Section~\ref{sec:naive-soph}'s motivating story: turn-level
+satisfaction signals penalize extra clarifying questions more than users actually
+mind answering them). Under the opposite bias, the direction of distortion can
+flip; we do not claim a sign that holds for all $\Pi_\kappa$.
+\end{remark}
+
+\section{Comparing the Two Regimes}
+\label{sec:compare}
+
+\begin{corollary}[Menus weakly dominate pooling]
+The leader's optimal expected payoff under Model II is weakly greater than under
+Model I: any pooling policy $a$ is a feasible (degenerate) menu with
+$a_L=a_H=a$, trivially satisfying IC, so the unconstrained menu optimum is at
+least as good.
+\end{corollary}
+
+The more interesting comparison is \emph{where the two regimes' losses come from},
+which Propositions~\ref{prop:aSE}--\ref{prop:distortion} let us decompose cleanly:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Model I (pooling)} loses welfare from two additive, independent
+sources: (i) the pooling restriction itself, present even when $\mu_A{=}1,
+\lambda_A{=}c_Q$ (Corollary 3), and (ii) bias, which shifts $a^{SE}$ further
+(Corollary 2). These compound: a biased pooling policy is worse than either
+distortion alone would predict.
+\item \textbf{Model II (screening)} loses welfare from bias \emph{only}
+(Proposition~\ref{prop:nodistortion}): with no bias, screening recovers full
+efficiency despite private information. With bias, the loss is the
+rent-extraction-driven downward distortion of Proposition~\ref{prop:distortion},
+which is a genuinely different mechanism from Model I's pooling loss (it doesn't
+arise from being unable to condition on anything---it arises from not being able
+to trust what is conditioned on).
+\end{itemize}
+
+\begin{remark}[Compounding, testable]
+Because Model II's distortion is triggered by, and scales with, the same bias
+parameters ($\mu_A,\lambda_A$ vs.\ $c_Q$) that drive Model I's shift in
+$a^{SE}$, reducing measured assistant bias should improve outcomes for high-cost
+(terse) users under \emph{both} regimes, but the welfare \emph{gap between}
+menu-conditioned and pooled policies should track population heterogeneity in
+$\kappa$ (the spread $\kappa_H-\kappa_L$ and how far $F$ sits on either side of
+$\kappa^*$) almost independently of bias. This gives two separable, testable
+quantities from the same field data: a bias-sensitive term and a
+heterogeneity-sensitive term.
+\end{remark}
+
+\section{Testable Predictions}
+\label{sec:predictions}
+
+\begin{enumerate}[leftmargin=*]
+\item[\textbf{P1}] (Prop.~\ref{prop:accuracy}, Cor.~\ref{cor:mono}) Holding the
+assistant's policy fixed, higher guessing accuracy should be associated with
+shorter specifications but higher or equal success rates---never both shorter
+specs and lower success.
+\item[\textbf{P1$'$}] (Model I remark) Holding accuracy fixed, the effect of a
+higher \emph{ask rate} on specification length should flip sign depending on
+whether $c_Q \gtrless \Lambda=L(1-g)$: where clarifying questions are cheap
+relative to the risk they resolve, users should specify less as ask rate rises
+(substitution); where questions are relatively costly to answer, users should
+specify \emph{more} (pre-emption). This is a within-model prediction distinct
+from P1's accuracy channel.
+\item[\textbf{P2}] (Prop.~\ref{prop:bias}) The correlation between turn-level
+satisfaction and eventual task success should weaken, or invert, specifically for
+under-asking assistants, and can now be benchmarked against the derived $a^{SE}$
+of Proposition~\ref{prop:aSE} rather than an assumed ask rate.
+\item[\textbf{P3}] Making ask-rate statistics visible to users should shift
+specification length toward the sophisticated best response of
+Section~\ref{sec:naive-soph}.
+\item[\textbf{P4}] (Prop.~\ref{prop:firstbest}) Ask rates should rise with a
+user's revealed difficulty specifying detail (terseness), sharply around a
+threshold $\kappa^*$, rather than responding only to model confidence.
+\item[\textbf{P5}] Users with lower self-reported error-catching rates should show
+declining specification effort over a session (Section 3.2's dynamic channel).
+\item[\textbf{P6}] (Cor.~3) Under a pooling policy, terse users should be
+under-served and verbose users over-served relative to \emph{each type's own}
+first best, even for a demonstrably unbiased assistant---a gap attributable
+purely to instrument restriction, distinguishable in data from bias by holding
+$\lambda_A$ fixed (e.g., via an A/B test on friction penalties in training) and
+varying only whether the policy can condition on declared specification.
+\item[\textbf{P7}] (Prop.~\ref{prop:distortion}) Even where an assistant \emph{can}
+condition on declared specification, terse users should still be asked less than
+the assistant's own (possibly already-biased) per-type preference would predict,
+specifically because of the incentive-compatibility constraint---a distortion
+that should shrink as the population's cost heterogeneity ($\kappa_H-\kappa_L$)
+shrinks, holding bias fixed (Remark on compounding).
+\end{enumerate}
+
+\section{Empirical Strategy (Summary)}
+
+\textbf{Simulation.} Instantiate LLM-simulated users with heterogeneous cost
+types $\kappa$ interacting with assistants implementing Model I's derived
+$a^{SE}$, Model II's numerically-solved menu, and naive baselines (fixed
+confidence threshold, ignoring both stakes and type). Verify
+Proposition~\ref{prop:firstbest}'s threshold numerically, verify
+Proposition~\ref{prop:aSE}'s closed form against a grid search over $a$, and
+verify Proposition~\ref{prop:nodistortion}/\ref{prop:distortion} by solving the
+constrained menu optimization directly and checking that the low type's bundle
+sits at its unconstrained optimum while the high type's does not, with the gap
+shrinking as bias is set to zero.
+
+\textbf{Human study.} A between-subjects manipulation of ask policy (pooling vs.\
+menu-conditioned; biased vs.\ unbiased friction weighting) across repeated coding
+tasks, measuring specification length and, where feasible, self-reported
+terseness/verbosity as a proxy for $\kappa$, to test P1$'$, P6, and P7 causally
+rather than correlationally.
+
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+The linear-risk approximation to the conjunctive success function is the main
+tractability assumption carried through Sections~\ref{sec:stackelberg}--\ref{sec:compare};
+we expect the qualitative results (threshold first best, no-distortion-without-bias,
+downward distortion under bias) to survive the exact conjunctive form, since
+they rely on convexity/monotonicity properties rather than the specific
+functional form, but this should be checked numerically before the claims are
+stated without qualification. The two-type restriction in Model II avoids
+ironing/continuum-type complications at the cost of generality; a continuum
+version using the standard Mirrlees technique is the natural next step and would
+let $\kappa^*$ from the first-best benchmark interact directly with the screening
+distortion. We also assume truthful revelation of specified attributes (no
+cheap-talk vagueness within what is said) and a single leader (no competition
+among assistants, which would itself be an interesting extension---competition
+plausibly disciplines bias directly, another testable channel).
+
+\bibliographystyle{plainnat}
+\begin{thebibliography}{9}
+
+\bibitem[von Stackelberg(1934)]{stackelberg1934}
+Heinrich von Stackelberg. \textit{Marktform und Gleichgewicht}. Springer, 1934.
+
+\bibitem[Myerson(1981)]{myerson1981}
+Roger B.\ Myerson. Optimal auction design. \textit{Mathematics of Operations
+Research}, 6(1):58--73, 1981.
+
+\bibitem[Baron and Myerson(1982)]{baron-myerson1982}
+David P.\ Baron and Roger B.\ Myerson. Regulating a monopolist with unknown
+costs. \textit{Econometrica}, 50(4):911--930, 1982.
+
+\bibitem[Mussa and Rosen(1978)]{mussa-rosen1978}
+Michael Mussa and Sherwin Rosen. Monopoly and product quality. \textit{Journal
+of Economic Theory}, 18(2):301--317, 1978.
+
+\bibitem[Laffont and Tirole(1986)]{laffont-tirole1986}
+Jean-Jacques Laffont and Jean Tirole. Using cost observation to regulate firms.
+\textit{Journal of Political Economy}, 94(3):614--641, 1986.
+
+\bibitem[Crawford and Sobel(1982)]{crawford-sobel1982}
+Vincent P.\ Crawford and Joel Sobel. Strategic information transmission.
+\textit{Econometrica}, 50(6):1431--1451, 1982.
+
+\bibitem[Townsend(1979)]{townsend1979}
+Robert M.\ Townsend. Optimal contracts and competitive markets with costly state
+verification. \textit{Journal of Economic Theory}, 21(2):265--293, 1979.
+
+\bibitem[Grossman(1981)]{grossman1981}
+Sanford J.\ Grossman. The informational role of warranties and private
+disclosure about product quality. \textit{Journal of Law and Economics},
+24(3):461--483, 1981.
+
+\bibitem[Sims(2003)]{sims2003}
+Christopher A.\ Sims. Implications of rational inattention. \textit{Journal of
+Monetary Economics}, 50(3):665--690, 2003.
+
+\bibitem[Topkis(1978)]{topkis1978}
+Donald M.\ Topkis. Minimizing a submodular function on a lattice.
+\textit{Operations Research}, 26(2):305--321, 1978.
+
+\end{thebibliography}
+
+\vspace{1em}
+\noindent\textit{Note: bibliographic entries are given from memory to anchor
+citations conceptually and should be checked against primary sources
+(volume/issue/page numbers) before submission.}
+
+\end{document}

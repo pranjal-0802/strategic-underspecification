@@ -1,0 +1,2 @@
+kappa_L,kappa_H,lambda_A,c_Q,a_L_opt,a_L_B,a_L_at_corner,a_H_opt,a_H_B,a_H_strictly_below,distortion_size,IC_L_slack,IC_H_slack,IR_L_slack,IR_H_slack,active_constraints,matches_paper_assumed_active,passed
+0.3,0.5,4.0,2.0,7.316888633305113e-16,0.0,True,0.7499999559235518,1.0,True,0.25000004407644816,-9.947598300641403e-14,3.0555540863399813,85.0,78.05555408633998,IC_L,False,True

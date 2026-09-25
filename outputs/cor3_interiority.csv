@@ -1,0 +1,2 @@
+mu_A,lambda_A,c_Q,kappa_star,F_min,F_max,a_SE_closed,a_SE_grid,is_corner,soc_value,is_concave,passed,message
+1.0,2.0,2.0,0.35,0.2,0.6,1.06010035983301,0.0,True,-24.729365662101593,False,False,"FAIL: In the unbiased case (mu_A=1, lambda_A=c_Q), a_SE lands at corner (grid argmax = 0.0000, closed form = 1.0601). Reason: SOC Delta*gamma_bar = -24.7294 <= 0 makes Pi(a) strictly convex in a."
