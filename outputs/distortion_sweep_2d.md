@@ -12,7 +12,7 @@
 
 ### 2. Welfare Gap (Screening vs Corrected Pooling) & Regime Flags:
 - **Dominance Holds:** **True** (Minimum gap: `0.0000`).
-- **Pooling Regimes in Sweep:** `{'corner': 20}`.
+- **Pooling Regimes in Sweep:** `{'corner': 10, 'interior': 10}`.
 - In this parameter region ($k=10, L=10, c_Q=2$), $\\Pi_I(a)$ is minimized in the interior and achieves its maximum at corner $a^{SE}=0$ (`regime: corner`).
 - The welfare advantage of screening ($\Pi_{II} - \Pi_I$) grows with heterogeneity $\Delta\kappa$ and persists across all bias levels.
 

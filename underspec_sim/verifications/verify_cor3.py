@@ -1,12 +1,12 @@
 r"""
 underspec_sim.verifications.verify_cor3:
 Verifies Corollary 3 (Pooling is a corner solution, not a compromise [Corrected]):
-1. In the unbiased case (\mu_A = 1, \lambda_A = c_Q), \Delta * \bar{\gamma} = -(\Lambda - c_Q)^2 * E[1/\kappa] <= 0 ALWAYS.
+1. In the unbiased case (\mu_A = 1, \lambda_A = c_Q), \bar{Q} = s^2 * \bar{\gamma} / 2 >= 0 ALWAYS.
    \Pi(a) is weakly convex on [0, 1] and the true pooling optimum is a corner a^{SE} \in {0, 1}.
 2. The corner is chosen by comparing \Pi(1) vs \Pi(0) directly:
-   \Pi(1) - \Pi(0) = (\Lambda - c_Q) * [\bar{R}_0 - c_Q * E[1/\kappa]].
+   \Pi(1) - \Pi(0) = (\Lambda - c_Q) * [\bar{R}_0 + \bar{\gamma}/2] = (\Lambda - c_Q) * [k - (\Lambda + c_Q)/2 * E[1/\kappa]].
 3. Away from the unbiased case, an interior a^{SE} is possible specifically when
-   (\lambda_A - \mu_A * \Lambda) and (\Lambda - c_Q) share a sign.
+   \bar{Q} < 0, i.e., 2(\lambda_A - c_Q) > \mu_A(\Lambda - c_Q).
 
 Outputs:
 - outputs/cor3_interiority.csv
@@ -29,26 +29,26 @@ from underspec_sim.model1_pooling.payoff import leader_payoff_pooling
 def run_verification(output_dir: str = "outputs", raise_on_failure: bool = False) -> Dict[str, Any]:
     os.makedirs(output_dir, exist_ok=True)
 
-    # 1. Unbiased Case A: Expected corner a = 0 (k moderate, specification high cost)
-    params_corner0 = ModelParams(k=10.0, g=0.5, L=10.0, c_Q=2.0, mu_A=1.0, lambda_A=2.0, V=100.0)
+    # 1. Unbiased Case A: Expected corner a = 0 (k below first-best threshold, specification high cost)
+    params_corner0 = ModelParams(k=5.0, g=0.5, L=10.0, c_Q=2.0, mu_A=1.0, lambda_A=2.0, V=100.0)
     F_samples = np.linspace(0.2, 0.6, 500)
     res_corner0 = test_interiority(F_samples=F_samples, params=params_corner0, fail_loudly=False)
 
-    # 2. Unbiased Case B: Expected corner a = 1 (k large, asking dominates)
-    params_corner1 = ModelParams(k=30.0, g=0.5, L=10.0, c_Q=2.0, mu_A=1.0, lambda_A=2.0, V=100.0)
+    # 2. Unbiased Case B: Expected corner a = 1 (k above threshold, asking dominates - benchmark case)
+    params_corner1 = ModelParams(k=10.0, g=0.5, L=10.0, c_Q=2.0, mu_A=1.0, lambda_A=2.0, V=100.0)
     res_corner1 = test_interiority(F_samples=F_samples, params=params_corner1, fail_loudly=False)
 
-    # 3. Biased Case: Interior stationary point when (lambda_A - mu_A*Lambda) and (Lambda - c_Q) share a sign
-    # k=5.0, c_Q=2.0, Lambda=4.0 -> Lambda - c_Q = 2.0 > 0
+    # 3. Biased Case: Interior stationary point when Q_bar < 0
+    # k=5.0, c_Q=2.0, Lambda=4.0 -> s = 2.0 > 0
     k_bias = 5.0
     c_Q_bias = 2.0
     Lambda_bias = 4.0
+    s_bias = Lambda_bias - c_Q_bias
     inv_kap_mean = float(np.mean(1.0 / F_samples))
-    gamma_b = (Lambda_bias - c_Q_bias) * inv_kap_mean
+    gamma_b = s_bias * inv_kap_mean
     r0_b = k_bias - Lambda_bias * inv_kap_mean
-    c0 = Lambda_bias
-    delta_target = -c0 * gamma_b / (r0_b + gamma_b)
-    params_interior = ModelParams(k=k_bias, g=0.5, L=8.0, c_Q=c_Q_bias, mu_A=1.0, lambda_A=c0 + delta_target, V=100.0)
+    b_target = s_bias * (r0_b + 0.5 * gamma_b) / (r0_b + gamma_b)
+    params_interior = ModelParams(k=k_bias, g=0.5, L=8.0, c_Q=c_Q_bias, mu_A=1.0, lambda_A=float(c_Q_bias + b_target), V=100.0)
     res_interior = solve_pooling_equilibrium(F_samples=F_samples, params=params_interior)
 
     # 4. Comprehensive sweep across parameter grid to verify 100% agreement with corner formula
@@ -91,8 +91,8 @@ def run_verification(output_dir: str = "outputs", raise_on_failure: bool = False
     ax1 = axes[0]
     pi_c0 = leader_payoff_pooling(a_dense, F_samples, params=params_corner0)
     pi_c1 = leader_payoff_pooling(a_dense, F_samples, params=params_corner1)
-    ax1.plot(a_dense, pi_c0, color="firebrick", lw=2, label=f"Unbiased (k=10): Corner a*={res_corner0.a_SE:.0f}")
-    ax1.plot(a_dense, pi_c1, color="navy", lw=2, label=f"Unbiased (k=30): Corner a*={res_corner1.a_SE:.0f}")
+    ax1.plot(a_dense, pi_c0, color="firebrick", lw=2, label=f"Unbiased (k=5): Corner a*={res_corner0.a_SE:.0f}")
+    ax1.plot(a_dense, pi_c1, color="navy", lw=2, label=f"Unbiased (k=10): Corner a*={res_corner1.a_SE:.0f}")
     ax1.scatter([res_corner0.a_SE], [leader_payoff_pooling(res_corner0.a_SE, F_samples, params=params_corner0)],
                 color="red", s=100, zorder=5)
     ax1.scatter([res_corner1.a_SE], [leader_payoff_pooling(res_corner1.a_SE, F_samples, params=params_corner1)],
@@ -126,28 +126,26 @@ def run_verification(output_dir: str = "outputs", raise_on_failure: bool = False
 
 **Status:** **{status}** (Corrected Corollary 3 Verified 100% Numerically)
 
-### Theoretical Result (Paper eq 301-328):
+### Theoretical Result:
 In the unbiased case ($\\mu_A = 1, \\lambda_A = c_Q$):
-$$\\Delta = c_Q - \\Lambda, \\qquad \\bar{{\\gamma}} = (\\Lambda - c_Q) \\mathbb{{E}}[1/\\kappa]$$
-$$\\Delta\\bar{{\\gamma}} = -(\\Lambda - c_Q)^2 \\mathbb{{E}}[1/\\kappa] \\le 0 \\quad \\text{{always}}.$$
+$$\\bar{{Q}} = \\frac{{(\\Lambda - c_Q)^2 \\mathbb{{E}}[1/\\kappa]}}{{2}} \\ge 0 \\quad \\text{{always}}.$$
 
-The second-order condition fails: $\\Pi(a)$ is weakly convex on $[0, 1]$, its interior stationary point is a minimum, and the true optimum is a corner $a^{{SE}} \\in \\{{0, 1\\}}$. The corner is determined by:
-$$\\Pi(1) - \\Pi(0) = (\\Lambda - c_Q)\\Big[\\bar{{R}}_0 - c_Q \\mathbb{{E}}[1/\\kappa]\\Big].$$
+The objective $\\Pi(a)$ is weakly convex on $[0, 1]$, its interior stationary point is a minimum, and the true optimum is a corner $a^{{SE}} \\in \\{{0, 1\\}}$. The corner is determined by:
+$$\\Pi(1) - \\Pi(0) = \\bar{{L}} + \\bar{{Q}} = (\\Lambda - c_Q)\\left[\\bar{{R}}_0 + \\frac{{\\bar{{\\gamma}}}}{{2}}\\right] = (\\Lambda - c_Q)\\left[k - \\frac{{\\Lambda + c_Q}}{{2}}\\mathbb{{E}}[1/\\kappa]\\right].$$
 
 ### Numerical Audit Results:
-1. **Unbiased Corner 0 Verification ($k=10$):**
+1. **Unbiased Corner 0 Verification ($k=5$):**
    - $\\Pi(1) - \\Pi(0) = {res_corner0.pi_diff:.4f} < 0$.
    - Solver returns $a^{{SE}} = {res_corner0.a_SE:.1f}$ with regime `"{res_corner0.regime}"`.
-   - SOC $\\Delta\\bar{{\\gamma}} = {res_corner0.soc_value:.4f} \\le 0$ confirms convexity. Match confirmed.
-2. **Unbiased Corner 1 Verification ($k=30$):**
+   - SOC $\\bar{{Q}} = {res_corner0.soc_value:.4f} \\ge 0$ confirms convexity. Match confirmed.
+2. **Unbiased Corner 1 Verification ($k=10$, Benchmark):**
    - $\\Pi(1) - \\Pi(0) = {res_corner1.pi_diff:.4f} > 0$.
    - Solver returns $a^{{SE}} = {res_corner1.a_SE:.1f}$ with regime `"{res_corner1.regime}"`.
-   - SOC $\\Delta\\bar{{\\gamma}} = {res_corner1.soc_value:.4f} \\le 0$ confirms convexity. Match confirmed.
+   - SOC $\\bar{{Q}} = {res_corner1.soc_value:.4f} \\ge 0$ confirms convexity. Match confirmed.
 3. **Comprehensive Grid Sweep ({len(df_sweep)} configurations):**
    - Verified across variations in $k, L, c_Q$: 100% returned `regime="corner"` with $a^{{SE}} \\in \\{{0, 1\\}}$ exactly matching the formula sign.
 4. **Biased Case Interior Solution:**
-   - When $\\lambda_A - \\mu_A\\Lambda$ and $\\Lambda - c_Q$ share a sign, $\\Delta\\bar{{\\gamma}} > 0$.
-   - $\\Pi(a)$ is strictly concave; solver returns an interior stationary solution $a^{{SE}} = {res_interior.a_SE:.4f}$ with regime `"{res_interior.regime}"`.
+   - When $\\bar{{Q}} < 0$, $\\Pi(a)$ is strictly concave; solver returns an interior stationary solution $a^{{SE}} = {res_interior.a_SE:.4f}$ with regime `"{res_interior.regime}"`.
 
 **Artifacts Generated:**
 - CSV: `cor3_interiority.csv`

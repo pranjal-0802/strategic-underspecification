@@ -42,36 +42,68 @@ def test_sympy_prop3_first_best_threshold():
 
 
 def test_sympy_prop4_pooling_foc_and_soc():
-    r"""Verify dPi/da = 0 gives Proposition 4's a_SE and second derivative is -2*Delta*gamma."""
-    a, mu_A, V, C0, Delta, R0_bar, gamma_bar = sp.symbols('a mu_A V C0 Delta R0_bar gamma_bar')
-    Pi = mu_A * V - C0 * R0_bar - a * (C0 * gamma_bar + Delta * R0_bar) - a**2 * (Delta * gamma_bar)
+    r"""
+    Derive the leader's pooling objective directly from primitives using SymPy:
+    Pi_kappa = mu_A * U(m*, a; kappa) - (lambda_A - c_Q) * a * (k - m*)
+    where m* = beta - a * gamma.
+    Verify that expanding in a yields Pi = const + L * a + Q * a^2,
+    with dPi/da = L + 2 * Q * a = 0 giving a* = - L / (2 * Q),
+    and d2Pi/da2 = 2 * Q.
+    """
+    a, kappa, Lambda, c_Q, V, k, mu_A, lambda_A = sp.symbols(
+        'a kappa Lambda c_Q V k mu_A lambda_A', positive=True
+    )
+    m_star = (Lambda - a * (Lambda - c_Q)) / kappa
+    U = V - Lambda * (1 - a) * (k - m_star) - (kappa / 2) * m_star**2 - a * c_Q * (k - m_star)
+    Pi_kappa = mu_A * U - (lambda_A - c_Q) * a * (k - m_star)
 
-    dPi_da = sp.diff(Pi, a)
-    a_SE_sol = sp.solve(dPi_da, a)[0]
+    # Collect powers of a:
+    poly_a = sp.collect(sp.expand(Pi_kappa), a)
+    Q_kappa = poly_a.coeff(a, 2)
+    L_kappa = poly_a.coeff(a, 1)
 
-    expected_a_SE = - (C0 * gamma_bar + Delta * R0_bar) / (2 * Delta * gamma_bar)
+    s = Lambda - c_Q
+    b = lambda_A - c_Q
+    gamma = s / kappa
+    R_0 = k - Lambda / kappa
+
+    expected_Q = (mu_A * s - 2 * b) * gamma / 2
+    expected_L = (mu_A * s - b) * R_0
+
+    assert sp.simplify(Q_kappa - expected_Q) == 0
+    assert sp.simplify(L_kappa - expected_L) == 0
+
+    # FOC and SOC:
+    a_SE_sol = sp.solve(sp.diff(poly_a, a), a)[0]
+    expected_a_SE = - expected_L / (2 * expected_Q)
     assert sp.simplify(a_SE_sol - expected_a_SE) == 0
-
-    d2Pi_da2 = sp.diff(dPi_da, a)
-    assert sp.simplify(d2Pi_da2 - (-2 * Delta * gamma_bar)) == 0
+    assert sp.simplify(sp.diff(poly_a, a, 2) - 2 * expected_Q) == 0
 
 
 def test_sympy_unbiased_pooling_convexity():
-    r"""Prove symbolically that in the unbiased case, Delta * gamma_bar <= 0 always."""
-    Lambda, c_Q, inv_kappa = sp.symbols('Lambda c_Q inv_kappa', positive=True)
-    # Unbiased: mu_A = 1, lambda_A = c_Q
-    Delta = c_Q - Lambda
-    gamma_bar = (Lambda - c_Q) * inv_kappa
+    r"""
+    Prove symbolically from primitives that in the unbiased case (mu_A=1, lambda_A=c_Q => b=0),
+    Q_kappa = s^2 / (2 * kappa) >= 0 ALWAYS, so Pi(a) is weakly convex on [0, 1]
+    and the optimum is always a corner solution.
+    Furthermore, Pi(1) - Pi(0) = s * (R_0 + gamma / 2).
+    """
+    a, kappa, Lambda, c_Q, V, k = sp.symbols('a kappa Lambda c_Q V k', positive=True)
+    s = Lambda - c_Q
+    m_star = (Lambda - a * s) / kappa
+    U = V - Lambda * (1 - a) * (k - m_star) - (kappa / 2) * m_star**2 - a * c_Q * (k - m_star)
 
-    soc_val = Delta * gamma_bar
-    # soc_val = (c_Q - Lambda) * (Lambda - c_Q) * inv_kappa = - (Lambda - c_Q)^2 * inv_kappa
-    expected = - (Lambda - c_Q)**2 * inv_kappa
+    d2U_da2 = sp.diff(U, a, 2)
+    expected_d2 = s**2 / kappa
+    assert sp.simplify(d2U_da2 - expected_d2) == 0
 
-    assert sp.simplify(soc_val - expected) == 0
-    # Second derivative of Pi with respect to a:
-    d2Pi_da2 = - 2 * soc_val
-    # d2Pi_da2 = + 2 * (Lambda - c_Q)^2 * inv_kappa > 0!
-    assert sp.simplify(d2Pi_da2 - 2 * (Lambda - c_Q)**2 * inv_kappa) == 0
+    # Corner difference Pi(1) - Pi(0)
+    U_1 = U.subs(a, 1)
+    U_0 = U.subs(a, 0)
+    diff = sp.simplify(U_1 - U_0)
+    gamma = s / kappa
+    R_0 = k - Lambda / kappa
+    expected_diff = s * (R_0 + gamma / 2)
+    assert sp.simplify(diff - expected_diff) == 0
 
 
 def test_sympy_single_crossing_rent():

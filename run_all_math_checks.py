@@ -75,7 +75,7 @@ def main():
         "name": "Pooling Equilibrium Closed Form",
         "verdict": "PASS" if res_p4["passed"] else "FAIL",
         "passed": res_p4["passed"],
-        "note": f"Matches grid under SOC Delta*gamma>0 (gap: {res_p4['res_valid'].discrepancy:.4f})",
+        "note": f"Matches grid under SOC Q_bar<0 (gap: {res_p4['res_valid'].discrepancy:.4f})",
     })
 
     # 3. Cor 2
@@ -161,7 +161,7 @@ def main():
         "name": "mu_A Comparative Statics & Confound",
         "verdict": res_mu["verdict"],
         "passed": res_mu["passed"],
-        "note": f"Verified ratio dmu/dlam = -lambda_A/mu_A (error: {res_mu['max_ratio_error']:.1e}); parameters confounded",
+        "note": f"Verified ratio dmu/dlam = -(lambda_A - c_Q)/mu_A (error: {res_mu['max_ratio_error']:.1e}); parameters confounded",
     })
 
     # 12. Follow-up 1 (Task 1): Monotonicity Survival

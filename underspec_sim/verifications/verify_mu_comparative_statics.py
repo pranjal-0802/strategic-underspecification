@@ -72,16 +72,18 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     c_Q = 2.0
     V = 100.0
 
-    # Interior pooling setup where Delta * gamma_bar > 0
+    # Interior pooling setup where Q_bar < 0
     k = 5.0
     Lambda = 4.0
+    s = Lambda - c_Q
     F_samples = np.linspace(0.25, 0.35, 100)
     inv_kap = float(np.mean(1.0 / F_samples))
-    gamma_b = (Lambda - c_Q) * inv_kap
+    gamma_b = s * inv_kap
     r0_b = k - Lambda * inv_kap
-    c0 = Lambda
-    delta_target = -c0 * gamma_b / (r0_b + gamma_b)
-    lam_anchor = c0 + delta_target  # ~19.56
+
+    # Calibrate lam_anchor to place stationary point at a* = 0.5 for mu_A = 1.0:
+    b_target = s * (r0_b + 0.5 * gamma_b) / (r0_b + gamma_b)
+    lam_anchor = float(c_Q + b_target)
 
     params_base = ModelParams(k=k, g=0.5, L=8.0, c_Q=c_Q, mu_A=1.0, lambda_A=lam_anchor, V=V)
 
@@ -92,7 +94,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     for mu in mu_sweep:
         res = solve_pooling_equilibrium(F_samples, mu_A=mu, lambda_A=lam_anchor, c_Q=c_Q, params=params_base)
         da_dmu, da_dlam, ratio = compute_pooling_derivatives(F_samples, mu, lam_anchor, c_Q, params_base)
-        analytical_ratio = - lam_anchor / mu
+        analytical_ratio = - (lam_anchor - c_Q) / mu
         ratio_error = abs(ratio - analytical_ratio) if not np.isnan(ratio) else 0.0
 
         records_mu.append({
@@ -113,7 +115,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 
     # 2. 2D Grid Sweep for Isolines (Contour Map)
     mu_grid = np.linspace(0.50, 1.20, 20)
-    lam_grid = np.linspace(lam_anchor * 0.7, lam_anchor * 1.3, 20)
+    lam_grid = np.linspace(c_Q + b_target * 0.7, c_Q + b_target * 1.3, 20)
     a_matrix = np.zeros((len(mu_grid), len(lam_grid)))
 
     records_2d: List[Dict[str, Any]] = []
@@ -125,7 +127,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
                 "mu_A": mu,
                 "lambda_A": lam,
                 "a_SE": res_ij.a_SE,
-                "effective_ratio_lam_mu": lam / mu,
+                "effective_ratio_lam_mu": (lam - c_Q) / mu,
             })
 
     df_2d = pd.DataFrame(records_2d)
@@ -152,7 +154,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     ax2.clabel(cs, inline=True, fontsize=8, fmt="a=%.2f")
     ax2.set_xlabel(r"Perceived Asking Friction $\lambda_A$")
     ax2.set_ylabel(r"Altruism Weight $\mu_A$")
-    ax2.set_title(r"Isolines of $a^{SE}$: Constant along Rays $\lambda_A / \mu_A = \text{const}$")
+    ax2.set_title(r"Isolines of $a^{SE}$: Constant along Rays $(\lambda_A - c_Q) / \mu_A = \text{const}$")
     ax2.grid(True, alpha=0.3)
 
     plt.tight_layout()
@@ -171,20 +173,21 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 **Verdict:** **{verdict}** (Remark rmk:mu-lambda analytically and numerically verified)
 
 ### 1. Mathematical Derivation of the Confound:
-From Proposition 4, when $\\Delta\\bar{{\\gamma}} > 0$, the interior pooling ask rate is:
-$$a^{{SE}} = -\\frac{{C_0 \\bar{{\\gamma}} + \\Delta \\bar{{R}}_0}}{{2\\Delta\\bar{{\\gamma}}}} = -\\frac{{\\bar{{R}}_0}}{{2\\bar{{\\gamma}}}} - \\frac{{\\mu_A \\Lambda}}{{2(\\lambda_A - \\mu_A \\Lambda)}} = -\\frac{{\\bar{{R}}_0}}{{2\\bar{{\\gamma}}}} - \\frac{{1}}{{2}} \\left[ \\frac{{1}}{{\\frac{{\\lambda_A}}{{\\mu_A \\Lambda}} - 1}} \\right]$$
+From Proposition 4, when $\\bar{{Q}} < 0$, the interior pooling ask rate is:
+$$a^{{SE}} = -\\frac{{\\bar{{L}}}}{{2\\bar{{Q}}}} = -\\frac{{(\\mu_A s - b)\\bar{{R}}_0}}{{(\\mu_A s - 2b)\\bar{{\\gamma}}}} = -\\frac{{\\bar{{R}}_0}}{{\\bar{{\\gamma}}}} \\frac{{s - \\tilde{{\\rho}}}}{{s - 2\\tilde{{\\rho}}}}$$
+where $s \\equiv \\Lambda - c_Q$, $b \\equiv \\lambda_A - c_Q$, and $\\tilde{{\\rho}} \\equiv \\frac{{\\lambda_A - c_Q}}{{\\mu_A}}$ is the excess friction per unit altruism.
 
-Notice that $a^{{SE}}$ depends on the two bias parameters $(\\mu_A, \\lambda_A)$ **strictly through the scalar ratio $\\lambda_A / \\mu_A$**!
+Notice that $a^{{SE}}$ depends on the two bias parameters $(\\mu_A, \\lambda_A)$ **strictly through the scalar ratio $\\tilde{{\\rho}} = (\\lambda_A - c_Q) / \\mu_A$**!
 
 ### 2. Exact Derivative Ratio:
 Differentiating directly:
-$$\\frac{{\\partial a^{{SE}}}}{{\\partial \\lambda_A}} = \\frac{{\\mu_A \\Lambda}}{{2(\\lambda_A - \\mu_A \\Lambda)^2}} = \\frac{{\\mu_A \\Lambda}}{{2\\Delta^2}}$$
-$$\\frac{{\\partial a^{{SE}}}}{{\\partial \\mu_A}} = -\\frac{{\\lambda_A \\Lambda}}{{2(\\lambda_A - \\mu_A \\Lambda)^2}} = -\\frac{{\\lambda_A \\Lambda}}{{2\\Delta^2}}$$
+$$\\frac{{\\partial a^{{SE}}}}{{\\partial \\lambda_A}} = -\\frac{{\\bar{{R}}_0}}{{\\bar{{\\gamma}}}} \\frac{{\\mu_A s}}{{(\\mu_A s - 2b)^2}}$$
+$$\\frac{{\\partial a^{{SE}}}}{{\\partial \\mu_A}} = \\frac{{\\bar{{R}}_0}}{{\\bar{{\\gamma}}}} \\frac{{b s}}{{(\\mu_A s - 2b)^2}}$$
 
 Taking the ratio:
-$$\\frac{{\\partial a^{{SE}} / \\partial \\mu_A}}{{\\partial a^{{SE}} / \\partial \\lambda_A}} = -\\frac{{\\lambda_A}}{{\\mu_A}}$$
+$$\\frac{{\\partial a^{{SE}} / \\partial \\mu_A}}{{\\partial a^{{SE}} / \\partial \\lambda_A}} = -\\frac{{b}}{{\\mu_A}} = -\\frac{{\\lambda_A - c_Q}}{{\\mu_A}}$$
 
-- **Numerical Verification:** Across the parameter sweep, the finite-difference ratio matches $-\\lambda_A / \\mu_A$ with maximum error `{max_ratio_err:.2e}`.
+- **Numerical Verification:** Across the parameter sweep, the finite-difference ratio matches $-(\\lambda_A - c_Q) / \\mu_A$ with maximum error `{max_ratio_err:.2e}`.
 
 ### 3. Empirical Implications for Field Identification:
 1. **Opposite Derivative Signs, Identical Bias Effect:**

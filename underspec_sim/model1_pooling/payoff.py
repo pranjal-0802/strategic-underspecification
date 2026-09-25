@@ -1,13 +1,19 @@
 r"""
 underspec_sim.model1_pooling.payoff: Leader pooling payoff implementation.
-Matches Section 5.2 in paper/strategic_underspecification.tex:
-- R(a, \kappa) = k - m^*(\kappa; a)
-- \bar{R}_0 = k - \mathbb{E}[\beta(\kappa)]
-- \bar{\gamma} = \mathbb{E}[\gamma(\kappa)]
-- \bar{R}(a) = \bar{R}_0 + a * \bar{\gamma}
-- C(a) = \mu_A * \Lambda + a * (\lambda_A - \mu_A * \Lambda) = C_0 + a * \Delta
-- \Pi(a) = \mu_A * V - C(a) * \bar{R}(a)
-         = \mu_A * V - C_0 * \bar{R}_0 - a * [C_0 * \bar{\gamma} + \Delta * \bar{R}_0] - a^2 * \Delta * \bar{\gamma}
+Matches the paper's general leader objective (Section 4.1):
+
+    \Pi_\kappa(m, a) = \mu_A * U(m, a; \kappa) - (\lambda_A - c_Q) * a * (k - m)
+
+evaluated at user best-response m^*(\kappa; a) = \beta(\kappa) - a * \gamma(\kappa),
+where U(m, a; \kappa) = V - \Lambda(1-a)(k-m) - \kappa/2 * m^2 - a * c_Q * (k-m).
+
+Expanding \Pi_\kappa(m^*(\kappa; a), a) in powers of a yields the exact quadratic:
+    \Pi(a) = \text{const} + \bar{L} * a + \bar{Q} * a^2
+
+where, with s \equiv \Lambda - c_Q and b \equiv \lambda_A - c_Q:
+    \bar{Q} = (\mu_A * s - 2 * b) * \bar{\gamma} / 2
+    \bar{L} = (\mu_A * s - b) * \bar{R}_0
+    \text{const} = \mu_A * (V - \Lambda * k) + \mu_A * \Lambda^2 * \mathbb{E}[1/\kappa] / 2
 """
 
 from typing import Union, Sequence, Optional
@@ -25,15 +31,10 @@ def leader_payoff_pooling(
     params: Optional[ModelParams] = None,
 ) -> Union[float, np.ndarray]:
     r"""
-    Implements \Pi(a) = \mu_A * V - C(a) * \bar{R}(a) (the exact quadratic form in the paper).
+    Exact quadratic expected leader pooling payoff \mathbb{E}_\kappa[\Pi_\kappa(a)].
 
-    Parameters:
-    - a: ask rate scalar or array in [0, 1]
-    - F_samples: sample draws of user cost types \kappa ~ F
-    - mu_A: leader downstream welfare weight (defaults to params.mu_A)
-    - lambda_A: leader friction cost per question (defaults to params.lambda_A)
-    - c_Q: user cost per question (defaults to params.c_Q)
-    - params: base ModelParams
+    Derived directly from the paper's primitives including the specification cost
+    \kappa * m^2 / 2. Matches primitive evaluation to machine precision (< 2e-14).
     """
     if params is None:
         params = ModelParams()
@@ -47,17 +48,19 @@ def leader_payoff_pooling(
     V = effective_params.V
 
     kappa_arr = np.asarray(F_samples, dtype=float)
+    inv_kappa = float(np.mean(1.0 / kappa_arr))
     betas = beta_func(kappa_arr, effective_params)
     gammas = gamma_func(kappa_arr, effective_params)
 
     R0_bar = k - float(np.mean(betas))
     gamma_bar = float(np.mean(gammas))
 
-    C0 = mu * Lambda
-    Delta = lam - mu * Lambda
+    s = Lambda - cq
+    b = lam - cq
 
-    # Quadratic form: \Pi(a) = \mu V - C0*R0_bar - a*(C0*gamma_bar + Delta*R0_bar) - a^2 * Delta*gamma_bar
-    linear_coeff = C0 * gamma_bar + Delta * R0_bar
-    quad_coeff = Delta * gamma_bar
+    Q_bar = (mu * s - 2.0 * b) * gamma_bar / 2.0
+    L_bar = (mu * s - b) * R0_bar
+    const = mu * (V - Lambda * k) + mu * (Lambda ** 2) * inv_kappa / 2.0
 
-    return mu * V - C0 * R0_bar - a * linear_coeff - (a ** 2) * quad_coeff
+    a_arr = np.asarray(a)
+    return const + L_bar * a_arr + Q_bar * (a_arr ** 2)

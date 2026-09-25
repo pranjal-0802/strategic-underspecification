@@ -1,14 +1,16 @@
 r"""
 underspec_sim.model1_pooling.solver: Proposition 4 Stackelberg Pooling Equilibrium.
 Computes:
-(a) Signs the second-order condition: \Delta * \bar{\gamma} = (\lambda_A - \mu_A \Lambda) * \bar{\gamma}.
-(b) If \Delta * \bar{\gamma} > 0 (concave):
-    uses closed-form interior stationary point a^{SE} = - (C_0*\bar{\gamma} + \Delta*\bar{R}_0)/(2*\Delta*\bar{\gamma})
-    clipped to [0, 1] if unconstrained peak lies outside the interval.
-(c) If \Delta * \bar{\gamma} <= 0 (convex/linear, including unbiased \mu_A=1, \lambda_A=c_Q):
+(a) Signs the second-order condition: \bar{Q} = (\mu_A * s - 2 * b) * \bar{\gamma} / 2,
+    where s \equiv \Lambda - c_Q and b \equiv \lambda_A - c_Q.
+(b) If \bar{Q} < 0 (concave, so stationary point is a local maximum):
+    uses closed-form interior stationary point a^{SE} = - \bar{L} / (2 * \bar{Q}),
+    where \bar{L} = (\mu_A * s - b) * \bar{R}_0.
+    Clipped to [0, 1] if unconstrained peak lies outside the interval.
+(c) If \bar{Q} >= 0 (convex/linear, including unbiased \mu_A=1, \lambda_A=c_Q):
     evaluates \Pi(0) and \Pi(1) directly, returning whichever is larger:
-    \Pi(1) - \Pi(0) = - [C_0*\bar{\gamma} + \Delta*(\bar{R}_0 + \bar{\gamma})]
-    (which equals (\Lambda - c_Q)*[\bar{R}_0 - c_Q * \mathbb{E}[1/\kappa]] in the unbiased case).
+    \Pi(1) - \Pi(0) = \bar{L} + \bar{Q}
+    (which equals (\Lambda - c_Q)*[\bar{R}_0 + \bar{\gamma} / 2] in the unbiased case).
     Flags regime: "corner".
 """
 
@@ -33,13 +35,17 @@ class PoolingEquilibriumResult:
     pi_diff: float           # Pi(1) - Pi(0)
     matches: bool
     is_concave: bool
-    soc_value: float         # Delta * gamma_bar
-    C0: float
-    Delta: float
+    soc_value: float         # Q_bar (< 0 means strictly concave)
+    Q_bar: float
+    L_bar: float
     R0_bar: float
     gamma_bar: float
     discrepancy: float
     note: str
+    b: float = 0.0           # lambda_A - c_Q
+    s: float = 0.0           # Lambda - c_Q
+    Delta: float = 0.0       # lambda_A - mu_A * Lambda (legacy)
+    C0: float = 0.0          # mu_A * Lambda (legacy)
 
     def __float__(self) -> float:
         return self.a_SE
@@ -58,9 +64,9 @@ def solve_pooling_equilibrium(
     Solves for the leader's optimal pooling ask rate a^{SE} on [0, 1].
     
     Implements:
-    (a) Compute Delta * gamma_bar and check its sign.
-    (b) If positive, use closed-form interior a_SE (Proposition 4).
-    (c) If non-positive, evaluate Pi(0) and Pi(1) directly, returning the larger.
+    (a) Compute Q_bar and check its sign (Q_bar < 0 means concave).
+    (b) If Q_bar < 0, use closed-form interior a_SE = - L_bar / (2 * Q_bar).
+    (c) If Q_bar >= 0, evaluate Pi(0) and Pi(1) directly, returning the larger.
         Sets regime to "corner" vs "interior".
     """
     if params is None:
@@ -80,10 +86,12 @@ def solve_pooling_equilibrium(
     R0_bar = k - float(np.mean(betas))
     gamma_bar = float(np.mean(gammas))
 
-    C0 = mu * Lambda
-    Delta = lam - mu * Lambda
-    soc_val = Delta * gamma_bar
-    is_concave = soc_val > 0.0
+    s = Lambda - cq
+    b = lam - cq
+
+    Q_bar = (mu * s - 2.0 * b) * gamma_bar / 2.0
+    L_bar = (mu * s - b) * R0_bar
+    is_concave = Q_bar < -1e-12
 
     # Payoffs at boundaries
     pi_0 = float(leader_payoff_pooling(0.0, F_samples, mu, lam, cq, effective_params))
@@ -103,10 +111,10 @@ def solve_pooling_equilibrium(
     a_SE_grid_unb = float(a_grid_unb[best_unb_idx])
 
     # Raw Proposition 4 closed form formula
-    if abs(soc_val) < 1e-12:
+    if abs(Q_bar) < 1e-12:
         a_SE_closed = float("nan")
     else:
-        a_SE_closed = - (C0 * gamma_bar + Delta * R0_bar) / (2.0 * soc_val)
+        a_SE_closed = - L_bar / (2.0 * Q_bar)
 
     # Determine true optimum a_SE on [0, 1]
     if is_concave:
@@ -114,21 +122,21 @@ def solve_pooling_equilibrium(
         if 0.0 <= a_SE_closed <= 1.0:
             a_SE = a_SE_closed
             regime = "interior"
-            note = f"Concave regime (Delta*gamma={soc_val:.4f} > 0): interior optimum a_SE = {a_SE:.4f}."
+            note = f"Concave regime (Q_bar={Q_bar:.4f} < 0): interior optimum a_SE = {a_SE:.4f}."
         else:
             # Clipped to boundary
             a_SE = 1.0 if a_SE_closed > 1.0 else 0.0
             regime = "corner"
-            note = f"Concave regime (Delta*gamma={soc_val:.4f} > 0): stationary point {a_SE_closed:.4f} outside [0, 1], clipped to boundary {a_SE:.1f}."
+            note = f"Concave regime (Q_bar={Q_bar:.4f} < 0): stationary point {a_SE_closed:.4f} outside [0, 1], clipped to boundary {a_SE:.1f}."
     else:
-        # Non-positive: strictly convex or linear on [0, 1], optimum is at a corner
+        # Non-negative: strictly convex or linear on [0, 1], optimum is at a corner
         regime = "corner"
         if pi_1 >= pi_0:
             a_SE = 1.0
         else:
             a_SE = 0.0
         note = (
-            f"Convex/linear regime (Delta*gamma={soc_val:.4f} <= 0): "
+            f"Convex/linear regime (Q_bar={Q_bar:.4f} >= 0): "
             f"stationary point {a_SE_closed:.4f} is a minimum; "
             f"optimum is corner a_SE={a_SE:.1f} (Pi(1)-Pi(0)={pi_diff:.4f})."
         )
@@ -147,11 +155,15 @@ def solve_pooling_equilibrium(
         pi_diff=pi_diff,
         matches=matches,
         is_concave=is_concave,
-        soc_value=soc_val,
-        C0=C0,
-        Delta=Delta,
+        soc_value=Q_bar,
+        Q_bar=Q_bar,
+        L_bar=L_bar,
         R0_bar=R0_bar,
         gamma_bar=gamma_bar,
         discrepancy=discrepancy,
         note=note,
+        b=b,
+        s=s,
+        Delta=float(lam - mu * Lambda),
+        C0=float(mu * Lambda),
     )

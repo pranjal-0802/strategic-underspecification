@@ -76,7 +76,7 @@ Our screening framework builds on classical adverse-selection models~\citep{myer
 The user's specification decision formalizes costly disclosure under strategic interpretation, connecting to strategic information transmission~\citep{crawford-sobel1982}, voluntary quality disclosure~\citep{grossman1981}, and rational inattention~\citep{sims2003}. In our setting, under-specification arises not from an incentive to deceive, but from the user's rational economizing on specification costs when anticipating automated assistance.
 
 \paragraph{Stackelberg formulations of human--AI interaction.}
-A burgeoning literature investigates human--AI collaboration through hierarchical bi-level games~\citep{stackelberg1934}, where human task specification sets the boundary conditions for an AI agent's execution. Recent empirical studies in software engineering document an intent ``collaboration gap,'' wherein implicit or under-specified human prompts induce asymmetric repair loops. Our model provides the first formal contract-theoretic microfoundation for this trade-off, characterizing how assistant asking policies and guessing capabilities strategically shape developer specification effort.
+While game-theoretic formulations of hierarchical bi-level interactions date back to \citet{stackelberg1934}, human prompt specification in human--AI interaction has largely been examined through empirical studies in software engineering, where under-specified or implicit prompts frequently induce costly clarification and repair loops. To our knowledge, our model provides the first formal contract-theoretic microfoundation for this interaction, characterizing how assistant asking policies and guessing capabilities strategically shape user specification effort.
 
 \section{Environment and the Decision-Theoretic Benchmark}
 \label{sec:baseline}
@@ -338,123 +338,80 @@ prediction (P1$'$ below).
 
 \subsection{The leader's problem}
 
-Let $R(a,\kappa)=k-m^*(\kappa;a)$ denote the residual unspecified attributes. In the pooling regime, the assistant commits ex ante to an operational ask rate $a$ applied population-wide, without observing or directly contracting on individual specification effort. The assistant's operational payoff on type $\kappa$ evaluates the residual attributes: downstream success $\mu_A V$ minus expected resolution and dialogue friction costs $C(a)R(a,\kappa)$, where $C(a)=\mu_A\Lambda(1-a) + a\lambda_A = \mu_A\Lambda + a(\lambda_A - \mu_A\Lambda)$.\footnote{User specification effort $c(m)$ is sunk from the assistant's operational perspective. Even if the leader additionally internalized the follower's private effort cost directly via the total welfare objective $\mathbb{E}[U(m^*(\kappa;a),a;\kappa)]$, in the unbiased case ($\mu_A=1, \lambda_A=c_Q$) direct differentiation gives $d^2\mathbb{E}[U]/da^2 = (\Lambda-c_Q)^2 \mathbb{E}[1/\kappa] \ge 0$, which remains strictly convex on $[0,1]$. Thus, Corollary~\ref{cor:corner}'s central qualitative result---that unbiased pooling is always a corner solution rather than an interior compromise---survives identically under both specifications.} Averaging over $F$ with $\bar R(a) = \bar R_0 + a\bar\gamma$ (where $\bar R_0=k-\mathbb{E}[\beta]$, $\bar\gamma=\mathbb{E}[\gamma]$), $\Pi(a)$ is quadratic in $a$:
+Let $R(a,\kappa)=k-m^*(\kappa;a)$ denote the residual unspecified attributes. In the pooling regime, the assistant commits ex ante to an operational ask rate $a \in [0,1]$ applied population-wide, without observing or directly contracting on individual specification effort.
+
+Evaluating the general leader objective from Section~\ref{sec:firstbest} at the follower's best response $m^*(\kappa;a) = \beta(\kappa) - a\,\gamma(\kappa)$:
 \[
-\Pi(a) \;=\; \mu_A V - C_0\bar R_0 - a\big[C_0\bar\gamma + \Delta\bar R_0\big] -
-a^2\Delta\bar\gamma, \qquad C_0=\mu_A\Lambda,\;\; \Delta=\lambda_A-\mu_A\Lambda.
+\Pi_\kappa(m^*(\kappa;a),a) \;=\; \mu_A\, U(m^*(\kappa;a),a;\kappa) \;-\; (\lambda_A - c_Q)\, a\,\big(k - m^*(\kappa;a)\big).
+\]
+Substituting $U(m^*(\kappa;a),a;\kappa) = V - \Lambda(1-a)(k-m^*) - \frac{\kappa}{2}(m^*)^2 - a\,c_Q\,(k-m^*)$, using $k - m^*(\kappa;a) = R_0(\kappa) + a\,\gamma(\kappa)$, and defining the effective resolution stake $s \equiv \Lambda - c_Q$ and the assistant's excess asking friction $b \equiv \lambda_A - c_Q$, expanding in powers of $a$ yields:
+\[
+\Pi_\kappa(m^*(\kappa;a),a) \;=\; \mu_A \left( V - \Lambda k + \frac{\Lambda^2}{2\kappa} \right) \;+\; (\mu_A s - b)\, R_0(\kappa)\, a \;+\; \frac{(\mu_A s - 2b)\,\gamma(\kappa)}{2}\, a^2.
+\]
+Averaging over $\kappa \sim F$ requires no moments beyond the population sufficient statistics already defined, $\bar R_0 = k - \mathbb{E}[\beta]$ and $\bar\gamma = \mathbb{E}[\gamma] = s\,\mathbb{E}[1/\kappa]$:
+\[
+\Pi(a) \;=\; \text{const} \;+\; \bar L\, a \;+\; \bar Q\, a^2,
+\]
+where $\text{const} = \mu_A(V - \Lambda k) + \frac{\mu_A \Lambda^2}{2}\mathbb{E}[1/\kappa]$, and
+\[
+\bar L \;\equiv\; (\mu_A s - b)\,\bar R_0, \qquad \bar Q \;\equiv\; \frac{(\mu_A s - 2b)\,\bar\gamma}{2}.
 \]
 
 \begin{proposition}[Stackelberg-optimal pooling rate]\label{prop:aSE}
-Provided $\Delta\bar\gamma>0$ (second-order condition), the leader's optimal
-pooling ask rate is
+Provided $\bar Q < 0$ (the second-order condition for strict concavity, equivalent to $2(\lambda_A - c_Q) > \mu_A(\Lambda - c_Q)$), the leader's unconstrained stationary point is
 \[
-a^{SE} \;=\; -\,\frac{C_0\bar\gamma + \Delta \bar R_0}{2\Delta\bar\gamma}.
+a^{SE} \;=\; -\,\frac{\bar L}{2\bar Q} \;=\; -\,\frac{(\mu_A s - b)\,\bar R_0}{(\mu_A s - 2b)\,\bar\gamma}.
 \]
+When this stationary point lies in $[0,1]$, it is the unique global maximum of $\Pi(a)$ on $[0,1]$.
 \end{proposition}
 
-\begin{corollary}[Bias shifts the pooling rate]
-Differentiating the closed form in Proposition~\ref{prop:aSE} directly with
-respect to $\lambda_A$ (holding $\mu_A,\Lambda,\bar R_0,\bar\gamma$ fixed) gives,
-on the interior branch $\Delta\bar\gamma>0$,
+\begin{corollary}[Bias shifts the pooling rate on the interior branch]
+Differentiating the closed form in Proposition~\ref{prop:aSE} directly with respect to $\lambda_A$ (holding primitives $\mu_A,\Lambda,c_Q,\bar R_0,\bar\gamma$ fixed) gives, on the interior branch $\bar Q < 0$,
 \[
-\frac{\partial a^{SE}}{\partial \lambda_A} \;=\; \frac{\mu_A\Lambda}{2(\mu_A\Lambda-\lambda_A)^2}
-\;>\;0 \qquad \text{whenever } \mu_A,\Lambda>0 \text{ and } \lambda_A\ne\mu_A\Lambda,
+\frac{\partial a^{SE}}{\partial \lambda_A} \;=\; -\,\frac{\bar R_0}{\bar\gamma}\,\frac{\mu_A s}{(\mu_A s - 2b)^2} \;=\; -\,\frac{\bar R_0}{\bar\gamma}\,\frac{\mu_A (\Lambda - c_Q)}{\big[\mu_A (\Lambda - c_Q) - 2(\lambda_A - c_Q)\big]^2},
 \]
-so $a^{SE}$ is strictly \emph{increasing} in $\lambda_A$ throughout the interior
-branch --- the opposite direction from an earlier draft of this corollary, which
-claimed the sign was that of $2\bar\gamma a^{SE}-\bar R_0$ and concluded
-$a^{SE}$ was decreasing; that claim does not match implicit differentiation of
-the leader's own first-order condition and is superseded by the derivative
-above. This comparative static should also be read narrowly: by
-Corollary~\ref{cor:corner}, the interior stationary point is a
-\emph{minimizer} of $\Pi(a)$ whenever $\Delta\bar\gamma\le0$, which includes the
-entire unbiased case, so the interior branch on which this corollary is stated
-is already a departure from the unbiased benchmark, and the corollary describes
-how a (locally optimal, on that branch) interior rate moves with $\lambda_A$,
-not how the \emph{globally} optimal pooling rate moves in general --- for that,
-see the corner comparison in Corollary~\ref{cor:corner-ray} below, which holds
-unconditionally.
+which is strictly \emph{positive} whenever $\bar R_0 < 0$ (the under-specification regime). Hence, $a^{SE}$ is strictly increasing in perceived friction $\lambda_A$ throughout the interior branch. This comparative static holds on the interior branch ($\bar Q < 0$); for the global optimum in the corner regime, see Corollary~\ref{cor:corner-ray}.
 \end{corollary}
 
 \begin{corollary}[Non-identification of the two bias channels in the interior regime]
 \label{cor:mu-lambda}
-On the interior branch ($\Delta\bar\gamma>0$), substituting $C_0=\mu_A\Lambda$ and
-$\Delta=\lambda_A-\mu_A\Lambda$ into Proposition~\ref{prop:aSE} gives
+On the interior branch ($\bar Q < 0$), defining the normalized excess friction per unit of altruism $\tilde\rho \equiv \frac{\lambda_A - c_Q}{\mu_A} = \frac{b}{\mu_A}$, the optimal pooling rate simplifies to
 \[
-a^{SE} \;=\; -\frac{\bar R_0}{2\bar\gamma} \;-\; \frac{1}{2}
-\left[\frac{1}{\lambda_A/(\mu_A\Lambda)-1}\right],
+a^{SE} \;=\; -\,\frac{\bar R_0}{\bar\gamma} \left[ \frac{s - \tilde\rho}{s - 2\tilde\rho} \right],
 \]
-so $a^{SE}$ depends on the two bias parameters strictly through the scalar ratio
-$\lambda_A/\mu_A$ (holding $\Lambda$, the model primitive, fixed), not through
-$\lambda_A$ and $\mu_A$ separately. Consequently
-$\partial a^{SE}/\partial\mu_A = -(\lambda_A/\mu_A)\cdot\partial
-a^{SE}/\partial\lambda_A$ exactly, and any two parameter pairs on the same ray
-$\lambda_A/\mu_A=\text{const}$ produce the identical pooling ask rate. A leader
-that merely discounts downstream welfare ($\mu_A<1$, $\lambda_A=c_Q$) is
-therefore observationally indistinguishable, from $a^{SE}$ alone, from a leader
-with an under-asking friction bias at the corresponding $\lambda_A$ on the same
-ray: neither Corollary~2 nor this result identifies which channel is responsible
-for a low observed ask rate, and a field test would need an instrument
-independent of $a^{SE}$ itself (e.g.\ a training-objective measure of
-$\lambda_A$) to separate them.
+so $a^{SE}$ depends on the two bias parameters $(\mu_A, \lambda_A)$ strictly through the single scalar ratio $\tilde\rho = (\lambda_A - c_Q)/\mu_A$ (holding primitives $s$ and $\bar R_0/\bar\gamma$ fixed). Consequently,
+\[
+\frac{\partial a^{SE}/\partial\mu_A}{\partial a^{SE}/\partial\lambda_A} \;=\; -\,\frac{\lambda_A - c_Q}{\mu_A} \;=\; -\,\tilde\rho,
+\]
+and any two parameter pairs on the same ray $(\lambda_A - c_Q)/\mu_A = \text{const}$ produce the identical pooling ask rate. A leader that discounts downstream welfare ($\mu_A < 1$, $\lambda_A = c_Q \implies \tilde\rho = 0$) cannot be distinguished, from $a^{SE}$ alone, from any leader along the corresponding ray of excess friction.
 \end{corollary}
 
 \begin{remark}[Scope of Corollary~\ref{cor:mu-lambda}]
-The derivation above, and its numerical confirmation, are both restricted to the
-interior branch $\Delta\bar\gamma>0$. By Corollary~\ref{cor:corner} below, the
-\emph{unbiased} pooling optimum is always a corner, so the ray-invariance result
-has empirical bite only once bias is already present.
+The derivation above is stated on the interior branch $\bar Q < 0$. By Corollary~\ref{cor:corner} below, the \emph{unbiased} pooling optimum is always a corner ($\bar Q \ge 0$), so the interior stationary point describes behavior when friction bias is sufficiently large ($2b > \mu_A s$).
 \end{remark}
 
 \begin{corollary}[Ray-invariance extends to the corner regime]\label{cor:corner-ray}
-On the corner branch ($\Delta\bar\gamma\le 0$), the relevant comparison is
-$\Pi(1)-\Pi(0)$ rather than the interior stationary point. Substituting
-$C_0=\mu_A\Lambda$ and $\Delta=\lambda_A-\mu_A\Lambda$ into that difference gives
+On the corner branch ($\bar Q \ge 0$, or whenever the unconstrained stationary point lies outside $[0,1]$), the optimal policy is chosen by the sign of the corner difference $\Pi(1) - \Pi(0) = \bar L + \bar Q$:
 \[
-\Pi(1)-\Pi(0) \;=\; \mu_A\Big[\Lambda\bar R_0 - \tfrac{\lambda_A}{\mu_A}\big(\bar
-R_0+\bar\gamma\big)\Big],
+\Pi(1) - \Pi(0) \;=\; \mu_A \left[ s\left(\bar R_0 + \frac{\bar\gamma}{2}\right) - \tilde\rho\,(\bar R_0 + \bar\gamma) \right].
 \]
-so $\mu_A>0$ again factors out completely and the sign depends only on the
-scalar ratio $\lambda_A/\mu_A$, exactly as on the interior branch. The critical
-ratio is
+Since $\mu_A > 0$, $\mu_A$ factors out completely, and the sign depends solely on the scalar ratio $\tilde\rho = (\lambda_A - c_Q)/\mu_A$. The critical threshold ratio is
 \[
-\rho^{*} \;=\; \frac{\Lambda\bar R_0}{\bar R_0+\bar\gamma},
+\tilde\rho^{*} \;\equiv\; \frac{s\big(\bar R_0 + \bar\gamma/2\big)}{\bar R_0 + \bar\gamma},
 \]
-with $a^{SE}=1$ for $\lambda_A/\mu_A<\rho^{*}$ and $a^{SE}=0$ for
-$\lambda_A/\mu_A>\rho^{*}$. Ray-invariance therefore holds unconditionally
-across the entire parameter space, interior and corner regimes alike,
-resolving the open question raised above. A numerical sweep of 11 rays across
-10 values of $\mu_A\in[0.1,1.0]$ (110 evaluations) confirms the analytical
-threshold exactly and finds zero boundary-crossing violations.
+with $a^{SE} = 1$ for $\tilde\rho < \tilde\rho^{*}$ and $a^{SE} = 0$ for $\tilde\rho > \tilde\rho^{*}$. Ray-invariance in the excess friction ratio $\tilde\rho$ therefore holds unconditionally across the entire parameter space, interior and corner regimes alike. A numerical sweep of 11 rays across 10 values of $\mu_A \in [0.1, 1.0]$ (110 evaluations) confirms this analytical threshold with zero boundary-crossing violations.
 \end{corollary}
 
-\begin{corollary}[Pooling is a corner solution, not a compromise]\label{cor:corner}
-In the unbiased case ($\mu_A=1,\lambda_A=c_Q$), $\Delta=c_Q-\Lambda$ and
-$\bar\gamma=(\Lambda-c_Q)\mathbb{E}[1/\kappa]$, so
+\begin{corollary}[Pooling is a corner solution in the unbiased case]\label{cor:corner}
+In the unbiased case ($\mu_A = 1, \lambda_A = c_Q \implies b = 0$), the quadratic coefficient is:
 \[
-\Delta\bar\gamma \;=\; -(\Lambda-c_Q)^2\,\mathbb{E}[1/\kappa] \;\le\; 0 \quad
-\text{always}.
+\bar Q \;=\; \frac{s^2\,\bar\gamma}{2} \;=\; \frac{(\Lambda - c_Q)^2\,\mathbb{E}[1/\kappa]}{2} \;\ge\; 0 \quad \text{always}.
 \]
-The second-order condition of Proposition~\ref{prop:aSE} therefore \emph{fails}
-in the unbiased case: $\Pi(a)$ is weakly convex on $[0,1]$, its stationary point
-is a minimum, and the true optimum is a corner, $a^{SE}\in\{0,1\}$, not an
-interior compromise as an earlier draft of this result claimed. Comparing the
-two corners directly,
+The second-order condition for an interior maximum therefore fails: $\Pi(a)$ is weakly convex on $[0,1]$, its stationary point is a local minimum, and the true optimum is always a corner, $a^{SE} \in \{0,1\}$, not an interior compromise. Comparing the two corners directly:
 \[
-\Pi(1)-\Pi(0) \;=\; (\Lambda-c_Q)\Big[\bar R_0 - c_Q\,\mathbb{E}[1/\kappa]\Big],
+\Pi(1) - \Pi(0) \;=\; \bar L + \bar Q \;=\; s\left(\bar R_0 + \frac{\bar\gamma}{2}\right) \;=\; (\Lambda - c_Q)\left[ k - \frac{\Lambda + c_Q}{2}\,\mathbb{E}\left[\frac{1}{\kappa}\right] \right],
 \]
-so the unbiased pooling optimum is $a^{SE}=1$ (always ask) when this is positive
-and $a^{SE}=0$ (never ask) when negative. Pooling therefore does not average
-across the population's heterogeneous first-best preferences
-(Proposition~\ref{prop:firstbest}); it serves one type's preferred extreme
-exactly and gives the other type the extreme it least wants---a starker
-inefficiency than a blended compromise, and one that sharpens rather than
-weakens the contrast with screening in Section~\ref{sec:compare}: screening's
-value is not merely ``less averaging'' but the ability to treat types
-differently at all. (An interior $a^{SE}$ remains possible away from the
-unbiased case, specifically when $\lambda_A-\mu_A\Lambda$ and $\Lambda-c_Q$
-share a sign, so bias can change not only the level of $a^{SE}$ but whether
-pooling compromises or picks a winner.)
+so the unbiased pooling optimum is $a^{SE} = 1$ (always ask) when $k \ge \frac{\Lambda + c_Q}{2}\mathbb{E}[1/\kappa]$ and $a^{SE} = 0$ (never ask) when $k < \frac{\Lambda + c_Q}{2}\mathbb{E}[1/\kappa]$. This threshold matches the population-averaged first-best preference $\mathbb{E}[U(1) - U(0)]$ from Proposition~\ref{prop:firstbest} identically.
 \end{corollary}
 
 This last point matters for the comparison in Section~\ref{sec:compare}: Model I
@@ -614,6 +571,37 @@ which is a genuinely different mechanism from Model I's pooling loss (it doesn't
 arise from being unable to condition on anything---it arises from not being able
 to trust what is conditioned on).
 \end{itemize}
+
+\subsection{Sensitivity of the Unbiased Pooling Corner}
+\label{sec:unbiased_sensitivity}
+
+While Corollary~\ref{cor:corner}'s qualitative finding---that unbiased pooling is always a corner solution rather than an interior compromise---is structural and universal, the specific corner selected depends on whether the task size $k$ exceeds the population threshold $k^* \equiv \frac{\Lambda + c_Q}{2}\mathbb{E}[1/\kappa]$. Table~\ref{tab:unbiased_sensitivity} illustrates this boundary across varying task sizes $k$ and baseline guessing accuracies $g$, holding $L=10, c_Q=2$, and $\kappa \sim \text{Uniform}[0.2, 0.6]$ (where $\mathbb{E}[1/\kappa] \approx 2.747$).
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{cccccc}
+\toprule
+$g$ & $\Lambda = L(1-g)$ & Threshold $k^*$ & Task Size $k$ & $\Pi(1) - \Pi(0)$ & Optimal Corner $a^{SE}$ \\
+\midrule
+$0.30$ & $7.0$ & $12.36$ & $5$ & $-36.80$ & $0$ (never ask) \\
+$0.30$ & $7.0$ & $12.36$ & $10$ & $-11.80$ & $0$ (never ask) \\
+$0.30$ & $7.0$ & $12.36$ & $15$ & $+13.20$ & $1$ (always ask) \\
+\midrule
+$0.50$ & $5.0$ & $9.61$ & $5$ & $-13.84$ & $0$ (never ask) \\
+$0.50$ & $5.0$ & $9.61$ & $9$ & $-1.84$ & $0$ (never ask) \\
+$0.50$ & $5.0$ & $9.61$ & $10$ (Benchmark) & $+1.16$ & $1$ (always ask) \\
+$0.50$ & $5.0$ & $9.61$ & $12$ & $+7.16$ & $1$ (always ask) \\
+$0.50$ & $5.0$ & $9.61$ & $15$ & $+16.16$ & $1$ (always ask) \\
+\midrule
+$0.70$ & $3.0$ & $6.87$ & $5$ & $-1.87$ & $0$ (never ask) \\
+$0.70$ & $3.0$ & $6.87$ & $8$ & $+1.13$ & $1$ (always ask) \\
+$0.70$ & $3.0$ & $6.87$ & $10$ & $+3.13$ & $1$ (always ask) \\
+\bottomrule
+\end{tabular}
+\caption{Sensitivity of the unbiased pooling corner choice $\Pi(1) - \Pi(0) = (\Lambda - c_Q)[k - k^*]$ across task complexity $k$ and guessing capability $g$, for $L=10, c_Q=2, \kappa \sim \text{Uniform}[0.2, 0.6]$. At the paper's canonical benchmark ($g=0.5, k=10$), asking yields a modest advantage of $+1.16$, which flips to never-asking at $k \le 9$.}
+\label{tab:unbiased_sensitivity}
+\end{table}
 
 \begin{remark}[Compounding, testable]
 Because Model II's distortion is triggered by, and scales with, the same bias

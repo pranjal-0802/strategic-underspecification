@@ -3,20 +3,21 @@
 **Verdict:** **PASS** (Remark rmk:mu-lambda analytically and numerically verified)
 
 ### 1. Mathematical Derivation of the Confound:
-From Proposition 4, when $\Delta\bar{\gamma} > 0$, the interior pooling ask rate is:
-$$a^{SE} = -\frac{C_0 \bar{\gamma} + \Delta \bar{R}_0}{2\Delta\bar{\gamma}} = -\frac{\bar{R}_0}{2\bar{\gamma}} - \frac{\mu_A \Lambda}{2(\lambda_A - \mu_A \Lambda)} = -\frac{\bar{R}_0}{2\bar{\gamma}} - \frac{1}{2} \left[ \frac{1}{\frac{\lambda_A}{\mu_A \Lambda} - 1} \right]$$
+From Proposition 4, when $\bar{Q} < 0$, the interior pooling ask rate is:
+$$a^{SE} = -\frac{\bar{L}}{2\bar{Q}} = -\frac{(\mu_A s - b)\bar{R}_0}{(\mu_A s - 2b)\bar{\gamma}} = -\frac{\bar{R}_0}{\bar{\gamma}} \frac{s - \tilde{\rho}}{s - 2\tilde{\rho}}$$
+where $s \equiv \Lambda - c_Q$, $b \equiv \lambda_A - c_Q$, and $\tilde{\rho} \equiv \frac{\lambda_A - c_Q}{\mu_A}$ is the excess friction per unit altruism.
 
-Notice that $a^{SE}$ depends on the two bias parameters $(\mu_A, \lambda_A)$ **strictly through the scalar ratio $\lambda_A / \mu_A$**!
+Notice that $a^{SE}$ depends on the two bias parameters $(\mu_A, \lambda_A)$ **strictly through the scalar ratio $\tilde{\rho} = (\lambda_A - c_Q) / \mu_A$**!
 
 ### 2. Exact Derivative Ratio:
 Differentiating directly:
-$$\frac{\partial a^{SE}}{\partial \lambda_A} = \frac{\mu_A \Lambda}{2(\lambda_A - \mu_A \Lambda)^2} = \frac{\mu_A \Lambda}{2\Delta^2}$$
-$$\frac{\partial a^{SE}}{\partial \mu_A} = -\frac{\lambda_A \Lambda}{2(\lambda_A - \mu_A \Lambda)^2} = -\frac{\lambda_A \Lambda}{2\Delta^2}$$
+$$\frac{\partial a^{SE}}{\partial \lambda_A} = -\frac{\bar{R}_0}{\bar{\gamma}} \frac{\mu_A s}{(\mu_A s - 2b)^2}$$
+$$\frac{\partial a^{SE}}{\partial \mu_A} = \frac{\bar{R}_0}{\bar{\gamma}} \frac{b s}{(\mu_A s - 2b)^2}$$
 
 Taking the ratio:
-$$\frac{\partial a^{SE} / \partial \mu_A}{\partial a^{SE} / \partial \lambda_A} = -\frac{\lambda_A}{\mu_A}$$
+$$\frac{\partial a^{SE} / \partial \mu_A}{\partial a^{SE} / \partial \lambda_A} = -\frac{b}{\mu_A} = -\frac{\lambda_A - c_Q}{\mu_A}$$
 
-- **Numerical Verification:** Across the parameter sweep, the finite-difference ratio matches $-\lambda_A / \mu_A$ with maximum error `2.66e-08`.
+- **Numerical Verification:** Across the parameter sweep, the finite-difference ratio matches $-(\lambda_A - c_Q) / \mu_A$ with maximum error `7.46e-10`.
 
 ### 3. Empirical Implications for Field Identification:
 1. **Opposite Derivative Signs, Identical Bias Effect:**
