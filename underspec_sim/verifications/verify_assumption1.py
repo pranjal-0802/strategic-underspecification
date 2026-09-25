@@ -50,7 +50,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
                 unspecified = float(k_val - m_star)
                 lhs = float(unspecified * np.log(q_val))
 
-                # Corrected inequality in v4: (k - m*) * ln(q) >= -1
+                # Corrected inequality for decreasing differences: (k - m*) * ln(q) >= -1
                 holds_corrected = bool(lhs >= -1.0)
                 holds_legacy = bool(lhs <= -1.0)
 

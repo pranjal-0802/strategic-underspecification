@@ -30,3 +30,9 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["underspec_sim*"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+

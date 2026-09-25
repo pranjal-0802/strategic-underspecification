@@ -40,7 +40,7 @@ def test_assumption1_holds_for_high_cost_and_noisy_guessing():
 
 
 def test_assumption1_canonical_grid_exact_fraction():
-    """Regression test locking in exact canonical v4 audit results (653/726 = 89.94% corrected, 73/726 = 10.06% legacy)."""
+    """Regression test locking in exact canonical grid verification results (653/726 = 89.94% corrected, 73/726 = 10.06% reversed)."""
     res = run_verification(output_dir="outputs")
     assert res["verdict"] in ("PASS", "CAUTION")
     assert res["total_points"] == 726

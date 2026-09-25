@@ -1,6 +1,6 @@
-# underspec_sim
+# Strategic Under-Specification
 
-Numerical verification, simulation, and LLM-driven experimentation framework for the formal Stackelberg-game model of **strategic under-specification** in AI coding assistants, based on [*Strategic Under-Specification: A Stackelberg Game Between User and Assistant*](paper/strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
+Numerical verification, simulation, and LLM-based experimentation framework for *"Strategic Under-Specification: A Stackelberg Game Between User and Assistant"* (Pranjal Agarwal, BITS Pilani).
 
 ---
 
@@ -150,9 +150,9 @@ python3 run_all_math_checks.py --ignore-failures
 ```
 
 ### Running Unit Tests (pytest)
-Runs 46 comprehensive algebraic, numerical, regression, and symbolic tests:
+Runs 48 comprehensive algebraic, numerical, regression, and symbolic tests:
 ```bash
-pytest tests/ -v
+pytest tests/ -q
 ```
 
 ---
@@ -193,14 +193,13 @@ To ensure scientific traceability, this repository and manuscript maintain a cle
 strategic-underspecification/
 ├── README.md                           # Comprehensive documentation & verification mapping
 ├── LICENSE                             # Dual license: MIT (Software) & CC-BY-4.0 (Manuscript)
-├── CITATION.cff                        # Machine-readable citation metadata for GitHub (v4.0.0)
+├── CITATION.cff                        # Machine-readable citation metadata for GitHub
 ├── CHANGELOG.md                        # Version history and release notes
-├── pyproject.toml                      # Package configuration & dependencies (v4.0.0)
+├── pyproject.toml                      # Package configuration & dependencies
 ├── .gitignore                          # Ignored artifacts, virtual environments, and secrets
 ├── paper/                              # Sole canonical manuscript directory
-│   ├── strategic_underspecification.tex# Full LaTeX source of the paper (v4)
+│   ├── strategic_underspecification.tex# Full LaTeX source of the paper
 │   ├── strategic_underspecification.pdf# Compiled preprint of the paper
-│   ├── references.bib                  # BibTeX bibliography for cited literature
 │   └── figures/                        # High-resolution figures from verification suite
 ├── underspec_sim/                      # Core simulation & verification package
 │   ├── core/                           # Primitives, payoffs, best-response, first-best
@@ -210,7 +209,7 @@ strategic-underspecification/
 │   ├── verifications/                  # 14 standalone proposition & robustness runners
 │   ├── llm/                            # Anthropic client with retry, SQLite logging, dry-run
 │   └── experiments_llm/                # Simulated user experiments
-├── tests/                              # Pytest test suite (46 unit & symbolic tests)
+├── tests/                              # Pytest test suite (48 unit, regression & symbolic tests)
 ├── outputs/                            # Generated artifacts (CSVs, high-res PNGs, Markdown)
 └── run_all_math_checks.py              # Master runner executing all 14 mathematical checks
 ```

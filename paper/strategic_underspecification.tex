@@ -6,6 +6,7 @@
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{natbib}
+\usepackage{booktabs}
 
 \newtheorem{proposition}{Proposition}
 \newtheorem{corollary}{Corollary}
@@ -75,8 +76,8 @@ Our screening framework builds on classical adverse-selection models~\citep{myer
 \paragraph{Costly communication and strategic disclosure.}
 The user's specification decision formalizes costly disclosure under strategic interpretation, connecting to strategic information transmission~\citep{crawford-sobel1982}, voluntary quality disclosure~\citep{grossman1981}, and rational inattention~\citep{sims2003}. In our setting, under-specification arises not from an incentive to deceive, but from the user's rational economizing on specification costs when anticipating automated assistance.
 
-\paragraph{Stackelberg formulations of human--AI interaction.}
-While game-theoretic formulations of hierarchical bi-level interactions date back to \citet{stackelberg1934}, human prompt specification in human--AI interaction has largely been examined through empirical studies in software engineering, where under-specified or implicit prompts frequently induce costly clarification and repair loops. To our knowledge, our model provides the first formal contract-theoretic microfoundation for this interaction, characterizing how assistant asking policies and guessing capabilities strategically shape user specification effort.
+\paragraph{Assistance games and human--AI interaction.}
+Our bi-level interaction connects to the literature on assistance games and cooperative inverse reinforcement learning~\citep{hadfield-menell2016,stackelberg1934}, where an autonomous assistant acts to maximize human utility under incomplete information. However, while assistance games formalize the assistant's uncertainty over the human's underlying \emph{objective or reward function}, in our setting the economic task objective is known and shared (downstream success value $V$ and error loss $L$). Instead, the informational asymmetry resides entirely in the user's private \emph{specification cost} $\kappa$. The strategic margin in our model is therefore not reward learning or preference alignment, but rather the contract-theoretic trade-off between prompt specification effort and automated clarification under costly communication. To our knowledge, our model provides the first contract-theoretic microfoundation for this ask-versus-guess margin under asymmetric specification costs.
 
 \section{Environment and the Decision-Theoretic Benchmark}
 \label{sec:baseline}
@@ -691,8 +692,7 @@ plausibly disciplines bias directly, another testable channel).
 
 A broader methodological lesson from this model concerns the hazards of importing classical contract-theoretic intuition directly into human--AI settings. In classical mechanism design (e.g., Baron--Myerson, Laffont--Tirole), the principal pays monetary transfers to extract surplus, so agent rent directly diminishes principal payoff. In human--AI interaction, the assistant's objective directly incorporates (a discounted multiple of) user welfare. As a result, incentive compatibility can be free in the absence of bias (Proposition~\ref{prop:nodistortion}), participation constraints do not automatically bind at the bottom of the type distribution, and unbiased pooling naturally induces corner solutions rather than interior compromises (Corollary~\ref{cor:corner}). Contract-theoretic treatments of AI interaction must therefore explicitly account for the non-monetary, partially aligned nature of the interaction rather than relying on analogies to cash-transfer mechanisms.
 
-\bibliographystyle{plainnat}
-\begin{thebibliography}{13}
+\begin{thebibliography}{14}
 
 \bibitem[von Stackelberg(1934)]{stackelberg1934}
 Heinrich von Stackelberg. \textit{Marktform und Gleichgewicht}. Julius Springer, Berlin/Wien, 1934.
@@ -745,6 +745,12 @@ Princeton University Press, Princeton, NJ, 1998.
 \bibitem[Milgrom and Shannon(1994)]{milgrom-shannon1994}
 Paul Milgrom and Christina Shannon. Monotone comparative statics.
 \textit{Econometrica}, 62(1):157--180, 1994.
+
+\bibitem[Hadfield-Menell et al.(2016)]{hadfield-menell2016}
+Dylan Hadfield-Menell, Stuart J.\ Russell, Pieter Abbeel, and Anca Dragan.
+Cooperative inverse reinforcement learning.
+In \textit{Advances in Neural Information Processing Systems} (NeurIPS),
+volume~29, pages 3963--3971, 2016.
 
 \end{thebibliography}
 

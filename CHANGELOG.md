@@ -6,7 +6,7 @@ Canonical release accompanying the manuscript *"Strategic Under-Specification: A
 
 ### Summary of Framework & Contributions
 
-- **Canonical Manuscript & Preprint:** Complete LaTeX source in `paper/strategic_underspecification.tex`, BibTeX database in `paper/references.bib`, and high-resolution figures in `paper/figures/`.
+- **Canonical Manuscript & Preprint:** Complete LaTeX source in `paper/strategic_underspecification.tex`, compiled PDF in `paper/strategic_underspecification.pdf`, and high-resolution figures in `paper/figures/`.
 - **First-Best Social Optimum (Section 4):** Closed-form bang-bang threshold $\kappa^* = (\Lambda + c_Q)/(2k)$ separating high-cost users (always ask) from low-cost users (never ask).
 - **Model I: Pooling Equilibrium (Section 5):**
   - Exact quadratic leader payoff $\Pi(a) = \text{const} + \bar L a + \bar Q a^2$ derived directly from primitives including specification cost $\frac{\kappa}{2}(m^*)^2$.

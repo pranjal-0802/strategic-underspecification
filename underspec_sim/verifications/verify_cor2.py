@@ -1,13 +1,13 @@
 r"""
 underspec_sim.verifications.verify_cor2:
-Verifies Corollary 2 (Bias shifts the pooling rate - Corrected in v4):
+Verifies Corollary 2 (Bias shifts the pooling rate):
 
-On the interior branch (\Delta \bar\gamma > 0),
-  \partial a^{SE} / \partial \lambda_A = \mu_A \Lambda / [2 (\mu_A \Lambda - \lambda_A)^2] > 0
-whenever \mu_A, \Lambda > 0 and \lambda_A \ne \mu_A \Lambda.
+On the interior branch (\bar{Q} < 0),
+  \partial a^{SE} / \partial \lambda_A = - (\bar{R}_0 / \bar\gamma) * (\mu_A * s) / (\mu_A * s - 2*b)^2 > 0
+strictly when \bar{R}_0 < 0 (the under-specification regime).
 
 Tests:
-- Calibrates primitives to ensure \Delta \bar\gamma > 0 and a^{SE} is strictly interior throughout [0.2, 0.85].
+- Calibrates primitives to ensure \bar{Q} < 0 and a^{SE} is strictly interior throughout [0.2, 0.85].
 - Sweeps \lambda_A across a fine grid.
 - Computes empirical finite-difference slopes \Delta a^{SE} / \Delta \lambda_A.
 - Verifies that all empirical slopes are strictly positive (a^{SE} increases with \lambda_A).
