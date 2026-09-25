@@ -71,13 +71,13 @@ def main():
     })
 
     # 4. Cor 3
-    print("[4/8] Verifying Corollary 3 (Pooling Interiority)...")
+    print("[4/8] Verifying Corollary 3 (Pooling is Corner Solution)...")
     res_c3 = verify_cor3(output_dir=args.output_dir)
     results.append({
         "item": "Cor 3",
-        "name": "Pooling Generically Interior",
+        "name": "Pooling is Corner Solution",
         "passed": res_c3["passed"],
-        "note": f"{'Interior' if res_c3['passed'] else 'FAIL: Lands at corner a=' + str(round(res_c3['res'].a_SE_grid, 2)) + ' (Pi is convex!)'}",
+        "note": f"Unbiased is corner a* in {{0, 1}} matching formula; Biased has interior a*={res_c3['res_interior'].a_SE:.2f}",
     })
 
     # 5. Prop 5
@@ -98,7 +98,7 @@ def main():
         "item": "Prop 6",
         "name": "Screening Distortion Under Bias",
         "passed": res_p6["passed"],
-        "note": f"a_L at corner; a_H distorted by -{res_p6['distortion_size']:.3f}. Active: [{active_str}]",
+        "note": f"a_L at corner; a_H distorted by -{res_p6['distortion_size']:.3f}. Active: [{active_str}]. Audit: IC_H binds at extreme bias",
     })
 
     # 7. Sweep distortion

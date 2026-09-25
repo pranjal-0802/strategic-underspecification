@@ -298,14 +298,33 @@ users actually mind them ($\lambda_A>c_Q$) sets a strictly lower pooling ask rat
 than an unbiased assistant would.
 \end{corollary}
 
-\begin{corollary}[Pooling is generically interior]
-Because $F$ has support on both sides of the threshold $\kappa^*$ from
-Proposition~\ref{prop:firstbest} whenever the population is heterogeneous
-($\kappa_L < \kappa^* < \kappa_H$), the single pooling rate $a^{SE}$ is a
-compromise strictly between the two first-best corners: neither type receives its
-own first-best ask rate. This holds \emph{even when the leader is fully unbiased}
-($\mu_A=1,\lambda_A=c_Q$)---pooling loses efficiency purely from being restricted
-to one instrument, independent of any misalignment.
+\begin{corollary}[Pooling is a corner solution, not a compromise]\label{cor:corner}
+In the unbiased case ($\mu_A=1,\lambda_A=c_Q$), $\Delta=c_Q-\Lambda$ and
+$\bar\gamma=(\Lambda-c_Q)\mathbb{E}[1/\kappa]$, so
+\[
+\Delta\bar\gamma \;=\; -(\Lambda-c_Q)^2\,\mathbb{E}[1/\kappa] \;\le\; 0 \quad
+\text{always}.
+\]
+The second-order condition of Proposition~\ref{prop:aSE} therefore \emph{fails}
+in the unbiased case: $\Pi(a)$ is weakly convex on $[0,1]$, its stationary point
+is a minimum, and the true optimum is a corner, $a^{SE}\in\{0,1\}$, not an
+interior compromise as an earlier draft of this result claimed. Comparing the
+two corners directly,
+\[
+\Pi(1)-\Pi(0) \;=\; (\Lambda-c_Q)\Big[\bar R_0 - c_Q\,\mathbb{E}[1/\kappa]\Big],
+\]
+so the unbiased pooling optimum is $a^{SE}=1$ (always ask) when this is positive
+and $a^{SE}=0$ (never ask) when negative. Pooling therefore does not average
+across the population's heterogeneous first-best preferences
+(Proposition~\ref{prop:firstbest}); it serves one type's preferred extreme
+exactly and gives the other type the extreme it least wants---a starker
+inefficiency than a blended compromise, and one that sharpens rather than
+weakens the contrast with screening in Section~\ref{sec:compare}: screening's
+value is not merely ``less averaging'' but the ability to treat types
+differently at all. (An interior $a^{SE}$ remains possible away from the
+unbiased case, specifically when $\lambda_A-\mu_A\Lambda$ and $\Lambda-c_Q$
+share a sign, so bias can change not only the level of $a^{SE}$ but whether
+pooling compromises or picks a winner.)
 \end{corollary}
 
 This last point matters for the comparison in Section~\ref{sec:compare}: Model I
@@ -386,21 +405,45 @@ $\partial\Pi_{\kappa_H}/\partial a_H = \frac{f_L}{f_H}\big[\kappa_H-\kappa_L\big
 m_H \cdot \partial m_H/\partial a_H$ (rent-adjustment term on the right).
 \end{proposition}
 
-\begin{proof}[Proof sketch]
-Standard: relax the problem to IC$_L$ and IR$_H$ only (verify ex post the omitted
-constraints are slack, routine given single-crossing); use the envelope
-representation of type $\kappa_L$'s rent from mimicking $\kappa_H$'s bundle,
-$U(m_H,a_H;\kappa_L)-U(m_H,a_H;\kappa_H) = (\kappa_H-\kappa_L)m_H^2/2$; substitute
-the binding IR$_H$ and IC$_L$ into the leader's objective to obtain a
-``virtual-surplus'' objective in $(m_H,a_H)$ alone, in which the $\kappa_H$ bundle
-is charged an extra marginal cost proportional to $f_L/f_H\cdot(\kappa_H-\kappa_L)$
-for increasing $m_H$ (since a larger $m_H$ enlarges the rent owed to $\kappa_L$);
-this pulls the optimal $a_H$ (and implicitly $m_H$, via the follower's own FOC)
-below the leader's unconstrained-per-type preference $a_H^{B}$. We omit the full
-explicit substitution; it follows Baron--Myerson/Myerson's virtual-surplus
-technique line for line once $\Pi_\kappa$ replaces the classical transfer-based
-payoff.
+\begin{proof}[Proof sketch, corrected]
+Relax the problem to IC$_L$ alone binding. Unlike classical transfer-based
+screening (Baron--Myerson, Laffont--Tirole), where the principal's payoff is
+directly reduced by the rent conceded to the efficient type---so the standard
+technique pushes the inefficient type's IR down to reservation to minimize that
+rent---here $\Pi_{\kappa_H}$ already contains $\mu_A U(\cdot;\kappa_H)$ directly,
+so the leader's own payoff from serving the high-cost type \emph{rises} with
+that type's true welfare: there is no independent budget motive to depress
+$U_H$ to $\underline{U}$, and IR$_H$ need not bind. The bundle given to the
+high-cost type is instead set by its own (biased) unconstrained optimum
+$(m_H^{B},a_H^{B})=\arg\max\Pi_{\kappa_H}$, moved only as far as needed to
+satisfy IC$_L$---i.e., only until $U(m_H,a_H;\kappa_L)=U(m_L,a_L;\kappa_L)$
+binds---using the envelope representation of the low type's temptation to
+mimic, $U(m_H,a_H;\kappa_L)-U(m_H,a_H;\kappa_H)=(\kappa_H-\kappa_L)m_H^2/2$.
+This still yields $a_H^{SB}<a_H^{B}$ whenever the unconstrained biased optimum
+would otherwise violate IC$_L$, but the resulting first-order condition is not
+the classical virtual-surplus expression a naive import of Baron--Myerson would
+suggest; see the remark below.
 \end{proof}
+
+\begin{remark}[Correction from numerical audit]
+An earlier draft of this proof sketch assumed, by direct analogy with
+Baron--Myerson, that IC$_L$ and IR$_H$ bind while IC$_H$ and IR$_L$ are slack.
+Solving the full four-variable constrained problem numerically instead finds
+IC$_L$ binding alone, with IR$_H$, IC$_H$, and IR$_L$ slack at representative
+under-asking-bias parameters, for exactly the reason given in the proof sketch
+above---and it is the same class of error already corrected once in this model
+(Proposition~\ref{prop:nodistortion}): a classical mechanism-design result that
+relies on the principal's payoff being reduced by conceded rent does not
+transfer mechanically to a principal whose payoff already contains the agent's
+utility. We flag the exact active constraint set as parameter-region-specific
+rather than proven for all bias magnitudes---for sufficiently extreme bias,
+$\Pi_{\kappa_H}$ and $U(\cdot;\kappa_H)$ could diverge enough that IC$_H$ binds
+instead, which would change the character of the result. The claim we retain
+with confidence is qualitative: some constraint binds and produces
+$a_H^{SB}<a_H^{B}$ under under-asking bias; the exact active set should be
+checked numerically for the parameter region of interest rather than assumed
+from the classical template.
+\end{remark}
 
 \begin{remark}
 The direction in Proposition~\ref{prop:distortion} is specific to the
@@ -425,11 +468,14 @@ The more interesting comparison is \emph{where the two regimes' losses come from
 which Propositions~\ref{prop:aSE}--\ref{prop:distortion} let us decompose cleanly:
 
 \begin{itemize}[leftmargin=*]
-\item \textbf{Model I (pooling)} loses welfare from two additive, independent
-sources: (i) the pooling restriction itself, present even when $\mu_A{=}1,
-\lambda_A{=}c_Q$ (Corollary 3), and (ii) bias, which shifts $a^{SE}$ further
-(Corollary 2). These compound: a biased pooling policy is worse than either
-distortion alone would predict.
+\item \textbf{Model I (pooling)} loses welfare from two sources that need not be
+additive in the same simple sense as in earlier drafts: (i) the pooling
+restriction itself, present even when $\mu_A{=}1,\lambda_A{=}c_Q$, where it
+manifests as a corner solution that fully serves one type and fully fails the
+other (Corollary~\ref{cor:corner}), and (ii) bias, which shifts $a^{SE}$
+(Corollary 2) and can additionally flip pooling from a corner into an interior
+compromise or vice versa, depending on the sign alignment noted in
+Corollary~\ref{cor:corner}. The two sources interact rather than simply add.
 \item \textbf{Model II (screening)} loses welfare from bias \emph{only}
 (Proposition~\ref{prop:nodistortion}): with no bias, screening recovers full
 efficiency despite private information. With bias, the loss is the
@@ -528,6 +574,21 @@ distortion. We also assume truthful revelation of specified attributes (no
 cheap-talk vagueness within what is said) and a single leader (no competition
 among assistants, which would itself be an interesting extension---competition
 plausibly disciplines bias directly, another testable channel).
+
+Two results in this model (the corner-solution character of unbiased pooling,
+Corollary~\ref{cor:corner}; and the active constraint set in the biased
+screening problem, the remark following Proposition~\ref{prop:distortion}) were
+corrected after a companion numerical implementation solved the underlying
+optimizations directly rather than trusting a hand-derived proof sketch by
+analogy with classical mechanism design. Both corrections trace to the same
+root cause---importing a technique that assumes the principal's payoff is
+reduced by conceded surplus, into a setting where the principal's payoff
+instead contains the agent's utility directly---which suggests this is a
+recurring hazard specific to modeling an assistant whose objective is a
+(possibly discounted) function of user welfare rather than a literal transfer,
+and future extensions of this model should treat any imported result from the
+transfer-based mechanism-design literature as a conjecture to be checked
+numerically rather than a result to be cited directly.
 
 \bibliographystyle{plainnat}
 \begin{thebibliography}{9}

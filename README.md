@@ -33,9 +33,9 @@ underspec_sim/
 | **Sec 4.2** | **Prop 3** (Bang-Bang First-Best Threshold) | `underspec_sim/verifications/verify_prop3.py` | `tests/test_first_best.py` | `prop3_first_best.csv`, `.png`, `.md` | **PASS** |
 | **Sec 5.2** | **Prop 4** (Stackelberg Pooling Rate $a^{SE}$) | `underspec_sim/verifications/verify_prop4.py` | `tests/test_pooling.py` | `prop4_pooling_closed_form.csv`, `.png`, `.md` | **PASS** (under SOC) |
 | **Sec 5.2** | **Cor 2** (Bias Shifts Pooling Rate) | `underspec_sim/verifications/verify_cor2.py` | `tests/test_pooling.py` | `cor2_bias_direction.csv`, `.png`, `.md` | **PASS** |
-| **Sec 5.2** | **Cor 3** (Pooling Generically Interior) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `cor3_interiority.csv`, `.png`, `.md` | **FAIL** *(audit finding)* |
+| **Sec 5.2** | **Cor 3** (Pooling is a Corner Solution) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `cor3_interiority.csv`, `.png`, `.md` | **PASS** *(formula verified)* |
 | **Sec 6.2** | **Prop 5** (Zero Distortion Without Bias) | `underspec_sim/verifications/verify_prop5.py` | `tests/test_screening.py` | `prop5_screening_no_bias.csv`, `.png`, `.md` | **PASS** |
-| **Sec 6.3** | **Prop 6** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `prop6_screening_biased.csv`, `.png`, `.md` | **PASS** *(constraint audit)* |
+| **Sec 6.3** | **Prop 6** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `prop6_screening_biased.csv`, `.png`, `.md`, `prop6_bias_sweep_active_constraints.csv`, `.png` | **PASS** *(active set characterized)* |
 | **Sec 6.3** | **Remark** (Heterogeneity vs Bias Separability) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** |
 | **Sec 7** | **Cor 4** (Dominance of Menus over Pooling) | `underspec_sim/verifications/compare_regimes_runner.py` | `tests/test_comparison.py` | `regime_comparison.csv`, `.png`, `.md` | **PASS** |
 
@@ -43,22 +43,29 @@ underspec_sim/
 
 ## 3. Mathematical Audits and Analytical Findings
 
-The numerical simulations verified the core mechanics while uncovering two critical theoretical nuances in the paper's LaTeX proofs:
+The numerical simulations verified the core mechanics and informed the paper's theoretical corrections:
 
-### 1. Corollary 3 & Proposition 4 Convexity (Why Pooling Lands at a Corner)
+### 1. Corollary 3 (Pooling is a Corner Solution, Not a Compromise)
 - **Proposition 4** provides the closed-form pooling stationary point:
   $$a^{SE} = -\frac{C_0\bar\gamma + \Delta\bar R_0}{2\Delta\bar\gamma}, \quad \text{provided } \Delta\bar\gamma > 0 \text{ (SOC)}$$
 - In the unbiased baseline ($\mu_A = 1, \lambda_A = c_Q$):
   $$\Delta = c_Q - \Lambda, \quad \bar\gamma = (\Lambda - c_Q)\mathbb{E}[1/\kappa] \implies \Delta\bar\gamma = -(\Lambda - c_Q)^2 \mathbb{E}[1/\kappa] \le 0$$
-- Because the quadratic term in $\Pi(a)$ is $-a^2 \Delta \bar\gamma = +a^2 (\Lambda - c_Q)^2 \mathbb{E}[1/\kappa] > 0$, **the leader payoff $\Pi(a)$ is strictly convex in $a$**!
-- Any strictly convex function on a closed interval $[0, 1]$ achieves its maximum at a **boundary** ($a = 0$ or $a = 1$), never in the interior $(0, 1)$.
-- Therefore, **Corollary 3 fails under the paper's linear-risk quadratic formulation**. An interior pooling ask rate requires non-linear risk, congestion costs, or capacity constraints.
+- Because the quadratic term in $\Pi(a)$ is $-a^2 \Delta \bar\gamma \ge 0$, **the leader payoff $\Pi(a)$ is weakly convex in $a$**!
+- Any weakly convex function on a closed interval $[0, 1]$ achieves its maximum at a **boundary corner** ($a = 0$ or $a = 1$), never in the interior $(0, 1)$.
+- Direct comparison yields the exact selection criterion:
+  $$\Pi(1) - \Pi(0) = (\Lambda - c_Q)\Big[\bar R_0 - c_Q \mathbb{E}[1/\kappa]\Big]$$
+  If positive, $a^{SE} = 1$; if negative, $a^{SE} = 0$.
+- **Biased Regime:** Away from the unbiased baseline, when $(\lambda_A - \mu_A \Lambda)$ and $(\Lambda - c_Q)$ share a sign, $\Delta\bar\gamma > 0$ and $\Pi(a)$ becomes strictly concave, producing a true interior stationary maximum.
+- The solver and test suite confirm 100% agreement with this closed-form rule.
 
-### 2. Proposition 6 Proof Sketch Audit (Active Constraint Set in Screening)
-- Proposition 6's proof sketch assumed a standard relaxed problem where $IC_L$ and $IR_H$ bind, while $IC_H$ and $IR_L$ are slack.
-- The numerical solver solved the **unrelaxed 4-variable problem** with all 4 constraints explicit:
-  - **Observed Active Constraints:** `[IC_L]` strictly binding; `[IR_H]`, `[IC_H]`, and `[IR_L]` are **slack**.
-  - **Economic Explanation:** In classical mechanism design (e.g., Baron--Myerson), the principal pays a monetary transfer $t$ and therefore pushes $IR_H$ to bind to minimize informational rents. Here, **there is no monetary transfer $t$**, and the leader's payoff $\Pi_\kappa = \mu_A U - (\lambda_A - c_Q)a(k-m)$ values user utility directly ($+\mu_A U$). The leader has no incentive to depress user utility down to reservation utility $\underline{U}$. The correct relaxed program is constrained by $IC_L$ alone.
+### 2. Proposition 6 & Active Constraint Audit (Screening Under Bias)
+- **Down-and-Out Distortion:** At representative under-asking bias ($\lambda_A > \mu_A c_Q$), the low-cost type remains at $a_L^{SB} = a_L^B = 0$, while the high-cost type's asking rate is strictly distorted downward ($a_H^{SB} < a_H^B$).
+- **Active Constraint Set Audit:**
+  - In representative bias regions ($\lambda_A = 4.0, \mu_A = 1.0$), **$\text{IC}_L$ binds alone**; $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ are strictly slack.
+  - *Economic Intuition:* Unlike classical Baron--Myerson transfer models where the principal pays cash rents, here $\Pi_{\kappa_H}$ directly contains user utility $\mu_A U(\cdot;\kappa_H)$. The leader has no rent-minimization incentive to push $U_H$ down to $\underline{U}$.
+- **Task 4 Extended Sweep (100 configurations in $(\lambda_A, \mu_A)$ plane):**
+  - **Does $\text{IR}_H$ ever bind?** **NO** (Slack $\ge 75.0$ everywhere; binds in 0/100 points).
+  - **Does $\text{IC}_H$ ever bind?** **YES** (Under extreme friction $\lambda_A \ge 6.0$ or low altruism $\mu_A \le 0.5$, $\text{IC}_H$ binds alongside $\text{IC}_L$, confirming the paper's caveat in Remark 2).
 
 ---
 

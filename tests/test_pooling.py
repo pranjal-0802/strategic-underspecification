@@ -1,5 +1,5 @@
-"""
-tests/test_pooling.py: Direct algebraic tests of Model I pooling formulas (Section 5, Prop 4).
+r"""
+tests/test_pooling.py: Direct algebraic tests of Model I pooling formulas (Section 5, Prop 4, Cor 3).
 """
 
 import pytest
@@ -52,4 +52,61 @@ def test_prop4_closed_form_matches_exact_quadratic_argmax():
     assert res.is_concave is True
     assert res.matches is True
     assert res.a_SE_closed == pytest.approx(0.5, abs=1e-3)
+    assert res.a_SE == pytest.approx(0.5, abs=1e-2)
     assert res.a_SE_grid == pytest.approx(0.5, abs=1e-2)
+    assert res.regime == "interior"
+
+
+def test_unbiased_pooling_always_corner_matching_formula():
+    r"""
+    Corollary 3 (Corrected): In the unbiased case (mu_A=1, lambda_A=c_Q),
+    Pi(a) is weakly convex on [0, 1] because Delta*gamma_bar <= 0 always.
+    The solver must ALWAYS return regime: 'corner' with a_SE in {0, 1},
+    matching Pi(1) - Pi(0) = (Lambda - c_Q)*(R0_bar - c_Q*E[1/kappa]).
+    Tested across a grid of (Lambda, c_Q, k, and F distributions).
+    """
+    Lambda_values = [3.0, 5.0, 7.0]
+    c_Q_values = [1.5, 2.0, 4.0]
+    k_values = [5.0, 10.0, 15.0]
+    distributions = [
+        np.linspace(0.2, 0.6, 200),
+        np.linspace(0.1, 0.3, 200),
+        np.linspace(0.4, 0.9, 200),
+    ]
+
+    for lam in Lambda_values:
+        for cq in c_Q_values:
+            if abs(lam - cq) < 1e-4:
+                continue
+            for k_val in k_values:
+                for F in distributions:
+                    # Construct params: L = lam / (1 - g), choose g = 0.5 => L = 2 * lam
+                    p = ModelParams(
+                        k=k_val,
+                        g=0.5,
+                        L=2.0 * lam,
+                        c_Q=cq,
+                        mu_A=1.0,
+                        lambda_A=cq,  # Unbiased
+                        V=100.0,
+                    )
+                    assert p.Lambda == pytest.approx(lam)
+                    assert p.is_unbiased is True
+
+                    res = solve_pooling_equilibrium(F, params=p)
+
+                    # 1. Must be corner regime
+                    assert res.regime == "corner"
+                    assert res.a_SE in (0.0, 1.0)
+
+                    # 2. SOC must be non-positive
+                    assert res.soc_value <= 1e-9
+
+                    # 3. Predict corner via Corollary 3 formula:
+                    inv_kap = float(np.mean(1.0 / F))
+                    R0_bar = k_val - lam * inv_kap
+                    pi_diff_formula = (lam - cq) * (R0_bar - cq * inv_kap)
+                    expected_corner = 1.0 if pi_diff_formula >= 0.0 else 0.0
+
+                    assert res.a_SE == expected_corner
+                    assert res.a_SE == pytest.approx(res.a_SE_grid, abs=1e-2)

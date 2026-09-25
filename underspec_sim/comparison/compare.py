@@ -23,6 +23,7 @@ class RegimeComparisonResult:
     dominance_holds: bool
     payoff_gap: float  # Pi_screening - Pi_pooling
     a_SE: float
+    pooling_regime: str
     menu: Dict[str, Tuple[float, float]]
     heterogeneity: float
     bias: float
@@ -69,7 +70,8 @@ def compare_regimes(
         c_Q=cq,
         params=effective_params,
     )
-    a_SE = pool_res.a_SE_grid
+    a_SE = pool_res.a_SE
+    pooling_regime = pool_res.regime
 
     # Compute leader pooling payoff on the two types
     mL_pool = user_best_response(kap_L, a_SE, effective_params, clip=(not unconstrained_m))
@@ -102,7 +104,7 @@ def compare_regimes(
     bias = lam - cq
 
     msg = (
-        f"Regime Comparison: Model I Pi={pi_pooling:.4f} (a_SE={a_SE:.4f}), "
+        f"Regime Comparison: Model I Pi={pi_pooling:.4f} (a_SE={a_SE:.4f}, {pooling_regime}), "
         f"Model II Pi={pi_screening:.4f}. Gap={gap:.4f}. Dominance: {dominance}."
     )
 
@@ -112,6 +114,7 @@ def compare_regimes(
         dominance_holds=dominance,
         payoff_gap=gap,
         a_SE=a_SE,
+        pooling_regime=pooling_regime,
         menu=screen_res.menu,
         heterogeneity=het,
         bias=bias,
@@ -162,6 +165,7 @@ def sweep_regime_comparison(
                 "payoff_gap": comp.payoff_gap,
                 "dominance_holds": comp.dominance_holds,
                 "a_SE": comp.a_SE,
+                "pooling_regime": comp.pooling_regime,
                 "a_L_screen": comp.menu["L"][1],
                 "a_H_screen": comp.menu["H"][1],
             })

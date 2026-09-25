@@ -11,6 +11,9 @@ import numpy as np
 import pandas as pd
 from underspec_sim.core.params import ModelParams
 from underspec_sim.core.first_best import first_best, biased_first_best
+from underspec_sim.core.payoffs import leader_payoff_per_type
+from underspec_sim.core.best_response import user_best_response
+from underspec_sim.model1_pooling.solver import solve_pooling_equilibrium
 from underspec_sim.model2_screening.solver import solve_menu, MenuSolutionResult
 
 
@@ -131,7 +134,7 @@ def test_distortion_under_bias(
     Proposition 6: At \lambda_A > \mu_A * c_Q (under-asking bias):
     - a_L stays at its biased-first-best corner (a_L^{SB} = a_L^B = 0)
     - a_H comes in strictly below its own biased-first-best (a_H^{SB} < a_H^B <= 1)
-    - Report active constraints (Paper assumed: IC_L binding, IR_H binding, IC_H and IR_L slack).
+    - Report active constraints (Corrected proof sketch: IC_L binding alone, IR_H slack).
     """
     if params is None:
         params = ModelParams()
@@ -160,19 +163,18 @@ def test_distortion_under_bias(
     passed = a_L_at_corner and a_H_strictly_below
 
     active_set_str = ", ".join(res.active_constraints) if res.active_constraints else "None"
-    assumed_active_str = "IC_L, IR_H"
+    assumed_active_str = "IC_L alone"
 
     msg = (
         f"{'PASS' if passed else 'FAIL'} (Prop 6): a_L={res.a_L:.4f} (biased FB={a_B_L:.4f}), "
         f"a_H={res.a_H:.4f} (biased FB={a_B_H:.4f}, distortion={distortion_size:.4f}). "
         f"Observed active constraints: [{active_set_str}] "
-        f"(Paper proof sketch assumed: [{assumed_active_str}]). "
+        f"(Paper corrected proof sketch: [{assumed_active_str}]). "
     )
     if not res.matches_paper_active_set:
         msg += (
-            f"\nNOTE on Proof Sketch: The observed active set [{active_set_str}] differs from paper's "
-            f"relaxed assumption [{assumed_active_str}]. Without cash transfers, IR_H is slack (slack={res.IR_H_slack:.2f}), "
-            f"while IC_L binds (slack={res.IC_L_slack:.2e})."
+            f"\nNOTE on Active Constraints: The observed active set [{active_set_str}] differs from standard "
+            f"[{assumed_active_str}]. Under extreme bias, IC_H may also bind."
         )
 
     return DistortionUnderBiasResult(
@@ -237,6 +239,25 @@ def sweep_distortion_vs_heterogeneity(
             )
             distortion = float(a_B_H - sol.a_H)
 
+            # Also compute Model I pooling equilibrium on this two-type population
+            F_samples = [kappa_L] * 500 + [kap_H] * 500
+            pool_sol = solve_pooling_equilibrium(
+                F_samples=F_samples,
+                mu_A=1.0,
+                lambda_A=lam,
+                c_Q=c_Q,
+                params=eff_params,
+            )
+            a_SE = pool_sol.a_SE
+            pooling_regime = pool_sol.regime
+            mL_pool = user_best_response(kappa_L, a_SE, eff_params, clip=(not unconstrained_m))
+            mH_pool = user_best_response(kap_H, a_SE, eff_params, clip=(not unconstrained_m))
+            pi_pool = float(
+                0.5 * leader_payoff_per_type(mL_pool, a_SE, kappa_L, eff_params)
+                + 0.5 * leader_payoff_per_type(mH_pool, a_SE, kap_H, eff_params)
+            )
+            payoff_gap = float(sol.leader_payoff - pi_pool)
+
             records.append({
                 "kappa_L": kappa_L,
                 "kappa_H": kap_H,
@@ -249,6 +270,11 @@ def sweep_distortion_vs_heterogeneity(
                 "m_H": sol.m_H,
                 "a_H_B": float(a_B_H),
                 "distortion": distortion,
+                "pi_screening": sol.leader_payoff,
+                "pi_pooling": pi_pool,
+                "payoff_gap": payoff_gap,
+                "a_SE": a_SE,
+                "pooling_regime": pooling_regime,
                 "IC_L_slack": sol.IC_L_slack,
                 "IC_H_slack": sol.IC_H_slack,
                 "IR_L_slack": sol.IR_L_slack,

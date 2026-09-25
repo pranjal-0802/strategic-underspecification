@@ -197,8 +197,8 @@ def solve_menu(
     if abs(ir_H_val) <= active_tol:
         active_cons.append("IR_H")
 
-    # Paper's assumed active set in proof sketch: IC_L and IR_H
-    matches_assumed = ("IC_L" in active_cons) and ("IR_H" in active_cons) and (len(active_cons) == 2)
+    # Paper's corrected active set in proof sketch: IC_L alone binds (IR_H, IC_H, IR_L slack)
+    matches_assumed = ("IC_L" in active_cons) and ("IR_H" not in active_cons)
 
     total_payoff = -float(best_res.fun)
     u_L = float(user_utility(mL, aL, kappa_L, effective_params))
