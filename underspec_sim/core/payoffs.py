@@ -1,6 +1,6 @@
 r"""
 underspec_sim.core.payoffs: User and Leader payoff functions.
-Matches equations in strategic_underspecification.tex:
+Matches equations in paper/strategic_underspecification.tex:
 - eq (210): U(m, a; \kappa) = V - \Lambda(1 - a)(k - m) - 0.5 * \kappa * m^2 - a * c_Q * (k - m)
 - eq (179): \Pi_\kappa(m, a) = \mu_A * U(m, a; \kappa) - (\lambda_A - c_Q) * a * (k - m)
 - eq (87): exact conjunctive benchmark U_exact(m; a, g) = V * q(a, g)^{k-m} - 0.5*\kappa*m^2 - a*c_Q*(k-m)

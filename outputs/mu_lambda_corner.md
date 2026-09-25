@@ -1,7 +1,7 @@
 # Verification Report: Ray-Invariance in the Corner Regime
 
 ## Overview
-- **Reference**: `strategic_underspecification_v3.tex`, Corollary 3, Remark 3 (Scope of Corollary 3).
+- **Reference**: `paper/strategic_underspecification.tex`, Corollary 3, Remark 3 (Scope of Corollary 3).
 - **Key Question**: Does the scalar ratio invariance $\lambda_A / \mu_A$ proven for the interior branch ($\Delta\bar\gamma > 0$) extend to the corner regime ($\Delta\bar\gamma \le 0$)?
 - **Theoretical Scope**: In Remark 3 of the paper, whether ray-invariance holds for corner selection was left as an open question. This check resolves that question both analytically and numerically.
 

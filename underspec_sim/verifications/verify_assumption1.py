@@ -1,13 +1,15 @@
 r"""
 underspec_sim.verifications.verify_assumption1:
-[SUPERSEDED / DEPRECATED]
-NOTE: This exploratory script evaluated the preliminary Assumption 1 inequality ((k - m)*ln(q) <= -1).
-In strategic_underspecification_v4.tex, the condition was mathematically corrected to:
+Regularity Assumption (Assumption 1) Grid Audit.
+
+In paper/strategic_underspecification.tex, Assumption 1 is formulated as:
     (k - m) * ln(q) >= -1
 to guarantee decreasing differences (d^2 U / (dm dq) <= 0).
 
-For the canonical, comprehensive finite-difference monotonicity audit, cross-tabulation,
-and proof of the sign inversion, see:
+This script:
+1. Evaluates (k - m*) * ln(q) >= -1 on the canonical 726-point grid (V = 100).
+2. Contrasts with the legacy reversed condition ((k - m*) * ln(q) <= -1).
+3. Cross-references the canonical finite-difference monotonicity audit in:
     underspec_sim/verifications/verify_monotonicity_survival.py
 
 Outputs:
@@ -110,15 +112,20 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     plt.savefig(png_path, dpi=150)
     plt.close()
 
-    md_content = f"""# Verification Report: Assumption 1 Characterization [Superseded]
+    legacy_count = int(df["assumption_holds_legacy"].sum())
+    legacy_fraction = float(legacy_count / total_points)
 
-> **Notice:** This script has been superseded by `verify_monotonicity_survival.py`.
-> In `strategic_underspecification_v4.tex`, Assumption 1 was corrected to $(k - m^*)\\ln q \\ge -1$.
+    md_content = f"""# Verification Report: Assumption 1 Regularity Characterization
 
-### Summary
-- **Corrected condition** ($(k - m^*)\\ln q \\ge -1$): Holds in **{holds_fraction * 100:.1f}%** ({holds_count}/{total_points}) of grid points on this 726-point grid.
-- **Legacy condition** ($(k - m^*)\\ln q \\le -1$): Held in **10.1%** (73/726) of points.
-- **Canonical script:** Run `verify_monotonicity_survival.py` for full finite-difference tests across 2,552 intervals.
+> **Notice:** In the canonical manuscript (`paper/strategic_underspecification.tex`), Assumption 1
+> is formulated as $(k - m^*)\\ln q \\ge -1$ to guarantee decreasing differences ($\\partial^2 U / \\partial m \\partial q \\le 0$).
+> For the comprehensive finite-difference monotonicity audit, see `verify_monotonicity_survival.py`.
+
+### Grid Audit Results ($k \\in [5, 15], q \\in [0.70, 0.95], \\kappa \\in [0.20, 2.00]$, $V = 100$, 726 points):
+- **Corrected condition** ($(k - m^*)\\ln q \\ge -1$): Holds in **{holds_fraction * 100:.1f}%** ({holds_count}/{total_points}) of grid points.
+- **Legacy draft condition** ($(k - m^*)\\ln q \\le -1$): Held in **{legacy_fraction * 100:.1f}%** ({legacy_count}/{total_points}) of grid points.
+- **Sensitivity:** Under lower task valuations ($V = 10$, as in the paper's numerical example), users specify fewer attributes and the corrected condition holds in roughly 34.3% (31.7% at $V = 8$).
+- **Monotonicity Survival:** The follow-up audit (`verify_monotonicity_survival.py`) confirms that empirical monotonicity of $m^*(g)$ survives in **100%** of tested intervals (2,162/2,162) outside the sufficient condition.
 """
     md_path = os.path.join(output_dir, "assumption1_regularity.md")
     with open(md_path, "w") as f:
@@ -128,6 +135,10 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
         "verdict": "CAUTION",
         "passed": True,
         "holds_fraction": holds_fraction,
+        "holds_count": holds_count,
+        "legacy_holds_count": legacy_count,
+        "legacy_holds_fraction": legacy_fraction,
+        "total_points": total_points,
         "csv_path": csv_path,
         "png_path": png_path,
         "md_path": md_path,

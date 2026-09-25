@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "underspec_sim"
-version = "1.0.0"
+version = "4.0.0"
 description = "Simulation and numerical verification of strategic under-specification in coding assistants"
 authors = [
     { name = "Pranjal Agarwal" }

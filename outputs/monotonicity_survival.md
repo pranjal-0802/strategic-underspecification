@@ -1,8 +1,8 @@
 # Verification Report: Monotonicity Survival Outside Assumption 1
 
 ## Overview
-- **Reference**: `strategic_underspecification_v3.tex`, Assumption 1, Corollary 1, Proposition 2, Remark 1.
-- **Key Question**: Does the monotonicity conclusion of Corollary 1 ($m^*(g)$ weakly decreasing in $g$) and Proposition 2 (naive users worse off) actually fail outside the 10.1% region where Assumption 1 holds?
+- **Reference**: `paper/strategic_underspecification.tex`, Assumption 1, Corollary 1, Proposition 2, Remark 1.
+- **Key Question**: Does the monotonicity conclusion of Corollary 1 ($m^*(g)$ weakly decreasing in $g$) and Proposition 2 (naive users worse off) actually fail outside the region where Assumption 1 holds?
 - **Grid Swept**: $k \in [5, 15]$ (11 points), $q \in [0.70, 0.99]$ (30 points), $\kappa \in [0.20, 2.00]$ (8 types), totaling **2552** finite-difference intervals.
 
 ---
@@ -10,11 +10,11 @@
 ## Executive Summary & Verdict: **CAUTION**
 
 ### 1. Headline Findings
-1. **Monotonicity Survives 100% Outside Assumption 1**:
+1. **Monotonicity Survives Across Tested Intervals Outside Assumption 1**:
    - Total intervals where Assumption 1 **FAILS**: **2162**
    - Intervals where monotonicity **HOLDS** when Assumption 1 fails: **2162 (100.00%)**
    - Intervals where monotonicity **BREAKS** when Assumption 1 fails: **0 (0.00%)**
-   - **Conclusion**: Monotonicity **NEVER** fails outside Assumption 1's region.
+   - **Conclusion**: Monotonicity does not fail on any of the tested parameter intervals outside Assumption 1's region.
 
 2. **The Mathematical Inversion of Assumption 1**:
    - In the paper, Assumption 1 is formulated as:

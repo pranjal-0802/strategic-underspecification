@@ -1,6 +1,6 @@
 r"""
 underspec_sim.model1_pooling.payoff: Leader pooling payoff implementation.
-Matches Section 5.2 in strategic_underspecification.tex:
+Matches Section 5.2 in paper/strategic_underspecification.tex:
 - R(a, \kappa) = k - m^*(\kappa; a)
 - \bar{R}_0 = k - \mathbb{E}[\beta(\kappa)]
 - \bar{\gamma} = \mathbb{E}[\gamma(\kappa)]

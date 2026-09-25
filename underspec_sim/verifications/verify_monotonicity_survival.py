@@ -3,8 +3,8 @@ underspec_sim.verifications.verify_monotonicity_survival:
 Robustness Check (Task 1): Does Monotonicity Actually Survive Outside Assumption 1's Region?
 
 Background:
-Assumption 1 in strategic_underspecification_v3.tex states:
-"In the relevant range of m, (k - m) * ln(q(a, g)) <= -1."
+Assumption 1 in paper/strategic_underspecification.tex states:
+"In the relevant range of m, (k - m) * ln(q(a, g)) >= -1."
 This was introduced as a sufficient condition for Topkis's theorem (decreasing differences in (m, g))
 to guarantee Corollary 1: m*(g) is weakly decreasing in g, and Proposition 2: naive users under-specify
 and are worse off than sophisticated users.
@@ -287,8 +287,8 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     md_content = f"""# Verification Report: Monotonicity Survival Outside Assumption 1
 
 ## Overview
-- **Reference**: `strategic_underspecification_v3.tex`, Assumption 1, Corollary 1, Proposition 2, Remark 1.
-- **Key Question**: Does the monotonicity conclusion of Corollary 1 ($m^*(g)$ weakly decreasing in $g$) and Proposition 2 (naive users worse off) actually fail outside the 10.1% region where Assumption 1 holds?
+- **Reference**: `paper/strategic_underspecification.tex`, Assumption 1, Corollary 1, Proposition 2, Remark 1.
+- **Key Question**: Does the monotonicity conclusion of Corollary 1 ($m^*(g)$ weakly decreasing in $g$) and Proposition 2 (naive users worse off) actually fail outside the region where Assumption 1 holds?
 - **Grid Swept**: $k \\in [5, 15]$ (11 points), $q \\in [0.70, 0.99]$ (30 points), $\\kappa \\in [0.20, 2.00]$ (8 types), totaling **{total_pairs}** finite-difference intervals.
 
 ---
@@ -296,11 +296,11 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 ## Executive Summary & Verdict: **{verdict}**
 
 ### 1. Headline Findings
-1. **Monotonicity Survives 100% Outside Assumption 1**:
+1. **Monotonicity Survives Across Tested Intervals Outside Assumption 1**:
    - Total intervals where Assumption 1 **FAILS**: **{ass1_fails_total}**
    - Intervals where monotonicity **HOLDS** when Assumption 1 fails: **{cross_tab_mono['ass1_fails_mono_holds']} ({pct_ass1_fails_mono_survives:.2f}%)**
    - Intervals where monotonicity **BREAKS** when Assumption 1 fails: **{cross_tab_mono['ass1_fails_mono_fails']} (0.00%)**
-   - **Conclusion**: Monotonicity **NEVER** fails outside Assumption 1's region.
+   - **Conclusion**: Monotonicity does not fail on any of the tested parameter intervals outside Assumption 1's region.
 
 2. **The Mathematical Inversion of Assumption 1**:
    - In the paper, Assumption 1 is formulated as:

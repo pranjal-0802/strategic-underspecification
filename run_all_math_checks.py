@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 run_all_math_checks.py: Runs all non-LLM mathematical verifications and robustness checks
-for the formal Stackelberg game model (strategic_underspecification_v3.tex).
+for the formal Stackelberg game model (paper/strategic_underspecification.tex).
 
 Checks:
 - Prop 3: First-Best threshold and argmax verification

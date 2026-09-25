@@ -1,6 +1,6 @@
 r"""
 underspec_sim.core.best_response: User best-response function against ask rate a.
-Matches Section 5.1 in strategic_underspecification.tex:
+Matches Section 5.1 in paper/strategic_underspecification.tex:
 m^*(\kappa; a) = \beta(\kappa) - a * \gamma(\kappa)
 where:
 \beta(\kappa) = \Lambda / \kappa

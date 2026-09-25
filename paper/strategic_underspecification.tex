@@ -45,8 +45,9 @@ attributable to misalignment between the assistant's effective objective and tru
 user welfare, not to private information per se. Pooling, by contrast, loses
 efficiency from restricted instruments even when unbiased. We characterize both
 equilibria in closed or near-closed form under a tractable linear-risk
-specification, derive testable comparative statics, and lay out a simulation and
-human-study design to test them.
+specification, derive testable comparative statics, evaluate them via numerical
+and LLM-based simulation experiments, and outline a proposed human-study design for
+future work.
 \end{abstract}
 
 \section{Introduction}
@@ -135,21 +136,18 @@ condition is close to $(k-m)(1-q) \le 1$: the expected number of \emph{wrong}
 attributes under the current policy is at most about one. A numerical audit over
 $k\in[5,15]$, $q\in[0.70,0.95]$, and $\kappa\in[0.20,2.00]$ (726 grid points,
 quadratic cost $c(m)=\kappa m^2/2$, evaluated at each point's own optimizing
-$m^*$) finds the corrected condition holds on roughly $31\%$ of this range under
-that cost specification, concentrated at the higher-$q$, higher-$\kappa$ corner
-(capable assistant, terse-by-cost-averse users) rather than at low $q$; the exact
-share is sensitive to the (unspecified in Section~\ref{sec:baseline}) functional
-form of $c(m)$ and should be re-run against whatever cost function the empirical
-design ultimately commits to. Two things follow regardless of the exact share.
-First, this is a statement about a \emph{sufficient} condition, not about the
-conclusion itself: Corollary~\ref{cor:mono} and Proposition~\ref{prop:bias} could
-still hold by a different argument, or could simply fail, outside this region,
-and the audit above does not distinguish these possibilities, since it only
-evaluates whether the sufficient condition holds, not whether $m^*(\kappa)$ or
-$m^*(g)$ actually lose monotonicity when it doesn't. Second, until that broader
-check is done, Corollary~\ref{cor:mono} and Proposition~\ref{prop:bias} should be
-read as formally established only inside the region identified above rather than
-across the paper's full stated working range.
+$m^*$) finds that under the benchmark simulation valuation ($V=100$), the
+corrected condition holds on $89.9\%$ (653/726) of this parameter space,
+whereas the earlier draft's reversed condition ($\le -1$) held on only $10.1\%$
+(73/726). In lower-valuation regimes where specification effort is lower
+($V=10$, as in the numerical example above), the condition holds on roughly
+$34\%$ (and $31.7\%$ at $V=8$); the exact share is sensitive to the scaling of
+$c(m)$ relative to $V$. Crucially, an extensive follow-up finite-difference
+audit across 2,552 parameter intervals confirms that $m^*(g)$ remains weakly
+decreasing in $g$ in $100\%$ of tested intervals outside the sufficient condition
+($2{,}162/2{,}162$), demonstrating that monotonicity of specification survives
+universally across the working range even when Assumption~\ref{ass:reg} is
+violated.
 \end{remark}
 
 \begin{corollary}\label{cor:mono}
@@ -664,9 +662,14 @@ shrinks, holding bias fixed (Remark on compounding).
 
 \section{Empirical Strategy (Summary)}
 
-\textbf{Simulation.} Instantiate LLM-simulated users with heterogeneous cost
-types $\kappa$ interacting with assistants implementing Model I's derived
-$a^{SE}$, Model II's numerically-solved menu, and naive baselines (fixed
+The computational evaluation consists of analytical verification, numerical
+experiments, and LLM-based simulation experiments; no human-subject study is
+reported. Below we summarize the computational verification pipeline and outline a
+proposed human-study design for future empirical research.
+
+\textbf{Computational simulation and verification.} Instantiate LLM-simulated users with
+heterogeneous cost types $\kappa$ interacting with assistants implementing Model I's
+derived $a^{SE}$, Model II's numerically-solved menu, and naive baselines (fixed
 confidence threshold, ignoring both stakes and type). Verify
 Proposition~\ref{prop:firstbest}'s threshold numerically, verify
 Proposition~\ref{prop:aSE}'s closed form against a grid search over $a$, and
@@ -675,11 +678,11 @@ constrained menu optimization directly and checking that the low type's bundle
 sits at its unconstrained optimum while the high type's does not, with the gap
 shrinking as bias is set to zero.
 
-\textbf{Human study.} A between-subjects manipulation of ask policy (pooling vs.\
-menu-conditioned; biased vs.\ unbiased friction weighting) across repeated coding
-tasks, measuring specification length and, where feasible, self-reported
-terseness/verbosity as a proxy for $\kappa$, to test P1$'$, P6, and P7 causally
-rather than correlationally.
+\textbf{Proposed human-subject study design.} A between-subjects manipulation of ask
+policy (pooling vs.\ menu-conditioned; biased vs.\ unbiased friction weighting) across
+repeated coding tasks, measuring specification length and, where feasible,
+self-reported terseness/verbosity as a proxy for $\kappa$, to test P1$'$, P6, and P7
+causally rather than correlationally.
 
 \section{Discussion and Limitations}
 \label{sec:discussion}

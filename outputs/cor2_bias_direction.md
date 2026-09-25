@@ -3,7 +3,7 @@
 **Status:** **PASS** (Empirical derivative strictly positive and matches closed-form formula)
 
 ### Overview & Corrected Mathematical Claim
-In `strategic_underspecification_v4.tex`, Corollary 2 is derived by direct differentiation of the closed form in Proposition 4:
+In `paper/strategic_underspecification.tex`, Corollary 2 is derived by direct differentiation of the closed form in Proposition 4:
 $$a^{SE} = -\frac{\bar R_0}{2\bar\gamma} - \frac{1}{2} \left[\frac{1}{\lambda_A/(\mu_A\Lambda) - 1}\right]$$
 On the interior branch where $\Delta\bar\gamma > 0$, differentiating with respect to $\lambda_A$ yields:
 $$\frac{\partial a^{SE}}{\partial \lambda_A} = \frac{\mu_A\Lambda}{2(\mu_A\Lambda - \lambda_A)^2} > 0$$

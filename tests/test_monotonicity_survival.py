@@ -78,8 +78,8 @@ def test_monotonicity_survival_runner():
 
 def test_cor1_direction_under_corrected_assumption1():
     r"""
-    Regression Test for Corollary 1 under Corrected Assumption 1 (v4):
-    In strategic_underspecification_v4.tex, Assumption 1 is (k - m)*ln(q) >= -1.
+    Regression Test for Corollary 1 under Corrected Assumption 1:
+    In paper/strategic_underspecification.tex, Assumption 1 is (k - m)*ln(q) >= -1.
     1. When (k - m)*ln(q) >= -1:
        Cross-partial d^2 U / (dm dq) <= 0 (decreasing differences).
        m*(q) is weakly decreasing in q: Topkis's theorem holds.

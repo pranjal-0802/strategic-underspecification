@@ -39,8 +39,12 @@ def test_assumption1_holds_for_high_cost_and_noisy_guessing():
     assert lhs <= -1.0
 
 
-def test_assumption1_verification_runs():
-    """Verify runner executes and returns expected structure."""
+def test_assumption1_canonical_grid_exact_fraction():
+    """Regression test locking in exact canonical v4 audit results (653/726 = 89.94% corrected, 73/726 = 10.06% legacy)."""
     res = run_verification(output_dir="outputs")
     assert res["verdict"] in ("PASS", "CAUTION")
-    assert 0.0 <= res["holds_fraction"] <= 1.0
+    assert res["total_points"] == 726
+    assert res["holds_count"] == 653
+    assert abs(res["holds_fraction"] - 653.0 / 726.0) < 1e-6
+    assert res["legacy_holds_count"] == 73
+    assert abs(res["legacy_holds_fraction"] - 73.0 / 726.0) < 1e-6

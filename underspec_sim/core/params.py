@@ -1,6 +1,6 @@
 """
 underspec_sim.core.params: Primitives and configuration parameters.
-Matches symbols in strategic_underspecification.tex:
+Matches symbols in paper/strategic_underspecification.tex:
 - k: attribute count
 - g: assistant raw guessing accuracy in (0, 1)
 - L: loss per unresolved wrong attribute

@@ -2,7 +2,7 @@ r"""
 underspec_sim.verifications.verify_mu_comparative_statics:
 Robustness Check (Task 3): \mu_A Comparative Statics & Bias Confounding Analysis.
 
-Paper Reference: Remark (rmk:mu-lambda) in strategic_underspecification_v2.tex:
+Paper Reference: Corollary 3 (cor:mu-lambda) in paper/strategic_underspecification.tex:
 "The model defines two distinct sources of bias, discounting (\mu_A < 1) and
 friction misperception (\lambda_A != c_Q), but only \lambda_A's comparative statics
 are derived... Expanding \Pi_\kappa = \mu_A U - (\lambda_A - c_Q) a (k - m) shows

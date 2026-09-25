@@ -3,7 +3,7 @@ underspec_sim.verifications.verify_exact_bias_sweep:
 Robustness Check (Task 3): Does IC_H Ever Bind Under the Exact Conjunctive Payoff?
 
 Background:
-In strategic_underspecification_v3.tex:
+In paper/strategic_underspecification.tex:
 - Proposition 6 & Proof Sketch:
   Argues that in the screening regime under moderate bias, IC_L alone binds.
   However, a Remark explicitly cautions that under sufficiently extreme bias, IC_H could plausibly bind instead.
@@ -282,14 +282,14 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     # Verdict
     # The paper's caveat stated: "IC_H could plausibly bind under extreme bias".
     # Since IC_H indeed binds under extreme bias in the exact conjunctive payoff,
-    # the paper's caveat is 100% CONFIRMED.
+    # the paper's caveat is verified on the tested grid.
     verdict = "PASS"
 
     # Generate Markdown Report
     md_content = f"""# Verification Report: Constraint Binding Under Exact Conjunctive Payoff
 
 ## Overview
-- **Reference**: `strategic_underspecification_v3.tex`, Proposition 6, Remark following Proposition 6, Section 8 (Discussion).
+- **Reference**: `paper/strategic_underspecification.tex`, Proposition 6, Remark following Proposition 6, Section 8 (Discussion).
 - **Key Question**: Does the extreme-bias reversal—where $\\text{{IC}}_H$ binds alongside $\\text{{IC}}_L$ under severe bias—occur under the **EXACT** conjunctive payoff $q(a,g)^{{k-m}}$, or does the exact form prevent $\\text{{IC}}_H$ from ever binding?
 - **Grid Swept**: $\\lambda_A \\in [c_Q, 10 c_Q] = [2.0, 20.0]$ (10 values), $\\mu_A \\in [0.1, 1.0]$ (10 values), totaling **{total_points}** screening menu optimizations.
 

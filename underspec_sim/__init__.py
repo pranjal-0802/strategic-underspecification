@@ -4,4 +4,4 @@ underspec_sim: Numerical verification and simulation framework for
 (Agarwal, 2026).
 """
 
-__version__ = "1.0.0"
+__version__ = "4.0.0"
