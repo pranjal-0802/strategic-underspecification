@@ -65,6 +65,19 @@ it---a one-sided optimization, useful as a benchmark but not yet a game. Section
 anticipating the population's best response, and we solve for that policy under two
 different instrument restrictions, then compare them.
 
+\subsection{Related literature}
+
+This work bridges contract theory and the emerging literature on formal models of human--AI interaction.
+
+\paragraph{Contract theory and screening without transfers.}
+Our screening framework builds on classical adverse-selection models~\citep{myerson1981,baron-myerson1982,mussa-rosen1978,laffont-tirole1986} that exploit the Spence--Mirrlees single-crossing property~\citep{spence1973} to separate heterogeneous agents. However, unlike classical monopoly or regulatory screening where the principal uses monetary transfers to extract information rents, here the assistant screens strictly through an interactive service margin (the ask rate $a$ offered in response to specification effort $m$). This connects to non-monetary screening and costly verification~\citep{townsend1979}, where information revelation is governed by operational friction rather than cash transfers.
+
+\paragraph{Costly communication and strategic disclosure.}
+The user's specification decision formalizes costly disclosure under strategic interpretation, connecting to strategic information transmission~\citep{crawford-sobel1982}, voluntary quality disclosure~\citep{grossman1981}, and rational inattention~\citep{sims2003}. In our setting, under-specification arises not from an incentive to deceive, but from the user's rational economizing on specification costs when anticipating automated assistance.
+
+\paragraph{Stackelberg formulations of human--AI interaction.}
+A burgeoning literature investigates human--AI collaboration through hierarchical bi-level games~\citep{stackelberg1934}, where human task specification sets the boundary conditions for an AI agent's execution. Recent empirical studies in software engineering document an intent ``collaboration gap,'' wherein implicit or under-specified human prompts induce asymmetric repair loops. Our model provides the first formal contract-theoretic microfoundation for this trade-off, characterizing how assistant asking policies and guessing capabilities strategically shape developer specification effort.
+
 \section{Environment and the Decision-Theoretic Benchmark}
 \label{sec:baseline}
 
@@ -128,7 +141,7 @@ $(k-m)\ln q + 1 \ge 0$, i.e., when Assumption~\ref{ass:reg} holds as stated here
 gives \emph{increasing} differences and hence $m^*(g)$ weakly \emph{increasing}
 in that region; a direct numerical optimization of $U$ confirms this reversal
 concretely, e.g. at $V{=}10,k{=}5,a{=}0,c(m){=}m^2/2$, $m^*$ rises from
-$\approx0.28$ at $g{=}0.5$ to $\approx0.67$ at $g{=}0.9$ --- both points well
+$\approx0.26$ at $g{=}0.5$ to $\approx0.67$ at $g{=}0.9$ --- both points well
 inside the old, incorrectly-signed condition's region --- before turning over and
 falling as $g\to1$, which is exactly the region the condition as corrected here
 identifies.) Loosely, since $\ln q \approx -(1-q)$ for $q$ near 1, the corrected
