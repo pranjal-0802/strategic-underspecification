@@ -1,6 +1,6 @@
 # underspec_sim
 
-Numerical verification, simulation, and LLM-driven experimentation framework for the formal Stackelberg-game model of **strategic under-specification** in AI coding assistants, based on [*Strategic Under-Specification: A Stackelberg Game Between User and Assistant*](strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
+Numerical verification, simulation, and LLM-driven experimentation framework for the formal Stackelberg-game model of **strategic under-specification** in AI coding assistants, based on [*Strategic Under-Specification: A Stackelberg Game Between User and Assistant (v3)*](strategic_underspecification.tex) (Pranjal Agarwal, BITS Pilani).
 
 ---
 
@@ -41,6 +41,9 @@ underspec_sim/
 | **Robustness 1** | **Exact vs Linear-Risk Conjunctive Model** | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner survives 100%; boundary saturation at low k)* |
 | **Robustness 2** | **Assumption 1 Regularity Characterization** | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(holds in 10.1%; restrictive for q>0.9 or low kappa)* |
 | **Robustness 3** | **$\mu_A$ Comparative Statics & Confound** | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(Remark rmk:mu-lambda verified: ratio = -lambda/mu)* |
+| **Follow-up 1 (Task 1)** | **Monotonicity Survival Outside Assump 1** | `underspec_sim/verifications/verify_monotonicity_survival.py` | `tests/test_monotonicity_survival.py` | `monotonicity_survival.csv`, `.png`, `.md` | **CAUTION** *(mono survives 100% outside Ass1; Ass1 inequality flipped)* |
+| **Follow-up 2 (Task 2)** | **Ray-Invariance in Corner Regime** | `underspec_sim/verifications/verify_mu_lambda_corner.py` | `tests/test_mu_lambda_corner.py` | `mu_lambda_corner.csv`, `.png`, `.md` | **PASS** *(sign of Pi(1)-Pi(0) strictly ray-invariant; 0 flips)* |
+| **Follow-up 3 (Task 3)** | **Exact Bias Sweep & $\text{IC}_H$ Binding** | `underspec_sim/verifications/verify_exact_bias_sweep.py` | `tests/test_exact_bias_sweep.py` | `exact_bias_sweep.csv`, `.png`, `.md` | **PASS** *(extreme bias reversal confirmed under exact payoff)* |
 
 ---
 
@@ -86,7 +89,28 @@ The numerical simulations verified the core mechanics and informed the paper's t
 - Derived the exact relationship between the two bias channels in pooling:
   $$\frac{\partial a^{SE} / \partial \mu_A}{\partial a^{SE} / \partial \lambda_A} = -\frac{\lambda_A}{\mu_A}$$
 - Level curves of $a^{SE}$ form constant rays along $\lambda_A / \mu_A = \text{constant}$.
-- Proves Remark `rmk:mu-lambda`: an assistant with discounting ($\mu_A < 1$) behaves identically along the ask-rate margin to an assistant with friction misperception ($\lambda_A > c_Q$). The two parameters are observationally confounded from $a^{SE}$ alone.
+- Proves Corollary 3 (`cor:mu-lambda` in v3): an assistant with discounting ($\mu_A < 1$) behaves identically along the ask-rate margin to an assistant with friction misperception ($\lambda_A > c_Q$). The two parameters are observationally confounded from $a^{SE}$ alone.
+
+### 6. Monotonicity Survival & Inversion of Assumption 1 (Follow-up Task 1)
+- Evaluated empirical monotonicity of $m^*(g)$ across 2,552 parameter intervals in $(k, q, \kappa) \in [5, 15] \times [0.70, 0.99] \times [0.20, 2.00]$:
+  - **100% Survival Outside Assumption 1:** In all 2,162 intervals where Assumption 1 fails, $m^*(g)$ is weakly decreasing in $g$ without exception (0 violations).
+  - **Mathematical Sign Inversion in Paper:** The cross-partial is $\frac{\partial^2 U}{\partial m \partial q} = -V q^{k-m-1}[1 + (k-m)\ln q]$. Decreasing differences ($\le 0$) mathematically requires $(k-m)\ln q \ge -1$, which is the **exact reverse** of the paper's Assumption 1 condition ($(k-m)\ln q \le -1$).
+  - Inside Assumption 1's stated region, the cross-partial is actually positive (supermodular), causing $m^*$ to *increase* with $g$ in 96.7% of points. Outside Assumption 1, decreasing differences holds universally.
+  - **Proposition 2 (Naive Welfare):** Naive users (who believe $a^\dagger > a_A$) suffer a welfare loss $U_{\text{naive}} \le U_{\text{soph}}$ in **100%** of tested grid points by suboptimality of miscalibrated choice.
+
+### 7. Ray-Invariance in the Corner Regime (Follow-up Task 2)
+- Resolved the open question in Remark 3 (`rmk:corner-ray`): does ray-invariance extend to the corner regime ($\Delta\bar\gamma \le 0$) where the choice is $a^{SE} \in \{0, 1\}$?
+  - **Analytical Proof:** In the corner regime, $\Pi(1) - \Pi(0) = \mu_A \cdot \left[ \Lambda \bar R_0 - \frac{\lambda_A}{\mu_A} (\bar R_0 + \bar\gamma) \right]$.
+  - Because $\mu_A > 0$ factors out cleanly as a positive scalar, the sign of $\Pi(1) - \Pi(0)$ depends **strictly and solely** on the ratio $\lambda_A / \mu_A$.
+  - The critical threshold is $\rho^* = \frac{\Lambda \bar R_0}{\bar R_0 + \bar\gamma}$. For $\lambda_A / \mu_A < \rho^*$, $a^{SE} = 1$; for $\lambda_A / \mu_A > \rho^*$, $a^{SE} = 0$.
+  - **Numerical Sweep:** Tested 11 rays across 10 values of $\mu_A \in [0.1, 1.0]$ (110 evaluations). Zero ray-invariance failures (0 boundary crossings).
+  - **Conclusion:** Ray-invariance holds unconditionally across the entire parameter space (both interior and corner regimes).
+
+### 8. Constraint Binding ($\text{IC}_H$) Under Exact Conjunctive Payoff (Follow-up Task 3)
+- Resolved the open question in Section 8 (Discussion): does the extreme-bias reversal ($\text{IC}_H$ binding alongside $\text{IC}_L$) occur under the exact conjunctive payoff $q^{k-m}$?
+  - Swept a 10x10 grid of $(\lambda_A, \mu_A) \in [2.0, 20.0] \times [0.1, 1.0]$ using 4D constrained optimization (SLSQP with multi-start).
+  - **Caveat Confirmed:** Under severe friction ($\lambda_A \ge 8.0$ at $\mu_A = 1.0$) or low altruism ($\mu_A \le 0.3$), $\text{IC}_H$ slack drops to 0.0, binding alongside $\text{IC}_L$ in 89% of grid points.
+  - Confirms that the extreme-bias binding of $\text{IC}_H$ is an intrinsic economic feature of the screening contract space, not an artifact of the linear-risk approximation.
 
 ---
 
@@ -108,7 +132,7 @@ pip install -e .
 ```
 
 ### Running Non-LLM Mathematical Verifications
-Runs all 8 verification suites in under 3 seconds, generates all CSVs and PNGs in `outputs/`, and prints a formatted summary table:
+Runs all 14 verification and follow-up robustness suites, generates all CSVs and PNGs in `outputs/`, and prints a formatted summary table:
 
 ```bash
 # Strict mode: exits nonzero (1) if any proposition fails (as requested before spending LLM budget)
@@ -119,7 +143,7 @@ python3 run_all_math_checks.py --ignore-failures
 ```
 
 ### Running Unit Tests (pytest)
-Runs 22 comprehensive algebraic and symbolic tests:
+Runs 44 comprehensive algebraic, numerical, and symbolic tests:
 ```bash
 pytest tests/ -v
 ```

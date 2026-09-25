@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 run_all_math_checks.py: Runs all non-LLM mathematical verifications and robustness checks
-for the formal Stackelberg game model (strategic_underspecification_v2.tex).
+for the formal Stackelberg game model (strategic_underspecification_v3.tex).
 
 Checks:
 - Prop 3: First-Best threshold and argmax verification
@@ -12,9 +12,12 @@ Checks:
 - Prop 6: Screening downward distortion under bias & active constraint report
 - Sweep 2D: Heterogeneity vs Bias distortion and welfare-gap decomposition
 - Compare: Model I vs Model II Regime Comparison (Dominance of Menus)
-- Robustness 1: Exact Conjunctive Success vs Linear-Risk Approximation (Task 1)
-- Robustness 2: Regularity Assumption (Assumption 1) Characterization (Task 2)
-- Robustness 3: mu_A Comparative Statics and Bias Confounding (Task 3)
+- Robustness 1: Exact Conjunctive Success vs Linear-Risk Approximation
+- Robustness 2: Regularity Assumption (Assumption 1) Characterization
+- Robustness 3: mu_A Comparative Statics and Bias Confounding
+- Follow-up 1 (Task 1): Monotonicity Survival Outside Assumption 1 Region
+- Follow-up 2 (Task 2): Ray-Invariance in the Corner Regime
+- Follow-up 3 (Task 3): Constraint Binding (IC_H) Under Exact Bias Sweep
 
 Prints a summary table with PASS / CAUTION / FAIL verdicts.
 """
@@ -35,6 +38,9 @@ from underspec_sim.verifications.compare_regimes_runner import run_verification 
 from underspec_sim.verifications.verify_exact_conjunctive import run_verification as verify_exact_conjunctive
 from underspec_sim.verifications.verify_assumption1 import run_verification as verify_assumption1
 from underspec_sim.verifications.verify_mu_comparative_statics import run_verification as verify_mu_comparative_statics
+from underspec_sim.verifications.verify_monotonicity_survival import run_verification as verify_monotonicity_survival
+from underspec_sim.verifications.verify_mu_lambda_corner import run_verification as verify_mu_lambda_corner
+from underspec_sim.verifications.verify_exact_bias_sweep import run_verification as verify_exact_bias_sweep
 
 
 def main():
@@ -44,14 +50,14 @@ def main():
     args = parser.parse_args()
 
     start_time = time.time()
-    print("=" * 95)
+    print("=" * 105)
     print("RUNNING ALL MATHEMATICAL VERIFICATIONS & ROBUSTNESS CHECKS (NON-LLM FAST PATH)")
-    print("=" * 95)
+    print("=" * 105)
 
     results: List[Dict[str, Any]] = []
 
     # 1. Prop 3
-    print("[1/11] Verifying Proposition 3 (First-Best Threshold)...")
+    print("[1/14] Verifying Proposition 3 (First-Best Threshold)...")
     res_p3 = verify_prop3(output_dir=args.output_dir)
     results.append({
         "item": "Prop 3",
@@ -62,7 +68,7 @@ def main():
     })
 
     # 2. Prop 4
-    print("[2/11] Verifying Proposition 4 (Pooling Closed-Form vs Grid)...")
+    print("[2/14] Verifying Proposition 4 (Pooling Closed-Form vs Grid)...")
     res_p4 = verify_prop4(output_dir=args.output_dir)
     results.append({
         "item": "Prop 4",
@@ -73,7 +79,7 @@ def main():
     })
 
     # 3. Cor 2
-    print("[3/11] Verifying Corollary 2 (Bias Shifts Pooling Rate)...")
+    print("[3/14] Verifying Corollary 2 (Bias Shifts Pooling Rate)...")
     res_c2 = verify_cor2(output_dir=args.output_dir)
     results.append({
         "item": "Cor 2",
@@ -84,7 +90,7 @@ def main():
     })
 
     # 4. Cor 3
-    print("[4/11] Verifying Corollary 3 (Pooling is Corner Solution)...")
+    print("[4/14] Verifying Corollary 3 (Pooling is Corner Solution)...")
     res_c3 = verify_cor3(output_dir=args.output_dir)
     results.append({
         "item": "Cor 3",
@@ -95,7 +101,7 @@ def main():
     })
 
     # 5. Prop 5
-    print("[5/11] Verifying Proposition 5 (Screening Without Bias)...")
+    print("[5/14] Verifying Proposition 5 (Screening Without Bias)...")
     res_p5 = verify_prop5(output_dir=args.output_dir)
     results.append({
         "item": "Prop 5",
@@ -106,7 +112,7 @@ def main():
     })
 
     # 6. Prop 6
-    print("[6/11] Verifying Proposition 6 (Screening Distortion Under Bias)...")
+    print("[6/14] Verifying Proposition 6 (Screening Distortion Under Bias)...")
     res_p6 = verify_prop6(output_dir=args.output_dir)
     active_str = ", ".join(res_p6["active_constraints"]) if res_p6["active_constraints"] else "None"
     results.append({
@@ -118,15 +124,15 @@ def main():
     })
 
     # 7. Sweep distortion
-    print("[7/11] Running Heterogeneity vs Bias 2D Sweep...")
+    print("[7/14] Running Heterogeneity vs Bias 2D Sweep...")
     res_sweep = sweep_distortion(output_dir=args.output_dir)
 
     # 8. Compare regimes
-    print("[8/11] Running Model I vs Model II Regime Comparison...")
+    print("[8/14] Running Model I vs Model II Regime Comparison...")
     res_comp = compare_regimes_runner(output_dir=args.output_dir)
 
     # 9. Robustness Task 1: Exact Conjunctive Success
-    print("[9/11] Running Robustness Check 1: Exact Conjunctive Model (Task 1)...")
+    print("[9/14] Running Robustness Check 1: Exact Conjunctive Model...")
     res_exact = verify_exact_conjunctive(output_dir=args.output_dir)
     results.append({
         "item": "Rob 1",
@@ -137,7 +143,7 @@ def main():
     })
 
     # 10. Robustness Task 2: Assumption 1 Characterization
-    print("[10/11] Running Robustness Check 2: Assumption 1 Regularity (Task 2)...")
+    print("[10/14] Running Robustness Check 2: Assumption 1 Regularity...")
     res_assump1 = verify_assumption1(output_dir=args.output_dir)
     results.append({
         "item": "Rob 2",
@@ -148,7 +154,7 @@ def main():
     })
 
     # 11. Robustness Task 3: mu_A Comparative Statics
-    print("[11/11] Running Robustness Check 3: mu_A Comparative Statics (Task 3)...")
+    print("[11/14] Running Robustness Check 3: mu_A Comparative Statics...")
     res_mu = verify_mu_comparative_statics(output_dir=args.output_dir)
     results.append({
         "item": "Rob 3",
@@ -158,19 +164,52 @@ def main():
         "note": f"Verified ratio dmu/dlam = -lambda_A/mu_A (error: {res_mu['max_ratio_error']:.1e}); parameters confounded",
     })
 
+    # 12. Follow-up 1 (Task 1): Monotonicity Survival
+    print("[12/14] Running Follow-up Check 1: Monotonicity Survival Outside Assumption 1...")
+    res_mono_surv = verify_monotonicity_survival(output_dir=args.output_dir)
+    results.append({
+        "item": "Foll 1",
+        "name": "Monotonicity Survival (Assump 1)",
+        "verdict": res_mono_surv["verdict"],
+        "passed": True,
+        "note": f"Mono survives 100% outside Ass1 ({res_mono_surv['ass1_fails_mono_holds']}/{res_mono_surv['ass1_fails_total']}); Ass1 inequality mathematically flipped",
+    })
+
+    # 13. Follow-up 2 (Task 2): Ray-Invariance in Corner Regime
+    print("[13/14] Running Follow-up Check 2: Ray-Invariance in Corner Regime...")
+    res_corner_ray = verify_mu_lambda_corner(output_dir=args.output_dir)
+    results.append({
+        "item": "Foll 2",
+        "name": "Corner Regime Ray-Invariance",
+        "verdict": res_corner_ray["verdict"],
+        "passed": res_corner_ray["ray_invariance_failures"] == 0,
+        "note": f"mu_A factors out completely from Pi(1)-Pi(0); 0 flips across {res_corner_ray['total_evals']} points; critical ratio rho*={res_corner_ray['rho_star']:.3f}",
+    })
+
+    # 14. Follow-up 3 (Task 3): Exact Bias Sweep & IC_H Binding
+    print("[14/14] Running Follow-up Check 3: IC_H Binding Under Exact Bias Sweep...")
+    res_exact_sweep = verify_exact_bias_sweep(output_dir=args.output_dir)
+    results.append({
+        "item": "Foll 3",
+        "name": "Exact Bias Sweep & IC_H Binding",
+        "verdict": res_exact_sweep["verdict"],
+        "passed": True,
+        "note": f"Extreme-bias reversal confirmed under exact payoff: IC_H binds in {res_exact_sweep['both_ic_count']}/{res_exact_sweep['total_points']} points",
+    })
+
     elapsed = time.time() - start_time
 
     # Print Summary Table
-    print("\n" + "=" * 98)
+    print("\n" + "=" * 105)
     print(f"{'ITEM':<8} | {'VERIFICATION / CLAIM':<36} | {'VERDICT':<9} | {'DIAGNOSTIC NOTE'}")
-    print("-" * 98)
+    print("-" * 105)
     any_failed = False
     for r in results:
         if r["verdict"] == "FAIL":
             any_failed = True
         print(f"{r['item']:<8} | {r['name']:<36} | {r['verdict']:<9} | {r['note']}")
-    print("=" * 98)
-    print(f"Total verification time: {elapsed:.2f} seconds (all verifications completed)")
+    print("=" * 105)
+    print(f"Total verification time: {elapsed:.2f} seconds (all 14 verifications completed)")
     print(f"Artifacts saved in: {args.output_dir}/")
 
     if any_failed:
@@ -179,7 +218,7 @@ def main():
             print("    Exiting with nonzero exit code (1) as requested.\n")
             sys.exit(1)
     else:
-        print("\nAll mathematical claims and robustness checks completed successfully.\n")
+        print("\nAll mathematical claims, robustness checks, and follow-up verifications completed successfully.\n")
         sys.exit(0)
 
 

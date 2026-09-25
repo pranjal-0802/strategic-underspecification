@@ -92,3 +92,44 @@ Following the updates to the foundational paper [*Strategic Under-Specification:
   - Verdict: **PASS** (Confirms Remark `rmk:mu-lambda`).
 - **Added 10 new pytest tests** in `tests/test_exact_conjunctive.py`, `tests/test_assumption1.py`, and `tests/test_mu_comparative_statics.py` (total test suite: 33 tests, 100% passing).
 
+---
+
+## 7. Strategic Underspecification v3 Synchronization & Follow-Up Verifications
+
+Following the synchronization with `strategic_underspecification_v3.tex`, three major open theoretical questions flagged in the paper were audited and verified:
+
+- **Paper v3 Updates:**
+  - Synchronized repository with `strategic_underspecification_v3.tex`.
+  - Updated Remark 1 (`rmk:assumption1-audit`) to explicitly recognize Assumption 1 as a sufficient condition and highlight the empirical monotonicity audit.
+  - Promoted Corollary 3 (`cor:mu-lambda`: "Non-identification of the two bias channels in the interior regime") and added Remark 3 (`rmk:corner-ray`: scope of ray-invariance on corner branch).
+  - Updated Section 8 (*Discussion*) to cite findings from the exact conjunctive audit and note the open question regarding $\text{IC}_H$ binding under extreme bias.
+
+- **`verify_monotonicity_survival.py` (Follow-up Task 1):**
+  - Swept $k \in [5, 15], q \in [0.70, 0.99], \kappa \in [0.20, 2.00]$ across 2,552 finite-difference intervals.
+  - **100% Monotonicity Survival Outside Assumption 1:** In all 2,162 intervals where Assumption 1 fails, $m^*(g)$ is weakly decreasing in $g$ with 0 violations.
+  - **Sign Inversion in Assumption 1:** Discovered that decreasing differences $\frac{\partial^2 U}{\partial m \partial q} \le 0$ requires $(k-m)\ln q \ge -1$, which is the exact mathematical inverse of Assumption 1's condition ($(k-m)\ln q \le -1$).
+  - **Proposition 2 Confirmed:** Naive users are weakly worse off than sophisticated users ($U_{\text{naive}} \le U_{\text{soph}}$) across 100% of tested grid points.
+  - Verdict: **CAUTION** (Monotonicity holds 100% outside Assumption 1; Assumption 1 has its inequality sign reversed).
+  - Artifacts: `outputs/monotonicity_survival.csv`, `.png`, `.md`.
+
+- **`verify_mu_lambda_corner.py` (Follow-up Task 2):**
+  - Analytically proved that $\Pi(1) - \Pi(0) = \mu_A [\Lambda \bar R_0 - \frac{\lambda_A}{\mu_A}(\bar R_0 + \bar\gamma)]$.
+  - Factoring out $\mu_A > 0$ proves that the sign of $\Pi(1) - \Pi(0)$, and thus the selected corner $a^{SE} \in \{0, 1\}$, depends strictly on the scalar ratio $\lambda_A / \mu_A$.
+  - Swept 11 rays across 10 values of $\mu_A \in [0.1, 1.0]$ (110 evaluations) with 0 ray-invariance failures and 0 boundary crossings.
+  - Resolved Remark 3: ray-invariance holds unconditionally across both interior and corner regimes.
+  - Verdict: **PASS**.
+  - Artifacts: `outputs/mu_lambda_corner.csv`, `.png`, `.md`.
+
+- **`verify_exact_bias_sweep.py` (Follow-up Task 3):**
+  - Solved the 4D constrained screening menu problem on a 10x10 grid of $(\lambda_A, \mu_A) \in [2.0, 20.0] \times [0.1, 1.0]$ under the exact conjunctive payoff $q^{k-m}$.
+  - Confirmed the paper's caveat: under extreme bias ($\lambda_A \ge 8.0$ or $\mu_A \le 0.3$), $\text{IC}_H$ becomes active alongside $\text{IC}_L$ (binding in 89/100 points).
+  - Resolved Section 8 open question: extreme-bias constraint reversal is confirmed under the exact payoff.
+  - Verdict: **PASS**.
+  - Artifacts: `outputs/exact_bias_sweep.csv`, `.png`, `.md`.
+
+- **Test Suite Expansion:**
+  - Added 11 new tests in `tests/test_monotonicity_survival.py`, `tests/test_mu_lambda_corner.py`, and `tests/test_exact_bias_sweep.py`.
+  - Full suite now contains **44 tests, 100% passing** (`pytest tests/ -v`).
+- **Master Verification Runner:**
+  - Updated `run_all_math_checks.py` to execute all 14 mathematical verifications in ~68s.
+
