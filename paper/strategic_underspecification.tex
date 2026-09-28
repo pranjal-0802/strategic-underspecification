@@ -460,11 +460,12 @@ now rank bundles differently.
 
 \begin{proposition}[Downward distortion of the high-cost type's service]
 \label{prop:distortion}
-Assume $\Lambda > c_Q$, $\kappa_L < \kappa^{*B} < \kappa_H$, and under-asking
-bias ($\lambda_A > \mu_A c_Q$, so $c_Q^{eff} \equiv c_Q + (\lambda_A - c_Q)/\mu_A > c_Q$).
+Assume $\Lambda > c_Q$, $\kappa_L < \kappa^{*B} < \kappa_H$, under-asking
+bias ($\lambda_A > \mu_A c_Q$, so $c_Q^{eff} \equiv c_Q + (\lambda_A - c_Q)/\mu_A > c_Q$),
+and task complexity $k > k_{\text{crit}}$ (defined in~\eqref{eq:kcrit}).
 Then:
 \begin{enumerate}[leftmargin=*]
-\item \textbf{Incentive violation of unconstrained menu:} The unconstrained biased menu $(m_L^B, a_L^B) = (\Lambda/\kappa_L, 0)$ and $(m_H^B, a_H^B) = (c_Q^{eff}/\kappa_H, 1)$ strictly violates $\text{IC}_L$ whenever the type heterogeneity spread $\kappa_H - \kappa_L$ is sufficiently large.
+\item \textbf{Incentive violation of unconstrained menu:} The unconstrained biased menu $(m_L^B, a_L^B) = (\min\{k, \Lambda/\kappa_L\}, 0)$ and $(m_H^B, a_H^B) = (\min\{k, c_Q^{eff}/\kappa_H\}, 1)$ strictly violates $\text{IC}_L$ whenever the type heterogeneity spread $\kappa_H - \kappa_L$ is sufficiently large.
 \item \textbf{Downward distortion:} Under the optimal incentive-compatible menu, the low-cost type receives no distortion ($a_L^{SB} = a_L^B = 0$), while the high-cost type's ask rate is strictly distorted downward:
 \[
 a_H^{SB} \;<\; a_H^B \;\le\; a_H^{FB} \;=\; 1.
@@ -480,7 +481,7 @@ We establish the result in five analytical steps:
 The leader objective per type is $\Pi_\kappa(m,a) = \mu_A [V - \Lambda(1-a)(k-m) - \frac{\kappa}{2}m^2 - a c_Q^{eff}(k-m)]$, where $c_Q^{eff} \equiv c_Q + (\lambda_A - c_Q)/\mu_A > c_Q$ under under-asking bias.
 Maximizing unconstrained with respect to $m$ yields $m^B(\kappa;a) = [\Lambda(1-a) + a c_Q^{eff}]/\kappa$.
 Because $\Pi_\kappa$ is linear in $a$ for fixed $m$ with slope $\mu_A(\Lambda - c_Q^{eff})(k-m)$, the biased first-best ask rate is bang-bang around the threshold $\kappa^{*B} = (\Lambda + c_Q^{eff})/(2k)$.
-For $\kappa_L < \kappa^{*B} < \kappa_H$, the unconstrained menu is $(m_L^B, a_L^B) = (\Lambda/\kappa_L, 0)$ and $(m_H^B, a_H^B) = (c_Q^{eff}/\kappa_H, 1)$.
+For $\kappa_L < \kappa^{*B} < \kappa_H$, the unconstrained menu is $(m_L^B, a_L^B) = (\min\{k, \Lambda/\kappa_L\}, 0)$ and $(m_H^B, a_H^B) = (\min\{k, c_Q^{eff}/\kappa_H\}, 1)$.
 
 \paragraph{Step 2: Upward temptation to mimic ($\text{IC}_L$ violation).}
 Evaluating type $\kappa_L$'s payoff from accepting the high type's bundle $(m_H^B, 1)$ versus its own bundle $(m_L^B, 0)$:
@@ -495,7 +496,7 @@ Here, the principal's payoff $\Pi_{\kappa_H}$ directly incorporates $\mu_A U(\cd
 
 \paragraph{Step 4: Global optimization along the $\text{IC}_L$ boundary.}
 When $\text{IC}_L$ binds, any feasible allocation must satisfy $U(m_H, a_H; \kappa_L) \le U(m_L, a_L; \kappa_L)$.
-First, consider the low-cost bundle $(m_L, a_L)$. Because $(m_L^B, a_L^B) = (\Lambda/\kappa_L, 0)$ is the unique unconstrained maximizer of both $U(\cdot; \kappa_L)$ and $\Pi_{\kappa_L}$ on the relevant domain, any distortion of $(m_L, a_L)$ away from $(m_L^B, 0)$ would strictly reduce $U(m_L, a_L; \kappa_L)$, tightening $\text{IC}_L$ and reducing leader surplus. Hence, standard no distortion at the top applies to the low-cost type: $(m_L^{SB}, a_L^{SB}) = (m_L^B, 0)$, fixing type $L$'s utility at $U_L^0 \equiv U(m_L^B, 0; \kappa_L) = V - \Lambda k + \frac{\Lambda^2}{2\kappa_L}$.
+First, consider the low-cost bundle $(m_L, a_L)$. Because $(m_L^B, a_L^B) = (\min\{k, \Lambda/\kappa_L\}, 0)$ is the unique unconstrained maximizer of both $U(\cdot; \kappa_L)$ and $\Pi_{\kappa_L}$ on the relevant domain, any distortion of $(m_L, a_L)$ away from $(m_L^B, 0)$ would strictly reduce $U(m_L, a_L; \kappa_L)$, tightening $\text{IC}_L$ and reducing leader surplus. Hence, standard no distortion at the top applies to the low-cost type: $(m_L^{SB}, a_L^{SB}) = (m_L^B, 0)$, fixing type $L$'s utility at its reservation level $U_L^0 \equiv U(m_L^B, 0; \kappa_L)$.
 
 The entire burden of satisfying $\text{IC}_L$ must therefore fall on the high-cost bundle $(m_H, a_H)$. Along the binding boundary $U(m_H, a_H; \kappa_L) = U_L^0$, utility is strictly linear in $a_H$:
 \[
@@ -531,14 +532,62 @@ Evaluating the asking rate at this global boundary optimum:
 \[
 a_H^{SB} \;=\; a_H(m_H^*) \;=\; 1 \;-\; \frac{U(m_H^*, 1; \kappa_L) - U_L^0}{s(k - m_H^*)}.
 \]
-For sufficiently heterogeneous types, $U(m_H^*, 1; \kappa_L) > U_L^0$, which strictly forces:
+Because $s(k - m_H^*) > 0$ for all $m_H^* < k$, strict downward distortion $a_H^{SB} < 1$ holds if and only if $U(m_H^*, 1; \kappa_L) - U_L^0 > 0$. Expanding this difference using $U(m_H^*, 1; \kappa_L) = V - c_Q(k - m_H^*) - \frac{\kappa_L}{2}(m_H^*)^2$:
+\begin{itemize}[leftmargin=*]
+\item When type $L$'s unconstrained effort is interior ($k \ge \Lambda/\kappa_L$), $U_L^0 = V - \Lambda k + \frac{\Lambda^2}{2\kappa_L}$. The rent difference becomes:
+\[
+U(m_H^*, 1; \kappa_L) - U_L^0 \;=\; s k - \frac{\Lambda^2}{2\kappa_L} + c_Q m_H^* - \frac{\kappa_L}{2}(m_H^*)^2 \;=\; s\left[ k - \frac{\Lambda + c_Q}{2\kappa_L} \right] - \frac{(c_Q - \kappa_L m_H^*)^2}{2\kappa_L}.
+\]
+Setting this difference strictly positive yields the explicit parameter inequality:
+\[
+k \;>\; k_{\text{crit}}^{\text{int}} \;\equiv\; \frac{\Lambda + c_Q}{2\kappa_L} \;+\; \frac{(c_Q - \kappa_L m_H^*)^2}{2 s \kappa_L}.
+\]
+\item When type $L$'s unconstrained effort saturates at the boundary ($k < \Lambda/\kappa_L$), $U_L^0 = V - \frac{\kappa_L}{2}k^2$. The difference factors as:
+\[
+U(m_H^*, 1; \kappa_L) - U_L^0 \;=\; (k - m_H^*)\left[ \frac{\kappa_L(k + m_H^*)}{2} - c_Q \right],
+\]
+which is strictly positive if and only if:
+\[
+k \;>\; k_{\text{crit}}^{\text{clip}} \;\equiv\; \frac{2 c_Q}{\kappa_L} - m_H^*.
+\]
+\end{itemize}
+Combining both cases defines the threshold:
+\begin{equation}
+\label{eq:kcrit}
+k_{\text{crit}}(\kappa_L, \kappa_H, \Lambda, c_Q, \lambda_A, \mu_A) \;\equiv\; \begin{cases}
+\dfrac{\Lambda + c_Q}{2\kappa_L} + \dfrac{(c_Q - \kappa_L m_H^*)^2}{2 s \kappa_L}, & \text{if } k \ge \dfrac{\Lambda}{\kappa_L}, \\[10pt]
+\dfrac{2 c_Q}{\kappa_L} - m_H^*, & \text{if } k < \dfrac{\Lambda}{\kappa_L}.
+\end{cases}
+\end{equation}
+Whenever $k > k_{\text{crit}}$, $U(m_H^*, 1; \kappa_L) > U_L^0$ holds strictly, which guarantees:
 \[
 a_H^{SB} \;<\; a_H^B \;\le\; a_H^{FB} \;=\; 1.
 \]
-In our representative calibration ($k=10, \Lambda=5, c_Q=2, s=3, b=2, \mu_A=1, \kappa_L=0.3, \kappa_H=0.5$), this yields $m_H^* = 25/3 \approx 8.33$ and $a_H^{SB} = 0.75 < 1$, exactly matching the numerical second-best contract.
+In our representative calibration ($k=10, \Lambda=5, c_Q=2, s=3, b=2, \mu_A=1, \kappa_L=0.3, \kappa_H=0.5$), $\Lambda/\kappa_L = 50/3 > k = 10$, so the clipped branch applies, giving $m_H^* = 25/3 \approx 8.33$ and $k_{\text{crit}} = \frac{4}{0.3} - \frac{25}{3} = 5.0 < k = 10$. The condition is satisfied with a 100\% margin, producing $a_H^{SB} = 0.75 < 1$ exactly matching the numerical second-best contract.
 
-Finally, maintaining $a_H = 1$ is globally strictly suboptimal: along the boundary $a_H = 1$, satisfying $\text{IC}_L$ would require choosing an extreme specification level $m_H$ such that $U(m_H, 1; \kappa_L) \le U_L^0$, which departs substantially from $m_H^B$, destroys cognitive surplus, and incurs full asking friction $b(k - m_H)$, yielding strictly lower leader surplus than $(m_H^*, a_H(m_H^*))$.
-Hence, the high-cost type's asking service is strictly distorted downward: $a_H^{SB} < a_H^B \le 1$.
+We now analytically demonstrate that maintaining $a_H = 1$ is globally strictly suboptimal.
+Let $\mathcal{F}_H = \{ (m_H, a_H) \in [0, k] \times [0, 1] : U(m_H, a_H; \kappa_L) \le U_L^0 \}$ denote the full feasible set of high-cost contracts satisfying $\text{IC}_L$.
+Because $\partial U/\partial a_H = s(k - m_H) > 0$ for all $m_H < k$, any feasible bundle $(m_H, a_H) \in \mathcal{F}_H$ must satisfy:
+\[
+a_H \;\le\; a_H(m_H) \;\equiv\; 1 - \frac{U(m_H, 1; \kappa_L) - U_L^0}{s(k - m_H)}.
+\]
+For any fixed $m_H$, the leader's payoff $\Pi_{\kappa_H}(m_H, a_H) = \mu_A U(m_H, a_H; \kappa_H) - b a_H (k - m_H)$ has partial derivative:
+\[
+\frac{\partial \Pi_{\kappa_H}}{\partial a_H} \;=\; (\mu_A s - b)(k - m_H).
+\]
+If $\mu_A s - b \le 0$, $\Pi_{\kappa_H}$ is non-increasing in $a_H$, so choosing $a_H = 1$ is immediately weakly or strictly dominated by choosing a smaller asking rate.
+If $\mu_A s - b > 0$, $\Pi_{\kappa_H}$ is strictly increasing in $a_H$. For any fixed $m_H$, the leader maximizes surplus within $\mathcal{F}_H$ by setting $a_H$ at its upper bound: $a_H = \min\{1, a_H(m_H)\}$.
+Along the locus where this bound binds at $a_H = a_H(m_H)$, the leader's reduced objective $\Pi_{\kappa_H}(m_H)$ is strictly concave in $m_H$ on $[0, k]$ with unique global maximizer $m_H^*$.
+Because $k > k_{\text{crit}}$, we have $a_H(m_H^*) < 1$.
+Now consider any candidate contract $(\tilde m_H, 1) \in \mathcal{F}_H$ that maintains $a_H = 1$.
+Feasibility under $\text{IC}_L$ requires $U(\tilde m_H, 1; \kappa_L) \le U_L^0$, which is equivalent to $a_H(\tilde m_H) \ge 1$.
+Because $a_H(m_H^*) < 1$, any such candidate must have $\tilde m_H \ne m_H^*$.
+By the strict concavity of $\Pi_{\kappa_H}(m_H)$, it follows that:
+\[
+\Pi_{\kappa_H}(\tilde m_H, 1) \;\le\; \Pi_{\kappa_H}(\tilde m_H, a_H(\tilde m_H)) \;<\; \Pi_{\kappa_H}(m_H^*, a_H(m_H^*)) \;=\; \Pi_{\kappa_H}(m_H^{SB}, a_H^{SB}).
+\]
+In our representative calibration, the best contract on the boundary $a_H = 1$ requires $\tilde m_H = k = 10$, yielding leader payoff $\Pi_{\kappa_H}(10, 1) = 75.0$, whereas the interior contract $(8.33, 0.75)$ delivers $\Pi_{\kappa_H}^{SB} = 75.5556$, an exact surplus gap of $5/9 > 0$.
+Hence, maintaining $a_H = 1$ is globally strictly suboptimal, and the high-cost type's asking service is strictly distorted downward: $a_H^{SB} < a_H^B \le 1$.
 
 \paragraph{Step 5: Co-activity of $\text{IC}_H$ under extreme bias.}
 As bias $\lambda_A$ increases, maintaining $\text{IC}_L$ forces $a_H^{SB}$ progressively lower. When $a_H^{SB}$ approaches $a_L^{SB} = 0$, the high-cost type receives negligible clarification assistance relative to its higher specification cost. Eventually, the reverse incentive constraint $\text{IC}_H$ ($U(m_H, a_H; \kappa_H) \ge U(m_L, a_L; \kappa_H)$) can become co-active. Under sufficiently extreme bias, separating the types via distinct asking rates is no longer incentive-viable, and the optimal screening menu may collapse to a pooling or boundary-saturated allocation where both types receive identical asking service.
