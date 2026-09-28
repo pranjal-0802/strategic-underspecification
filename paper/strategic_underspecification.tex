@@ -469,7 +469,7 @@ Then:
 \[
 a_H^{SB} \;<\; a_H^B \;\le\; a_H^{FB} \;=\; 1.
 \]
-\item \textbf{Active constraint regime:} In the moderate-bias regime, $\text{IC}_L$ binds alone while $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ remain strictly slack. The reverse constraint $\text{IC}_H$ becomes co-active if and only if asking friction is extreme ($\lambda_A \ge \lambda_A^{\text{pool}}$), where the screening menu collapses into a pooling contract.
+\item \textbf{Active constraint regime:} In the moderate-bias regime, $\text{IC}_L$ binds alone while $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ remain strictly slack. Under sufficiently extreme bias, $\text{IC}_H$ can become co-active with $\text{IC}_L$, and the optimal menu may collapse to a pooling or boundary-saturated allocation.
 \end{enumerate}
 \end{proposition}
 
@@ -494,28 +494,34 @@ In classical adverse selection with monetary transfers (Baron--Myerson, Laffont-
 Here, the principal's payoff $\Pi_{\kappa_H}$ directly incorporates $\mu_A U(\cdot;\kappa_H)$. Depressing $U_H$ directly penalizes the leader's own objective. Thus, the leader adjusts the bundle $(m_H, a_H)$ only as far as necessary to restore $\text{IC}_L$, leaving $\text{IR}_H$ strictly slack: $U(m_H^{SB}, a_H^{SB}; \kappa_H) > \underline{U}$.
 
 \paragraph{Step 4: Direction of distortion along the $\text{IC}_L$ boundary.}
-Form the Lagrangian of the relaxed problem where $\text{IC}_L$ binds with multiplier $\mu_{IC_L} > 0$:
+When $\text{IC}_L$ binds, any feasible allocation must satisfy $U(m_H, a_H; \kappa_L) \le U(m_L, a_L; \kappa_L)$.
+First, consider the low-cost bundle $(m_L, a_L)$. Because $(m_L^B, a_L^B) = (\Lambda/\kappa_L, 0)$ is the unique unconstrained maximizer of both $U(\cdot; \kappa_L)$ and $\Pi_{\kappa_L}$ on the relevant domain, any distortion of $(m_L, a_L)$ away from $(m_L^B, 0)$ would strictly reduce $U(m_L, a_L; \kappa_L)$, tightening $\text{IC}_L$ and reducing leader surplus. Hence, standard no distortion at the top applies to the low-cost type: $(m_L^{SB}, a_L^{SB}) = (m_L^B, 0)$.
+
+The entire burden of satisfying $\text{IC}_L$ must therefore fall on adjusting the high-cost bundle $(m_H, a_H)$ to make it less attractive to type $L$. Differentiating type $L$'s utility from mimicking type $H$ with respect to $a_H$:
 \[
-\mathcal{L} \;=\; f_L\,\Pi_{\kappa_L}(m_L, a_L) \;+\; f_H\,\Pi_{\kappa_H}(m_H, a_H) \;+\; \mu_{IC_L}\Big[ U(m_L,a_L;\kappa_L) - U(m_H,a_H;\kappa_L) \Big].
+\frac{\partial U(m_H, a_H; \kappa_L)}{\partial a_H} \;=\; (\Lambda - c_Q)(k - m_H) \;=\; s(k - m_H) \;>\; 0,
 \]
-By single-crossing ($\partial \text{MRS}/\partial\kappa > 0$), no downward constraint binds at the optimum ($a_L^{SB} = 0, m_L^{SB} = m_L^B$).
+which is strictly positive for all $m_H < k$ under the maintained condition $s \equiv \Lambda - c_Q > 0$. Thus, increasing $a_H$ strictly increases type $L$'s temptation to mimic, while reducing $a_H$ strictly diminishes it.
+
+Now evaluate the leader's margin of adjustment. Form the Lagrangian of the problem where $\text{IC}_L$ binds with shadow price $\mu_{IC_L} > 0$:
+\[
+\mathcal{L} \;=\; f_L\,\Pi_{\kappa_L}(m_L, a_L) \;+\; f_H\,\Pi_{\kappa_H}(m_H, a_H) \;+\; \mu_{IC_L}\Big[ U(m_L, a_L; \kappa_L) - U(m_H, a_H; \kappa_L) \Big].
+\]
 Differentiating $\mathcal{L}$ with respect to $a_H$:
 \[
-\frac{\partial\mathcal{L}}{\partial a_H} \;=\; f_H\,\frac{\partial\Pi_{\kappa_H}}{\partial a_H} \;-\; \mu_{IC_L}\,\frac{\partial U(m_H, a_H; \kappa_L)}{\partial a_H} \;=\; 0.
+\frac{\partial\mathcal{L}}{\partial a_H} \;=\; f_H\,\frac{\partial\Pi_{\kappa_H}}{\partial a_H} \;-\; \mu_{IC_L}\,\frac{\partial U(m_H, a_H; \kappa_L)}{\partial a_H} \;=\; (k - m_H)\Big[ f_H(\mu_A s - b) \;-\; \mu_{IC_L} s \Big],
 \]
-From user utility, $\partial U(m_H, a_H; \kappa_L)/\partial a_H = s(k - m_H)$, where $s \equiv \Lambda - c_Q > 0$. Therefore, at the constrained optimum:
+where $b \equiv \lambda_A - c_Q > 0$ represents the assistant's excess asking friction.
+Under under-asking bias, the assistant's private valuation of asking is strictly depressed ($\mu_A s - b < \mu_A s \le s$). Because $\text{IC}_L$ binds ($\mu_{IC_L} > 0$) and $s(k - m_H) > 0$, the binding incentive constraint exerts an unambiguously negative marginal force $-\mu_{IC_L} s(k - m_H) < 0$ on $a_H$.
+At the unconstrained boundary $a_H^B = 1$, the upper bound cannot remain active: satisfying $\text{IC}_L$ solely by adjusting $m_H$ would require distorting specification effort away from $m_H^B$, incurring second-order cognitive inefficiency $\kappa_H m_H$ without reducing the leader's costly asking friction $b(k - m_H)$. By contrast, reducing $a_H$ below $1$ simultaneously relaxes $\text{IC}_L$ at rate $s(k - m_H)$ and relieves the leader of excess friction at rate $b(k - m_H) > 0$.
+The leader therefore strictly lowers the high-cost type's asking rate along the $\text{IC}_L$ boundary:
 \[
-\frac{\partial\Pi_{\kappa_H}}{\partial a_H} \;=\; \frac{\mu_{IC_L}}{f_H}\,s\,(k - m_H).
+a_H^{SB} \;<\; a_H^B \;\le\; a_H^{FB} \;=\; 1.
 \]
-Because $\mu_{IC_L} > 0$ (the constraint binds) and $s(k - m_H) > 0$ for any interior $m_H < k$, the right-hand side is strictly positive.
-Because $\Pi_{\kappa_H}$ is strictly concave in $a$ near the unconstrained optimum (where $\partial\Pi/\partial a = 0$ at $a_H^B$), a strictly positive marginal value $\partial\Pi_{\kappa_H}/\partial a_H > 0$ requires the constrained optimum $a_H^{SB}$ to lie strictly to the left of the unconstrained peak:
-\[
-a_H^{SB} \;<\; a_H^B \;\le\; 1.
-\]
-Hence, the high-cost type's asking rate is strictly distorted downward.
+Hence, the high-cost type's service is strictly distorted downward.
 
-\paragraph{Step 5: Boundary of $\text{IC}_H$ co-activity.}
-As bias $\lambda_A$ increases, maintaining $\text{IC}_L$ forces $a_H^{SB}$ progressively lower. When $a_H^{SB}$ drops toward $a_L^{SB} = 0$, the high-cost type receives negligible clarification assistance. Eventually, the reverse constraint $\text{IC}_H$ ($U(m_H, a_H; \kappa_H) \ge U(m_L, a_L; \kappa_H)$) binds when $U(m_H^{SB}, a_H^{SB}; \kappa_H) = U(m_L^B, 0; \kappa_H)$. Beyond this threshold $\lambda_A \ge \lambda_A^{\text{pool}}$, separating the types is no longer feasible, and the menu collapses into the pooling policy of Model I.
+\paragraph{Step 5: Co-activity of $\text{IC}_H$ under extreme bias.}
+As bias $\lambda_A$ increases, maintaining $\text{IC}_L$ forces $a_H^{SB}$ progressively lower. When $a_H^{SB}$ approaches $a_L^{SB} = 0$, the high-cost type receives negligible clarification assistance relative to its higher specification cost. Eventually, the reverse incentive constraint $\text{IC}_H$ ($U(m_H, a_H; \kappa_H) \ge U(m_L, a_L; \kappa_H)$) can become co-active. Under sufficiently extreme bias, separating the types via distinct asking rates is no longer incentive-viable, and the optimal screening menu may collapse to a pooling or boundary-saturated allocation where both types receive identical asking service.
 \end{proof}
 
 \begin{remark}[Active constraint structure without monetary transfers]
