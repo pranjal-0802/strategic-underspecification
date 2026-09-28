@@ -493,32 +493,52 @@ Because type $\kappa_L$ can provide the high type's specification level $m_H^B =
 In classical adverse selection with monetary transfers (Baron--Myerson, Laffont--Tirole), the principal's payoff is linearly reduced by agent rent, driving the inefficient agent's $\text{IR}$ to bind at reservation $\underline{U}$.
 Here, the principal's payoff $\Pi_{\kappa_H}$ directly incorporates $\mu_A U(\cdot;\kappa_H)$. Depressing $U_H$ directly penalizes the leader's own objective. Thus, the leader adjusts the bundle $(m_H, a_H)$ only as far as necessary to restore $\text{IC}_L$, leaving $\text{IR}_H$ strictly slack: $U(m_H^{SB}, a_H^{SB}; \kappa_H) > \underline{U}$.
 
-\paragraph{Step 4: Direction of distortion along the $\text{IC}_L$ boundary.}
+\paragraph{Step 4: Global optimization along the $\text{IC}_L$ boundary.}
 When $\text{IC}_L$ binds, any feasible allocation must satisfy $U(m_H, a_H; \kappa_L) \le U(m_L, a_L; \kappa_L)$.
-First, consider the low-cost bundle $(m_L, a_L)$. Because $(m_L^B, a_L^B) = (\Lambda/\kappa_L, 0)$ is the unique unconstrained maximizer of both $U(\cdot; \kappa_L)$ and $\Pi_{\kappa_L}$ on the relevant domain, any distortion of $(m_L, a_L)$ away from $(m_L^B, 0)$ would strictly reduce $U(m_L, a_L; \kappa_L)$, tightening $\text{IC}_L$ and reducing leader surplus. Hence, standard no distortion at the top applies to the low-cost type: $(m_L^{SB}, a_L^{SB}) = (m_L^B, 0)$.
+First, consider the low-cost bundle $(m_L, a_L)$. Because $(m_L^B, a_L^B) = (\Lambda/\kappa_L, 0)$ is the unique unconstrained maximizer of both $U(\cdot; \kappa_L)$ and $\Pi_{\kappa_L}$ on the relevant domain, any distortion of $(m_L, a_L)$ away from $(m_L^B, 0)$ would strictly reduce $U(m_L, a_L; \kappa_L)$, tightening $\text{IC}_L$ and reducing leader surplus. Hence, standard no distortion at the top applies to the low-cost type: $(m_L^{SB}, a_L^{SB}) = (m_L^B, 0)$, fixing type $L$'s utility at $U_L^0 \equiv U(m_L^B, 0; \kappa_L) = V - \Lambda k + \frac{\Lambda^2}{2\kappa_L}$.
 
-The entire burden of satisfying $\text{IC}_L$ must therefore fall on adjusting the high-cost bundle $(m_H, a_H)$ to make it less attractive to type $L$. Differentiating type $L$'s utility from mimicking type $H$ with respect to $a_H$:
+The entire burden of satisfying $\text{IC}_L$ must therefore fall on the high-cost bundle $(m_H, a_H)$. Along the binding boundary $U(m_H, a_H; \kappa_L) = U_L^0$, utility is strictly linear in $a_H$:
 \[
-\frac{\partial U(m_H, a_H; \kappa_L)}{\partial a_H} \;=\; (\Lambda - c_Q)(k - m_H) \;=\; s(k - m_H) \;>\; 0,
+V - \Lambda(k - m_H) + a_H s(k - m_H) - \frac{\kappa_L}{2}m_H^2 \;=\; U_L^0,
 \]
-which is strictly positive for all $m_H < k$ under the maintained condition $s \equiv \Lambda - c_Q > 0$. Thus, increasing $a_H$ strictly increases type $L$'s temptation to mimic, while reducing $a_H$ strictly diminishes it.
+where $s \equiv \Lambda - c_Q > 0$. Because $s(k - m_H) > 0$ for all $m_H < k$, this uniquely determines the required asking rate $a_H$ as a function of specification effort $m_H$:
+\[
+a_H(m_H)(k - m_H) \;=\; \frac{1}{s}\left[ U_L^0 - V + \Lambda(k - m_H) + \frac{\kappa_L}{2}m_H^2 \right],
+\]
+or equivalently,
+\[
+a_H(m_H) \;=\; 1 \;-\; \frac{U(m_H, 1; \kappa_L) - U_L^0}{s(k - m_H)}.
+\]
+Next, evaluate the leader's payoff $\Pi_{\kappa_H}(m_H, a_H) = \mu_A U(m_H, a_H; \kappa_H) - b a_H (k - m_H)$ along this boundary, where $b \equiv \lambda_A - c_Q > 0$. Using the rent identity $U(m_H, a_H; \kappa_H) = U_L^0 - \frac{\kappa_H - \kappa_L}{2}m_H^2$ and substituting $a_H(m_H)(k - m_H)$, the leader's reduced objective becomes an exact function of $m_H$ alone:
+\[
+\Pi_{\kappa_H}(m_H) \;=\; \mu_A \left[ U_L^0 - \frac{\kappa_H - \kappa_L}{2}m_H^2 \right] \;-\; \frac{b}{s}\left[ U_L^0 - V + \Lambda(k - m_H) + \frac{\kappa_L}{2}m_H^2 \right].
+\]
+Expanding terms:
+\[
+\Pi_{\kappa_H}(m_H) \;=\; \left(\mu_A - \frac{b}{s}\right) U_L^0 \;+\; \frac{b}{s}(V - \Lambda k) \;+\; \frac{b\Lambda}{s}m_H \;-\; \frac{1}{2}\left[ \mu_A(\kappa_H - \kappa_L) + \frac{b}{s}\kappa_L \right] m_H^2.
+\]
+The second derivative with respect to $m_H$ is:
+\[
+\frac{d^2 \Pi_{\kappa_H}}{dm_H^2} \;=\; -\left[ \mu_A(\kappa_H - \kappa_L) + \frac{b}{s}\kappa_L \right] \;=\; -\,\frac{\mu_A s(\kappa_H - \kappa_L) + b\kappa_L}{s} \;<\; 0,
+\]
+which is strictly negative everywhere on $[0, k]$ because $\kappa_H > \kappa_L$, $\mu_A > 0$, $s > 0$, and $b > 0$. Therefore, along the binding $\text{IC}_L$ boundary, the leader's objective is globally strictly concave in $m_H$, with unique interior maximizer:
+\[
+m_H^* \;=\; \frac{b\Lambda}{\mu_A s(\kappa_H - \kappa_L) + b\kappa_L} \;=\; \frac{\Lambda \tilde\rho}{s(\kappa_H - \kappa_L) + \tilde\rho\kappa_L},
+\]
+where $\tilde\rho \equiv b/\mu_A = (\lambda_A - c_Q)/\mu_A$.
 
-Now evaluate the leader's margin of adjustment. Form the Lagrangian of the problem where $\text{IC}_L$ binds with shadow price $\mu_{IC_L} > 0$:
+Evaluating the asking rate at this global boundary optimum:
 \[
-\mathcal{L} \;=\; f_L\,\Pi_{\kappa_L}(m_L, a_L) \;+\; f_H\,\Pi_{\kappa_H}(m_H, a_H) \;+\; \mu_{IC_L}\Big[ U(m_L, a_L; \kappa_L) - U(m_H, a_H; \kappa_L) \Big].
+a_H^{SB} \;=\; a_H(m_H^*) \;=\; 1 \;-\; \frac{U(m_H^*, 1; \kappa_L) - U_L^0}{s(k - m_H^*)}.
 \]
-Differentiating $\mathcal{L}$ with respect to $a_H$:
-\[
-\frac{\partial\mathcal{L}}{\partial a_H} \;=\; f_H\,\frac{\partial\Pi_{\kappa_H}}{\partial a_H} \;-\; \mu_{IC_L}\,\frac{\partial U(m_H, a_H; \kappa_L)}{\partial a_H} \;=\; (k - m_H)\Big[ f_H(\mu_A s - b) \;-\; \mu_{IC_L} s \Big],
-\]
-where $b \equiv \lambda_A - c_Q > 0$ represents the assistant's excess asking friction.
-Under under-asking bias, the assistant's private valuation of asking is strictly depressed ($\mu_A s - b < \mu_A s \le s$). Because $\text{IC}_L$ binds ($\mu_{IC_L} > 0$) and $s(k - m_H) > 0$, the binding incentive constraint exerts an unambiguously negative marginal force $-\mu_{IC_L} s(k - m_H) < 0$ on $a_H$.
-At the unconstrained boundary $a_H^B = 1$, the upper bound cannot remain active: satisfying $\text{IC}_L$ solely by adjusting $m_H$ would require distorting specification effort away from $m_H^B$, incurring second-order cognitive inefficiency $\kappa_H m_H$ without reducing the leader's costly asking friction $b(k - m_H)$. By contrast, reducing $a_H$ below $1$ simultaneously relaxes $\text{IC}_L$ at rate $s(k - m_H)$ and relieves the leader of excess friction at rate $b(k - m_H) > 0$.
-The leader therefore strictly lowers the high-cost type's asking rate along the $\text{IC}_L$ boundary:
+For sufficiently heterogeneous types, $U(m_H^*, 1; \kappa_L) > U_L^0$, which strictly forces:
 \[
 a_H^{SB} \;<\; a_H^B \;\le\; a_H^{FB} \;=\; 1.
 \]
-Hence, the high-cost type's service is strictly distorted downward.
+In our representative calibration ($k=10, \Lambda=5, c_Q=2, s=3, b=2, \mu_A=1, \kappa_L=0.3, \kappa_H=0.5$), this yields $m_H^* = 25/3 \approx 8.33$ and $a_H^{SB} = 0.75 < 1$, exactly matching the numerical second-best contract.
+
+Finally, maintaining $a_H = 1$ is globally strictly suboptimal: along the boundary $a_H = 1$, satisfying $\text{IC}_L$ would require choosing an extreme specification level $m_H$ such that $U(m_H, 1; \kappa_L) \le U_L^0$, which departs substantially from $m_H^B$, destroys cognitive surplus, and incurs full asking friction $b(k - m_H)$, yielding strictly lower leader surplus than $(m_H^*, a_H(m_H^*))$.
+Hence, the high-cost type's asking service is strictly distorted downward: $a_H^{SB} < a_H^B \le 1$.
 
 \paragraph{Step 5: Co-activity of $\text{IC}_H$ under extreme bias.}
 As bias $\lambda_A$ increases, maintaining $\text{IC}_L$ forces $a_H^{SB}$ progressively lower. When $a_H^{SB}$ approaches $a_L^{SB} = 0$, the high-cost type receives negligible clarification assistance relative to its higher specification cost. Eventually, the reverse incentive constraint $\text{IC}_H$ ($U(m_H, a_H; \kappa_H) \ge U(m_L, a_L; \kappa_H)$) can become co-active. Under sufficiently extreme bias, separating the types via distinct asking rates is no longer incentive-viable, and the optimal screening menu may collapse to a pooling or boundary-saturated allocation where both types receive identical asking service.
