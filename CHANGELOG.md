@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.0 — Submitted Paper Version
+## v1.0.0: Submitted Paper Version
 
 Canonical release accompanying the manuscript *"Strategic Under-Specification: A Stackelberg Game Between User and Assistant"* (Agarwal, 2026).
 

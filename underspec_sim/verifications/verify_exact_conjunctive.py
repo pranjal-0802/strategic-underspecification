@@ -396,7 +396,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
    - **Corner Solution Rate:** **{corner_rate * 100:.1f}%** (In {int(df['corner_property_survives'].sum())}/{len(df)} grid points, $a^{{SE}}_{{\text{{exact}}}} \in \{{0.0, 1.0\}}$).
    - In no region did an interior compromise optimum ($a^{{SE}} \in (0.02, 0.98)$) emerge.
    - For small $k \le 3$, $a^{{SE}} = 0$ (never ask); for $k \ge 5$, $a^{{SE}} = 1$ (always ask).
-   - *Conclusion:* The qualitative conclusion of Corollary 3---that pooling in the unbiased regime is a corner solution picking a winner rather than a smooth interior compromise---is **robust to the exact conjunctive specification**.
+   - *Conclusion:* The qualitative conclusion of Corollary 3, that pooling in the unbiased regime is a corner solution picking a winner rather than a smooth interior compromise, is **robust to the exact conjunctive specification**.
 
 2. **Proposition 6 (Downward Distortion Under Bias) Robustness:**
    - **Downward Distortion Rate:** $a_H^{{SB}} \le a_H^B$ holds everywhere, with strict downward distortion $a_H^{{SB}} < a_H^B$ whenever $m$ does not saturate at $k$ (holding in **{downward_dist_rate * 100:.1f}%** of grid points).

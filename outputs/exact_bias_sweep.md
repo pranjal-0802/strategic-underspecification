@@ -2,7 +2,7 @@
 
 ## Overview
 - **Reference**: `paper/strategic_underspecification.tex`, Proposition 6, Remark following Proposition 6, Section 8 (Discussion).
-- **Key Question**: Does the extreme-bias reversal—where $\text{IC}_H$ binds alongside $\text{IC}_L$ under severe bias—occur under the **EXACT** conjunctive payoff $q(a,g)^{k-m}$, or does the exact form prevent $\text{IC}_H$ from ever binding?
+- **Key Question**: Does the extreme-bias reversal (where $\text{IC}_H$ binds alongside $\text{IC}_L$ under severe bias) occur under the **EXACT** conjunctive payoff $q(a,g)^{k-m}$, or does the exact form prevent $\text{IC}_H$ from ever binding?
 - **Grid Swept**: $\lambda_A \in [c_Q, 10 c_Q] = [2.0, 20.0]$ (10 values), $\mu_A \in [0.1, 1.0]$ (10 values), totaling **100** screening menu optimizations.
 
 ---
