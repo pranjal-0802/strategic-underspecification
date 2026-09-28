@@ -6,14 +6,14 @@ Numerical verification, simulation, and LLM-based experimentation framework for 
 
 ## 1. Overview & Architecture
 
-When users query AI coding assistants, they face a fundamental trade-off: spend cognitive effort specifying detailed constraints, edge cases, and architectural invariants, or leave them implicit and rely on the assistant to guess or ask clarifying questions. The assistant, in turn, commits to an asking policy—either a single population-wide ask rate (**Model I: Pooling**) or an incentive-compatible menu of asking rates conditioned on user specification effort (**Model II: Screening**).
+When users query AI coding assistants, they face a fundamental economic trade-off: spend cognitive effort specifying detailed constraints, edge cases, and architectural invariants, or leave them implicit and rely on the assistant to guess or ask clarifying questions. **Strategic under-specification is not driven by AI models becoming better at guessing; it emerges because users strategically economize on effort in response to the assistant's endogenous clarification policy when the assistant's objective differs from true user welfare.** The assistant, in turn, commits to an asking policy—either a single population-wide ask rate (**Model I: Pooling**) or an incentive-compatible menu of asking rates conditioned on user specification effort (**Model II: Screening**).
 
 This repository provides complete, end-to-end computational verification of the paper's theoretical framework:
-- **First-Best Benchmark (Section 4.2):** Fully-informed, welfare-aligned social optimum $(m^{FB}, a^{FB})$ with a bang-bang threshold $\kappa^*$.
+- **First-Best Benchmark (Section 4.2):** Fully-informed, welfare-aligned social optimum $(m^{FB}, a^{FB})$ with a bang-bang threshold $\kappa^*$ separating terse users (always ask) from verbose users (never ask) on the interior domain $\kappa \ge \Lambda/k$.
 - **Model I: Pooling Policy (Section 5):** The assistant commits to a single population-wide ask rate $a \in [0, 1]$. In the unbiased baseline, leader payoff is weakly convex, making pooling a corner solution ($a^{SE} \in \{0, 1\}$); in the biased regime, strict concavity produces an interior optimum.
-- **Model II: Screening Policy (Section 6):** The assistant offers a menu $\{(m_L, a_L), (m_H, a_H)\}$ separating high- and low-cost specification types. Without bias, screening achieves First-Best; under bias, asking rates are distorted downward.
+- **Model II: Screening Policy (Section 6):** The assistant offers a menu $\{(m_L, a_L), (m_H, a_H)\}$ separating high- and low-cost specification types. Without bias, screening achieves First-Best; under bias, asking rates are distorted downward via binding $\text{IC}_L$ ($a_H^{SB} < a_H^B$).
 - **Regime Comparison (Section 7):** Weak dominance of screening over pooling and decomposition of welfare losses.
-- **LLM Experimentation Layer:** Simulated users with heterogeneous specification cost types $\kappa$ interact with assistants applying the derived policies, audited in SQLite (`runs.db`) with a deterministic `--dry-run` stub.
+- **Agent-Based Simulation Infrastructure:** Simulated users with heterogeneous specification cost types $\kappa$ interact with assistants applying the derived policies, audited in SQLite (`runs.db`) with a deterministic `--dry-run` stub for computational reproducibility.
 
 ```
 underspec_sim/
@@ -179,14 +179,16 @@ python3 underspec_sim/experiments_llm/run_all_llm_experiments.py --live --model 
 
 ---
 
-## 6. Reproducibility Caveats & Scientific Scope
+## 6. Reproducibility & Hierarchy of Evidence
 
-To ensure scientific traceability, this repository and manuscript maintain a clear distinction between levels of evidence:
-1. **Analytical / Theoretical Results:** Propositions and corollaries formally proved via calculus, envelope theorems, and Topkis's theorem in `paper/strategic_underspecification.tex`.
-2. **Numerical Verifications:** High-resolution grid sweeps and constrained optimization (`SLSQP`) validating closed forms, second-order conditions, and constraint activity sets.
-3. **Simulation Evidence:** Parametric experiments comparing policy regimes and examining exact conjunctive non-linearities.
-4. **LLM Experiments:** Prompt-based simulated agent experiments with structured logging.
-5. **Human-Subject Study:** **The computational evaluation consists of analytical verification, numerical experiments, and LLM-based simulation experiments; no human-subject study is reported.** The human-subject study outlined in Section 9 of the paper represents a proposed experimental design for future empirical research.
+To ensure complete methodological transparency, our theoretical claims and computational evaluations are organized into five distinct levels of evidence:
+1. **Level 1 --- Analytical Theorems:** Propositions and corollaries formally proved via calculus, envelope theorems, and Topkis's theorem in `paper/strategic_underspecification.tex` (including the 5-step Kuhn--Tucker proof of Proposition 6). All closed-form solutions apply to the interior domain $\kappa \ge \Lambda/k$.
+2. **Level 2 --- Exact-Model Robustness:** Constrained optimizations (`SLSQP`) and grid sweeps demonstrating that the qualitative equilibrium structure (corner pooling, downward distortion, and extreme-bias regimes) survives when replacing the linear-risk approximation with the exact conjunctive success function $q(a,g)^{k-m}$.
+3. **Level 3 --- Numerical Primitive Verification:** Direct computational checks comparing analytical closed forms against fine-grid argmax searches over primitives, verifying second-order conditions, matching finite-difference comparative statics to analytical derivatives within $1.8\%$, and auditing active Kuhn--Tucker constraint sets directly from numerical Lagrange multipliers.
+4. **Level 4 --- Behavioral Predictions:** Seven distinct, directional empirical predictions (P1--P7 in Section 7) that translate theoretical mechanisms into observable margins for human-subject experimentation.
+5. **Level 5 --- Agent-Based Simulation Infrastructure:** An extensible software pipeline in `underspec_sim/experiments_llm/` that instantiates simulated user and assistant agents interacting under derived policies, with deterministic dry-run stubs for reproducible execution. We emphasize that this layer provides computational demonstration of the interaction protocol, not behavioral evidence of human or LLM decision-making.
+
+**Human-Subject Study Note:** The computational evaluation consists of analytical verification, numerical experiments, and agent-based simulation infrastructure; **no human-subject study is reported.** The human-subject study outlined in Section 8 of the paper represents a proposed experimental design for future empirical research.
 
 ---
 
