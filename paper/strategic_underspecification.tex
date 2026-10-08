@@ -191,23 +191,25 @@ Under the linear-risk specification analyzed in Sections~\ref{sec:stackelberg}--
 The accuracy channel strictly dominates the question-cost channel, ensuring that $U$ exhibits strictly decreasing differences in $(m,a)$.
 
 \begin{proposition}[Equilibrium Under-Specification under Naive Beliefs]\label{prop:bias}
-Under the linear-risk specification with $\Lambda > c_Q$, naive users choose strictly lower specification effort than sophisticated users,
+Under the linear-risk specification with $\Lambda > c_Q$, naive users choose weakly lower specification effort than sophisticated users:
 \[
-m^*_{\text{naive}} \;<\; m^*_{\text{soph}},
+m^*_{\text{naive}} \;\le\; m^*_{\text{soph}},
 \]
-and achieve strictly lower true welfare: $U(m^*_{\text{naive}};a_A) < U(m^*_{\text{soph}};a_A)$. Holding raw guessing accuracy $g$ fixed, naive users strategically under-specify and suffer an equilibrium welfare loss.
+holding strictly ($m^*_{\text{naive}} < m^*_{\text{soph}}$) for all interior types satisfying $\kappa > \frac{\Lambda(1-a^\dagger) + a^\dagger c_Q}{k}$. Consequently, naive users achieve weakly lower true welfare, $U(m^*_{\text{naive}};a_A) \le U(m^*_{\text{soph}};a_A)$, strictly so on the interior domain. Holding raw guessing accuracy $g$ fixed, naive users strategically under-specify and suffer an equilibrium welfare loss.
 \end{proposition}
 
 \begin{proof}
-Under linear risk, the follower's best response to an anticipated ask rate $a$ is $m^*(\kappa;a) = \frac{\Lambda(1-a) + a c_Q}{\kappa}$. Since $\Lambda > c_Q$, differentiating with respect to $a$ gives $\partial m^*/\partial a = (c_Q - \Lambda)/\kappa < 0$. A naive user anticipating $a^\dagger > a_A$ therefore chooses:
+Under linear risk on the physical domain $m \in [0, k]$, the follower's best response to an anticipated ask rate $a$ is $m^*(\kappa;a) = \min\{k, \beta(\kappa;a)\}$, where $\beta(\kappa;a) \equiv \frac{\Lambda(1-a) + a c_Q}{\kappa}$. Since $\Lambda > c_Q$, the unconstrained response $\beta(\kappa;a)$ is strictly decreasing in $a$: $\partial\beta/\partial a = (c_Q - \Lambda)/\kappa < 0$. A naive user anticipating $a^\dagger > a_A$ therefore satisfies $\beta(\kappa;a^\dagger) < \beta(\kappa;a_A)$.
+For low-cost types with $\kappa \le \frac{\Lambda(1-a^\dagger) + a^\dagger c_Q}{k}$, we have $\beta(\kappa;a^\dagger) \ge k$, so $\beta(\kappa;a_A) > k$ as well. Both beliefs therefore yield boundary saturation: $m^*_{\text{naive}} = m^*_{\text{soph}} = k$, and true welfare is identical ($U(m^*_{\text{naive}};a_A) = U(m^*_{\text{soph}};a_A)$).
+For all interior types satisfying $\kappa > \frac{\Lambda(1-a^\dagger) + a^\dagger c_Q}{k}$, we have $\beta(\kappa;a^\dagger) < k$, which guarantees:
 \[
-m^*_{\text{naive}} \;=\; m^*(\kappa;a^\dagger) \;<\; m^*(\kappa;a_A) \;=\; m^*_{\text{soph}}.
+m^*_{\text{naive}} \;=\; \beta(\kappa;a^\dagger) \;<\; \min\{k, \beta(\kappa;a_A)\} \;=\; m^*_{\text{soph}}.
 \]
-Because true utility $U(m;a_A)$ is strictly concave in $m$ with unique global maximizer at $m^*_{\text{soph}}$, any choice $m \ne m^*_{\text{soph}}$ incurs a strict utility loss. Evaluating the quadratic shortfall directly:
+Because true utility $U(m;a_A)$ is strictly concave in $m$ with unique global maximizer on $[0, k]$ at $m^*_{\text{soph}}$, any choice $m \ne m^*_{\text{soph}}$ incurs a strict utility loss. On the fully interior domain where $m^*_{\text{soph}} = \beta(\kappa;a_A) < k$, evaluating the quadratic shortfall directly yields:
 \[
 U(m^*_{\text{soph}};a_A) - U(m^*_{\text{naive}};a_A) \;=\; \frac{\kappa}{2}\big(m^*_{\text{soph}} - m^*_{\text{naive}}\big)^2 \;=\; \frac{(\Lambda - c_Q)^2}{2\kappa}\,(a^\dagger - a_A)^2 \;>\; 0,
 \]
-which proves that naive users are strictly worse off.
+confirming that interior naive users are strictly worse off.
 \end{proof}
 
 \begin{remark}[Exact Model Counterexample to Monotone Under-Specification]
@@ -491,6 +493,11 @@ incentive compatibility is costless, and private information incurs no welfare p
 Distortion in this setting is therefore a pure signature of objective misalignment,
 not of asymmetric information per se.
 
+\begin{remark}[Degeneracy of the Unbiased Menu on the Asking Margin]
+\label{rmk:unbiased_menu_degenerate}
+Under Proposition~\ref{prop:firstbest}, $a^{FB}(\kappa) = 1$ for every type in the population on the physically feasible domain $m \le k$. The unbiased first-best menu is therefore $(m^{FB}(\kappa), 1) = (\min\{k, c_Q/\kappa\}, 1)$, which offers uniform asking $a=1$ across all types and leaves followers to freely choose their preferred specification effort. This menu does not screen across the asking margin: scalar pooling at $a^{SE} = 1$ (Corollary~\ref{cor:corner}) implements each type's first best identically. Consequently, under linear risk on the feasible domain, the welfare gap between pooling and screening at zero bias is identically zero ($\Pi_{II} - \Pi_I = 0$). A positive instrument-restriction gap at zero bias emerges only in settings where first best itself prescribes different asking policies across types, such as the exact conjunctive success model (Section~\ref{sec:discussion}) or under attribute loss heterogeneity.
+\end{remark}
+
 \subsection{Distortion under bias}
 
 When $\Pi_\kappa \ne U(\cdot;\kappa)$ (bias present), the leader's preferred bundle per type,
@@ -626,20 +633,22 @@ Evaluating the magnitude of downward distortion:
 \]
 As type heterogeneity narrows ($\kappa_L$ approaches $\kappa_H$), type $L$'s utility from completing $k$ attributes decreases, increasing type $L$'s temptation to mimic the asking contract. To maintain separation, the leader must distort $a_H^{SB}$ further downward (lower $a_H$).
 Furthermore, as bias $\lambda_A$ increases, $m_H^*$ rises toward $k$, which also increases $\kappa_L(k + m_H^*)/2$ and forces $a_H^{SB}$ progressively lower.
-When $a_H^{SB}$ approaches $a_L^{SB} = 0$, the high-cost type receives negligible clarification assistance relative to its higher specification cost. Eventually, the reverse incentive constraint $\text{IC}_H$ ($U(m_H, a_H; \kappa_H) \ge U(m_L, a_L; \kappa_H)$) becomes co-active. Under sufficiently narrow heterogeneity or extreme bias, separating the types via distinct asking rates is no longer incentive-viable, and the optimal screening menu collapses to a pooling allocation where both types receive identical asking service.
+When $a_H^{SB}$ approaches $a_L^{SB} = 0$, the high-cost type receives negligible clarification assistance relative to its higher specification cost. Eventually, as friction approaches the task stake ($c_Q^{eff} \to \Lambda$), the leader's marginal gain from asking evaporates. In the prohibitive friction regime ($c_Q^{eff} \ge \Lambda$, or $\lambda_A - c_Q \ge \mu_A(\Lambda - c_Q)$), the leader unconstrainedly prefers zero asking for all types ($\partial\Pi/\partial a \le 0$), shutting down clarification entirely ($a_L = a_H = 0$). In this shutdown regime, both types choose $m=k$, receiving the identical bundle $(k, 0)$, so both $\text{IC}_L$ and $\text{IC}_H$ hold with equality ($0 = 0$). This boundary co-activity reflects uniform clarification shutdown due to prohibitive friction, whereas genuine adverse-selection screening distortion ($a_H^{SB} < a_H^B = 1$) operates strictly in the cost-effective asking regime $c_Q < c_Q^{eff} < \Lambda$.
 \end{proof}
 
-\begin{remark}[Active constraint structure without monetary transfers]
-In classical transfer-based screening (e.g., Baron--Myerson), IC$_L$ and IR$_H$ typically bind while IC$_H$ and IR$_L$ remain slack. In our setting, solving the full four-variable constrained problem shows that IC$_L$ binds alone, with IR$_H$, IC$_H$, and IR$_L$ remaining strictly slack at representative under-asking-bias parameters. This structural divergence arises because the leader's payoff $\Pi_{\kappa_H}$ directly internalizes follower welfare $\mu_A U(\cdot;\kappa_H)$, eliminating the classical principal's motive to compress agent rent down to the reservation utility. We note that the exact active constraint configuration is parameter-region-specific: under sufficiently extreme asking friction ($\lambda_A \gg c_Q$) or severe discounting ($\mu_A \ll 1$), IC$_H$ can bind alongside IC$_L$. The robust qualitative insight is that screening under misalignment strictly distorts $a_H^{SB} < a_H^B$, while the active constraint configuration reflects the non-monetary, partially aligned nature of the objective.
+\begin{remark}[Active Constraint Regimes and Clarification Shutdown]
+\label{rmk:active-constraints}
+In classical transfer-based screening (such as Baron--Myerson), $\text{IC}_L$ and $\text{IR}_H$ typically bind while $\text{IC}_H$ and $\text{IR}_L$ remain slack. In our setting, solving the full four-variable constrained problem reveals three distinct operational regimes:
+\begin{enumerate}[leftmargin=*]
+\item \emph{Small bias regime ($c_Q^{eff} \approx c_Q$):} When asking friction is close to true cost, the temptation of type $L$ to mimic the asking bundle is weak or absent ($k \le k_{\text{crit}}$), yielding negligible or zero distortion ($a_H^{SB} \approx a_H^B = 1$) with constraints slack.
+\item \emph{Moderate bias regime ($c_Q < c_Q^{eff} < \Lambda$ with $k > k_{\text{crit}}$):} Type $L$ faces a strict temptation to mimic, and $\text{IC}_L$ binds alone while $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ remain strictly slack. The leader directly penalizes itself by depressing follower utility, which keeps participation constraints slack and forces downward distortion $a_H^{SB} < a_H^B = 1$ purely to satisfy $\text{IC}_L$.
+\item \emph{Prohibitive friction regime ($c_Q^{eff} \ge \Lambda$, equivalently $\lambda_A - c_Q \ge \mu_A(\Lambda - c_Q)$):} Asking friction exceeds the entire task risk resolved, so the leader unconstrainedly prefers zero asking for all types ($\partial\Pi/\partial a \le 0$). Clarification is uniformly shut down: $a_L = a_H = 0$ and $m_L = m_H = k$. Both types receive the identical bundle $(k, 0)$, so $\text{IC}_L$ and $\text{IC}_H$ hold with equality trivially. This boundary co-activity reflects technological shutdown, not an adverse-selection screening distortion.
+\end{enumerate}
 \end{remark}
 
-\begin{remark}
-The direction in Proposition~\ref{prop:distortion} is specific to the
-under-asking bias case ($0 < \lambda_A - c_Q < \mu_A(\Lambda - c_Q)$), which we take to be the
-empirically relevant one (Section~\ref{sec:naive-soph}'s motivating story: turn-level
-satisfaction signals penalize extra clarifying questions more than users actually
-mind answering them). Under the opposite bias, the direction of distortion can
-flip; we do not claim a sign that holds for all $\Pi_\kappa$.
+\begin{remark}[Directionality of Policy Misalignment]
+\label{rmk:bias-direction}
+The downward distortion in Proposition~\ref{prop:distortion} is specific to the under-asking bias case ($0 < \lambda_A - c_Q < \mu_A(\Lambda - c_Q)$), which reflects the empirical reality of turn-penalizing satisfaction metrics. Under an over-asking bias ($\lambda_A < c_Q$), the direction of distortion can reverse, as the leader would favor excessive clarification.
 \end{remark}
 
 \section{Comparing the Two Regimes}
@@ -662,7 +671,7 @@ of welfare losses across the two regimes, enabled by Propositions~\ref{prop:aSE}
 (Proposition~\ref{prop:nodistortion}): in the absence of bias, screening recovers full
 efficiency despite private cost information. Under bias, the loss takes the form of the
 downward distortion characterized in Proposition~\ref{prop:distortion}.
-This represents a fundamentally different mechanism from the pooling loss: it stems
+This represents a fundamentally different mechanism from the instrument-restriction loss of pooling: it stems
 not from an inability to condition on observed effort, but from the requirement to
 prevent opportunistic mimicking across types.
 \end{itemize}
@@ -695,7 +704,7 @@ $0.70$ & $3.0$ & $6.87$ & $8$ & $+1.13$ & $+1.71$ \\
 $0.70$ & $3.0$ & $6.87$ & $10$ & $+3.13$ & $+3.32$ \\
 \bottomrule
 \end{tabular}
-\caption{Sensitivity of the unbiased pooling corner choice across task complexity $k$ and guessing capability $g$, for $L=10, c_Q=2, \kappa \sim \text{Uniform}[0.2, 0.6]$, where $\Delta\Pi \equiv \Pi(1) - \Pi(0)$. Columns compare the unconstrained closed form $(\Lambda - c_Q)[k - k^*]$ against the physically feasible clipped payoff difference. In the unclipped algebra, guessing appears to win whenever $k < k^*$ (e.g., $-36.80$ at $g=0.30, k=5$), but when followers are constrained to feasible effort $m \le k$, asking strictly dominates across all rows ($+0.15$ at $g=0.30, k=5$), confirming Proposition~\ref{prop:firstbest}.}
+\caption{Sensitivity of the unbiased pooling corner choice across task complexity $k$ and guessing capability $g$, for $L=10, c_Q=2, \kappa \sim \text{Uniform}[0.2, 0.6]$, where $\Delta\Pi \equiv \Pi(1) - \Pi(0)$. Columns compare the unconstrained closed form $(\Lambda - c_Q)[k - k^*]$ against the physically feasible clipped payoff difference computed via vectorized numerical integration (\texttt{underspec\_sim/\allowbreak verifications/\allowbreak generate\_table1.py}, recorded in \texttt{outputs/\allowbreak table1\_unbiased\_sensitivity.csv}). In the unclipped algebra, guessing appears to win whenever $k < k^*$ (e.g., $-36.80$ at $g=0.30, k=5$), but when followers are constrained to feasible effort $m \le k$, asking strictly dominates across all rows ($+0.15$ at $g=0.30, k=5$), confirming Proposition~\ref{prop:firstbest}.}
 \label{tab:unbiased_sensitivity}
 \end{table}
 
@@ -764,11 +773,11 @@ tractability assumption carried through Sections~\ref{sec:stackelberg}--\ref{sec
 To verify that this simplification does not drive our core theoretical findings, we
 evaluate both the unbiased pooling optimum and the biased screening menu directly under the exact conjunctive payoff $q(a,g)^{k-m}$
 (independently of the linear-risk closed forms, via direct numerical grid search and
-constrained optimization). Across wide ranges of task complexity ($k\in[3,20]$) and guessing accuracy ($g\in[0.50,0.95]$), numerical optimization confirms that the qualitative structure survives under the exact nonlinear specification:
+constrained optimization). Across wide ranges of task complexity ($k\in[3,20]$) and guessing accuracy ($g\in[0.50,0.95]$), numerical optimization confirms that the qualitative structure survives under the exact nonlinear specification (\path{underspec_sim/verifications/verify_exact_conjunctive.py}, recorded in \path{outputs/exact_conjunctive_robustness.csv}):
 the corner-solution property of Corollary~\ref{cor:corner} persists ($a^{SE}_{\text{exact}} \in \{0, 1\}$); downward distortion ($a_H^{SB} < a_H^B$) persists robustly, with exceptions concentrated at small $k$ where specification effort saturates at $m=k$; and participation constraints remain strictly slack. Furthermore, numerical solutions of the full four-variable
-constrained menu problem under the exact conjunctive payoff across $\lambda_A\in[c_Q,10c_Q]$ and $\mu_A\in[0.1,1.0]$ confirm that $\text{IC}_H$ binds alongside $\text{IC}_L$ under extreme bias. This reproduces the three-regime structure (no binding constraint, $\text{IC}_L$ alone, and $\text{IC}_L+\text{IC}_H$ together) identified under the linear-risk approximation, with only the boundary between moderate- and extreme-bias regimes shifting slightly (from $\lambda_A\approx6.0$ to $\lambda_A\approx8.0$ at $\mu_A=1.0$). The extreme-bias reversal is therefore an intrinsic structural feature of the screening contract space, rather than an artifact of the linear-risk approximation.
+constrained menu problem under the exact conjunctive payoff across $\lambda_A\in[c_Q,10c_Q]$ and $\mu_A\in[0.1,1.0]$ confirm that $\text{IC}_H$ binds alongside $\text{IC}_L$ under extreme bias (\path{underspec_sim/verifications/verify_exact_bias_sweep.py}, recorded in \path{outputs/exact_bias_sweep.csv} and Figure~\path{outputs/exact_bias_sweep.png}). This reproduces the three-regime structure (no binding constraint, $\text{IC}_L$ alone, and $\text{IC}_L+\text{IC}_H$ together) identified under the linear-risk approximation, with only the boundary between moderate- and extreme-bias regimes shifting slightly (from $\lambda_A\approx6.0$ to $\lambda_A\approx8.0$ at $\mu_A=1.0$). The extreme-bias reversal is therefore an intrinsic structural feature of the screening contract space, rather than an artifact of the linear-risk approximation.
 
-Regarding the regularity condition (Assumption~\ref{ass:reg}), monotonicity of prompt specification ($m^*(g)$ weakly decreasing in $g$) holds whenever $(k-m)\ln q \ge -1$. While monotonicity can fail when the cross-partial turns strictly positive, empirical monotonicity can still survive locally in low-stakes regimes as a boundary property, because Topkis submodularity is a sufficient rather than necessary condition for comparative statics.
+Regarding the regularity condition (Assumption~\ref{ass:reg}), monotonicity of prompt specification ($m^*(g)$ weakly decreasing in $g$) holds whenever $(k-m)\ln q \ge -1$. While monotonicity can fail when the cross-partial turns strictly positive, empirical monotonicity can still survive locally in low-stakes regimes as a boundary property (\path{underspec_sim/verifications/verify_monotonicity_survival.py}, recorded in \path{outputs/monotonicity_survival.csv}), because Topkis submodularity is a sufficient rather than necessary condition for comparative statics.
 
 A stylized modeling assumption is attribute symmetry ($k$ binary attributes with identical loss $L$ and guessing probability $g$). In practical software engineering, attributes exhibit substantial loss heterogeneity: omitting an architectural invariant or security convention causes severe failure ($L_i \gg 0$), while omitting a stylistic naming convention carries negligible cost ($L_j \approx 0$). In an extension with attribute-specific losses $L_i$, the user's objective becomes $U = V \prod_i q_i - c(m) - \sum_i a_i c_Q$. Ordering attributes by descending risk stake $\Lambda_i = L_i(1-g_i)$, users rationally specify the highest-stakes attributes first, while assistants prioritize asking on the highest-residual-stake attributes. The fundamental contract-theoretic mechanism, namely the substitution between upstream specification effort and automated clarification under misaligned asking friction, generalizes directly to the heterogeneous-loss setting.
 
@@ -778,15 +787,14 @@ predictions P2, P6, P7) is stated in terms of under-asking bias ($\lambda_A > c_
 $\lambda_A$ from observed policy alone is circular. Corollary~\ref{cor:mu-lambda}
 formalizes this as an exact non-identification result on the interior branch: $a^{SE}$ depends on
 $(\mu_A,\lambda_A)$ only through their ratio, so a discounting-driven leader and a
-friction-driven leader with the identical ratio $\lambda_A/\mu_A$ cannot be distinguished
+friction-driven leader with the identical excess friction ratio $(\lambda_A - c_Q)/\mu_A$ cannot be distinguished
 from pooling behavior alone. An independent empirical handle, such as an explicit penalty
 on turn count in the training objective or reward specification, would be needed before
 the bias-versus-heterogeneity predictions in Section~\ref{sec:predictions} can be tested
 without circularity. The two-type restriction in Model II avoids
 ironing complications at the cost of generality; a continuum
-formulation using the standard Mirrlees technique is a natural next step that would
-allow $\kappa^*$ from the first-best benchmark to interact directly with the screening
-distortion. We also assume truthful revelation of specified attributes (abstracting from
+formulation using the standard Mirrlees technique is a natural next step to characterize
+the continuous distribution of downward distortions across arbitrary cost distributions. We also assume truthful revelation of specified attributes (abstracting from
 cheap-talk ambiguity within what is communicated) and a single leader. Modeling competition
 among multiple assistants represents an appealing extension, as market competition
 could plausibly discipline asking bias directly.

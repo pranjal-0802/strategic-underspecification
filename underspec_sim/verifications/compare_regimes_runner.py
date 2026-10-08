@@ -75,9 +75,9 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     max_gap = float(df["payoff_gap"].max())
     mean_gap = float(df["payoff_gap"].mean())
 
-    md_content = fr"""# Verification Report: Section 7 Regime Comparison (Dominance of Menus)
+    md_content = fr"""# Verification Report: Section 6 Regime Comparison (Dominance of Menus)
 
-**Status:** **{'PASS' if passed else 'FAIL'}** (Dominance Corollary 4 Confirmed With Corrected Pooling Solver)
+**Status:** **{'PASS' if passed else 'FAIL'}** (Dominance Corollary Confirmed With Corrected Pooling Solver)
 
 ### Key Results:
 - **Dominance Corollary Verified:** Across all {len(df)} 2D grid points, Model II payoff weakly exceeds Model I (Min gap: `{min_gap:.6f}`, Mean gap: `{mean_gap:.4f}`, Max gap: `{max_gap:.4f}`).
@@ -89,9 +89,9 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
   - Because revealed preference guarantees that any single pooling ask rate $a \in [0, 1]$ is a feasible menu $(m^*(a), a, m^*(a), a)$, the screening policy weakly dominates pooling under both corner and interior pooling regimes.
 
 ### Decomposition:
-1. **Instrument Restriction Loss (Zero Bias):** At $\\lambda_A = c_Q$, Model II dominates Model I with a positive gap (e.g., gap = `{df[df['bias']==0.0]['payoff_gap'].max():.2f}` at $\\Delta\\kappa=0.30$) purely because pooling cannot offer type-contingent ask rates.
-2. **Heterogeneity Effect:** The welfare advantage $\\Pi_{{II}} - \\Pi_I$ grows monotonically with population cost heterogeneity $\\Delta\\kappa = \\kappa_H - \\kappa_L$.
-3. **Bias Effect:** Severe bias compresses asking toward zero for both types, narrowing the operational gap between pooling and screening at extreme bias.
+1. **First-Best Equivalence at Zero Bias:** At $\lambda_A = c_Q$, both Model I and Model II select $a = 1$ for all types, achieving the identical first-best payoff (payoff gap = `{df[df['bias']==0.0]['payoff_gap'].max():.2f}`, within numerical tolerance $10^{{-8}}$). Under linear risk on the feasible domain, instrument-restriction loss at zero bias is zero.
+2. **Heterogeneity and Bias Interaction:** When bias is present ($\lambda_A > c_Q$), Model II strictly dominates Model I ($\Pi_{{II}} - \Pi_I > 0$). The welfare advantage grows with population cost heterogeneity $\Delta\kappa = \kappa_H - \kappa_L$, because screening can tailor specification requirements to cost types while pooling is forced to a single compromised or suppressed rate.
+3. **Extreme Bias Saturation:** Severe bias compresses asking toward zero for both types, narrowing the operational gap between pooling and screening at extreme bias.
 
 **Artifacts Generated:**
 - CSV: `regime_comparison.csv`

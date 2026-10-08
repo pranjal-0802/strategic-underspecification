@@ -8,6 +8,7 @@ Checks:
 - Prop 4: Pooling closed-form formula vs fine grid search
 - Cor 2: Bias direction comparative statics
 - Cor 3: Pooling is a corner solution (unbiased case)
+- Table 1: Sensitivity of the Unbiased Pooling Corner and Clipped Payoffs
 - Prop 5: Screening menu with no bias recovers first-best and has slack ICs
 - Prop 6: Screening downward distortion under bias & active constraint report
 - Sweep 2D: Heterogeneity vs Bias distortion and welfare-gap decomposition
@@ -41,6 +42,7 @@ from underspec_sim.verifications.verify_mu_comparative_statics import run_verifi
 from underspec_sim.verifications.verify_monotonicity_survival import run_verification as verify_monotonicity_survival
 from underspec_sim.verifications.verify_mu_lambda_corner import run_verification as verify_mu_lambda_corner
 from underspec_sim.verifications.verify_exact_bias_sweep import run_verification as verify_exact_bias_sweep
+from underspec_sim.verifications.generate_table1 import run_table1_verification
 
 
 def main():
@@ -57,7 +59,7 @@ def main():
     results: List[Dict[str, Any]] = []
 
     # 1. Prop 3
-    print("[1/14] Verifying Proposition 3 (First-Best Threshold)...")
+    print("[1/15] Verifying Proposition 3 (First-Best Threshold)...")
     res_p3 = verify_prop3(output_dir=args.output_dir)
     results.append({
         "item": "Prop 3",
@@ -68,7 +70,7 @@ def main():
     })
 
     # 2. Prop 4
-    print("[2/14] Verifying Proposition 4 (Pooling Closed-Form vs Grid)...")
+    print("[2/15] Verifying Proposition 4 (Pooling Closed-Form vs Grid)...")
     res_p4 = verify_prop4(output_dir=args.output_dir)
     results.append({
         "item": "Prop 4",
@@ -79,7 +81,7 @@ def main():
     })
 
     # 3. Cor 2
-    print("[3/14] Verifying Corollary 2 (Bias Shifts Pooling Rate on Interior Branch)...")
+    print("[3/15] Verifying Corollary 2 (Bias Shifts Pooling Rate on Interior Branch)...")
     res_c2 = verify_cor2(output_dir=args.output_dir)
     results.append({
         "item": "Cor 2",
@@ -90,7 +92,7 @@ def main():
     })
 
     # 4. Cor 3
-    print("[4/14] Verifying Corollary 3 (Pooling is Corner Solution)...")
+    print("[4/15] Verifying Corollary 3 (Pooling is Corner Solution)...")
     res_c3 = verify_cor3(output_dir=args.output_dir)
     results.append({
         "item": "Cor 3",
@@ -100,8 +102,20 @@ def main():
         "note": f"Unbiased is corner a* in {{0, 1}} matching formula; Biased has interior a*={res_c3['res_interior'].a_SE:.2f}",
     })
 
-    # 5. Prop 5
-    print("[5/14] Verifying Proposition 5 (Screening Without Bias)...")
+    # 5. Table 1 (Unbiased Sensitivity & Physical Feasibility)
+    print("[5/15] Verifying Table 1 (Unbiased Pooling Sensitivity & Clipped Differences)...")
+    df_t1 = run_table1_verification(output_dir=args.output_dir)
+    t1_all_pos = bool((df_t1["clipped_delta"] > 0).all())
+    results.append({
+        "item": "Table 1",
+        "name": "Unbiased Pooling Sensitivity",
+        "verdict": "PASS" if t1_all_pos else "FAIL",
+        "passed": t1_all_pos,
+        "note": f"All 11 rows strictly positive (clipped delta in [{df_t1['clipped_delta'].min():+.2f}, {df_t1['clipped_delta'].max():+.2f}])",
+    })
+
+    # 6. Prop 5
+    print("[6/15] Verifying Proposition 5 (Screening Without Bias)...")
     res_p5 = verify_prop5(output_dir=args.output_dir)
     results.append({
         "item": "Prop 5",
@@ -111,8 +125,8 @@ def main():
         "note": f"Recovers FB; IC strictly slack (IC_L={res_p5['res_uncon'].IC_L_slack:.3f}, IC_H={res_p5['res_uncon'].IC_H_slack:.3f})",
     })
 
-    # 6. Prop 6
-    print("[6/14] Verifying Proposition 6 (Screening Distortion Under Bias)...")
+    # 7. Prop 6
+    print("[7/15] Verifying Proposition 6 (Screening Distortion Under Bias)...")
     res_p6 = verify_prop6(output_dir=args.output_dir)
     active_str = ", ".join(res_p6["active_constraints"]) if res_p6["active_constraints"] else "None"
     results.append({
@@ -123,16 +137,16 @@ def main():
         "note": f"a_L at corner; a_H distorted by -{res_p6['distortion_size']:.3f}. Active: [{active_str}]",
     })
 
-    # 7. Sweep distortion
-    print("[7/14] Running Heterogeneity vs Bias 2D Sweep...")
+    # 8. Sweep distortion
+    print("[8/15] Running Heterogeneity vs Bias 2D Sweep...")
     res_sweep = sweep_distortion(output_dir=args.output_dir)
 
-    # 8. Compare regimes
-    print("[8/14] Running Model I vs Model II Regime Comparison...")
+    # 9. Compare regimes
+    print("[9/15] Running Model I vs Model II Regime Comparison...")
     res_comp = compare_regimes_runner(output_dir=args.output_dir)
 
-    # 9. Robustness Task 1: Exact Conjunctive Success
-    print("[9/14] Running Robustness Check 1: Exact Conjunctive Model...")
+    # 10. Robustness Task 1: Exact Conjunctive Success
+    print("[10/15] Running Robustness Check 1: Exact Conjunctive Model...")
     res_exact = verify_exact_conjunctive(output_dir=args.output_dir)
     results.append({
         "item": "Rob 1",
@@ -142,8 +156,8 @@ def main():
         "note": f"Corner survived in {res_exact['corner_rate']*100:.0f}%; downward dist in {res_exact['downward_dist_rate']*100:.0f}%; IR_H slack everywhere",
     })
 
-    # 10. Robustness Task 2: Assumption 1 Characterization
-    print("[10/14] Running Robustness Check 2: Assumption 1 Regularity...")
+    # 11. Robustness Task 2: Assumption 1 Characterization
+    print("[11/15] Running Robustness Check 2: Assumption 1 Regularity...")
     res_assump1 = verify_assumption1(output_dir=args.output_dir)
     results.append({
         "item": "Rob 2",
@@ -153,8 +167,8 @@ def main():
         "note": f"Corrected (>= -1) holds in {res_assump1['holds_fraction']*100:.1f}%; canonical audit in Foll 1",
     })
 
-    # 11. Robustness Task 3: mu_A Comparative Statics
-    print("[11/14] Running Robustness Check 3: mu_A Comparative Statics...")
+    # 12. Robustness Task 3: mu_A Comparative Statics
+    print("[12/15] Running Robustness Check 3: mu_A Comparative Statics...")
     res_mu = verify_mu_comparative_statics(output_dir=args.output_dir)
     results.append({
         "item": "Rob 3",
@@ -164,8 +178,8 @@ def main():
         "note": f"Verified ratio dmu/dlam = -(lambda_A - c_Q)/mu_A (error: {res_mu['max_ratio_error']:.1e}); parameters confounded",
     })
 
-    # 12. Follow-up 1 (Task 1): Monotonicity Survival
-    print("[12/14] Running Follow-up Check 1: Monotonicity Under Assumption 1 & Tightness...")
+    # 13. Follow-up 1 (Task 1): Monotonicity Survival
+    print("[13/15] Running Follow-up Check 1: Monotonicity Under Assumption 1 & Tightness...")
     res_mono_surv = verify_monotonicity_survival(output_dir=args.output_dir)
     results.append({
         "item": "Foll 1",
@@ -175,8 +189,8 @@ def main():
         "note": f"Mono holds 100% under Ass1 ({res_mono_surv['ass1_holds_mono_holds']}/{res_mono_surv['ass1_holds_total']}); breaks in 96.7% outside ({res_mono_surv['ass1_fails_mono_fails']}/{res_mono_surv['ass1_fails_total']})",
     })
 
-    # 13. Follow-up 2 (Task 2): Ray-Invariance in Corner Regime
-    print("[13/14] Running Follow-up Check 2: Ray-Invariance in Corner Regime...")
+    # 14. Follow-up 2 (Task 2): Ray-Invariance in Corner Regime
+    print("[14/15] Running Follow-up Check 2: Ray-Invariance in Corner Regime...")
     res_corner_ray = verify_mu_lambda_corner(output_dir=args.output_dir)
     results.append({
         "item": "Foll 2",
@@ -186,8 +200,8 @@ def main():
         "note": f"mu_A factors out completely from Pi(1)-Pi(0); 0 flips across {res_corner_ray['total_evals']} points; critical ratio rho*={res_corner_ray['rho_star']:.3f}",
     })
 
-    # 14. Follow-up 3 (Task 3): Exact Bias Sweep & IC_H Binding
-    print("[14/14] Running Follow-up Check 3: IC_H Binding Under Exact Bias Sweep...")
+    # 15. Follow-up 3 (Task 3): Exact Bias Sweep & IC_H Binding
+    print("[15/15] Running Follow-up Check 3: IC_H Binding Under Exact Bias Sweep...")
     res_exact_sweep = verify_exact_bias_sweep(output_dir=args.output_dir)
     results.append({
         "item": "Foll 3",
@@ -209,7 +223,7 @@ def main():
             any_failed = True
         print(f"{r['item']:<8} | {r['name']:<36} | {r['verdict']:<9} | {r['note']}")
     print("=" * 105)
-    print(f"Total verification time: {elapsed:.2f} seconds (all 14 verifications completed)")
+    print(f"Total verification time: {elapsed:.2f} seconds (all 15 verifications completed)")
     print(f"Artifacts saved in: {args.output_dir}/")
 
     if any_failed:

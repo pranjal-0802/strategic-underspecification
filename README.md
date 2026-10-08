@@ -40,6 +40,7 @@ The table below maps every proposition, corollary, and robustness check in the p
 | **Sec 4.2** | **Cor 3** (Non-Identification of Bias Channels) | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(derivative ratio $= -\tilde\rho$)* |
 | **Sec 4.2** | **Cor 4** (Ray-Invariance in Corner Regime) | `underspec_sim/verifications/verify_mu_lambda_corner.py` | `tests/test_mu_lambda_corner.py` | `outputs/mu_lambda_corner.csv`, `.png`, `.md` | **PASS** *(sign of $\Delta\Pi$ ray-invariant)* |
 | **Sec 4.2** | **Cor 5** (Pooling is a Corner Solution in Unbiased Case) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `outputs/cor3_interiority.csv`, `.png`, `.md` | **PASS** *(unbiased is corner; biased is interior)* |
+| **Sec 6.1** | **Table 1** (Unbiased Pooling Sensitivity & Clipped Differences) | `underspec_sim/verifications/generate_table1.py` | `tests/test_pooling.py` | `outputs/table1_unbiased_sensitivity.csv`, `.md` | **PASS** *(all 11 rows strictly positive in [+0.15, +20.10])* |
 | **Sec 5.2** | **Prop 5** (Zero Distortion Without Bias) | `underspec_sim/verifications/verify_prop5.py` | `tests/test_screening.py` | `outputs/prop5_screening_no_bias.csv`, `.png`, `.md` | **PASS** *(recovers FB; IC slack)* |
 | **Sec 5.3** | **Prop 6** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `outputs/prop6_screening_biased.csv`, `.png`, `.md`, `outputs/prop6_bias_sweep_active_constraints.csv`, `.png` | **PASS** *(active set characterized)* |
 | **Sec 5.3** | **Remark** (Heterogeneity vs Bias Separability) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `outputs/distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** *(2D sweep verified)* |
@@ -76,13 +77,13 @@ The computational verification suite evaluates the analytical claims across repr
 - Over a calibrated parameter sweep ($k=3, \Lambda=2.0, c_Q=1.0, \lambda_A \in [1.75, 1.95]$), $a^{SE}$ falls monotonically from $0.51$ to $0.06$, matching fine-grid optima within $0.5\%$ relative error.
 
 ### 3. Proposition 6 & Active Constraint Audit (Screening Under Bias)
-- **Down-and-Out Distortion:** At representative under-asking bias ($0 < \lambda_A - c_Q < \mu_A(\Lambda - c_Q)$, so $c_Q < c_Q^{eff} < \Lambda$), the low-cost type remains at $a_L^{SB} = a_L^B = 0$, while the high-cost type's asking rate is strictly distorted downward ($a_H^{SB} < a_H^B$).
-- **Active Constraint Set Audit:**
-  - In representative bias regions ($\lambda_A = 4.0, \mu_A = 1.0$), **$\text{IC}_L$ binds alone**; $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ are strictly slack.
-  - *Economic Intuition:* Unlike classical Baron--Myerson transfer models where the principal pays cash rents, here $\Pi_{\kappa_H}$ directly contains user utility $\mu_A U(\cdot;\kappa_H)$. The leader has no rent-minimization incentive to push $U_H$ down to $\underline{U}$.
+- **Three Operational Regimes & Active Constraint Audit:**
+  - *Small Bias Regime ($c_Q^{eff} \approx c_Q$):* Weak mimicry temptation ($k \le k_{\text{crit}}$), yielding negligible or zero distortion ($a_H^{SB} \approx a_H^B = 1$) with constraints slack.
+  - *Moderate Bias Regime ($c_Q < c_Q^{eff} < \Lambda$ with $k > k_{\text{crit}}$):* True adverse-selection downward distortion $a_H^{SB} < a_H^B = 1$. $\text{IC}_L$ binds alone, while $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ remain strictly slack. Depressing follower utility directly hurts the leader's objective, keeping participation constraints slack.
+  - *Prohibitive Friction Regime ($c_Q^{eff} \ge \Lambda$, equivalently $\lambda_A - c_Q \ge \mu_A(\Lambda - c_Q)$):* Uniform clarification shutdown ($a_L = a_H = 0, m_L = m_H = k$) because the leader unconstrainedly prefers zero asking for all types ($\partial\Pi/\partial a \le 0$). Both types receive the identical bundle $(k, 0)$, so $\text{IC}_L$ and $\text{IC}_H$ hold with equality ($0 = 0$).
 - **Extended Sweep:**
   - **Does $\text{IR}_H$ ever bind?** **NO** (Slack $\ge 75.0$ across all 100 tested configurations).
-  - **Does $\text{IC}_H$ ever bind?** **YES** (Under extreme friction $\lambda_A \ge 6.0$ or low altruism $\mu_A \le 0.5$, $\text{IC}_H$ binds alongside $\text{IC}_L$, confirming Remark 2).
+  - **Does $\text{IC}_H$ ever bind?** **YES** (Under prohibitive friction $\lambda_A \ge 5.0$ or severe discounting $\mu_A \le 0.5$, menus collapse to uniform clarification shutdown where both types receive identical service).
 
 ### 4. Exact Conjunctive Robustness
 - Evaluated whether headline results survive replacing the linear-risk approximation $L(1-q)(k-m)$ with the exact conjunctive probability $q(a,g)^{k-m}$:

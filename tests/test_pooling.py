@@ -224,3 +224,26 @@ def test_ground_truth_argmax_grid_search_against_primitives():
     assert best_a_prim_k5 == 0.0
     assert res_k5.a_SE == 0.0
 
+
+def test_table1_clipped_payoff_differences():
+    """Verify that Table 1 clipped Delta Pi values generated from code match expected values."""
+    from underspec_sim.verifications.generate_table1 import compute_table1_rows
+
+    df = compute_table1_rows()
+    assert len(df) == 11
+    # All clipped values must be strictly positive (asking beats guessing everywhere)
+    assert (df["clipped_delta"] > 0).all()
+
+    # Verify specific key rows
+    bench_row = df[(df["g"] == 0.5) & (df["k"] == 10)].iloc[0]
+    assert abs(bench_row["clipped_delta"] - 5.42) < 0.05
+    assert abs(bench_row["unclipped_delta"] - 1.16) < 0.05
+
+    g3_k15 = df[(df["g"] == 0.3) & (df["k"] == 15)].iloc[0]
+    assert abs(g3_k15["clipped_delta"] - 20.10) < 0.05
+
+    g3_k5 = df[(df["g"] == 0.3) & (df["k"] == 5)].iloc[0]
+    assert abs(g3_k5["clipped_delta"] - 0.15) < 0.05
+    assert abs(g3_k5["unclipped_delta"] - (-36.80)) < 0.05
+
+
