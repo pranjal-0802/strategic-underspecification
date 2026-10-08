@@ -18,14 +18,15 @@ Canonical release accompanying the manuscript *"Strategic Under-Specification: A
 - **Model I: Pooling Equilibrium (Section 4):**
   - Exact quadratic leader payoff $\Pi(a) = \text{const} + \bar L a + \bar Q a^2$ derived directly from primitives.
   - Proposition 4 closed-form pooling ask rate $a^{SE} = -\frac{\bar L}{2\bar Q}$ under strict concavity ($\bar Q < 0$).
-  - Corollary 2 proves $\partial a^{SE}/\partial\lambda_A \le 0$ on the physically valid domain $\bar R_0 \ge 0$: perceived clarification friction suppresses the equilibrium asking rate.
+  - Corollary 2 proves $\partial a^{SE}/\partial\lambda_A \le 0$ on the interior specification domain ($\kappa \ge \Lambda/k$, $\bar R_0 > 0$): perceived clarification friction suppresses the equilibrium asking rate.
   - Corollary 3 non-identification and ray-invariance in the normalized friction ratio $\tilde\rho = (\lambda_A - c_Q)/\mu_A$.
   - Corollary 4 ray-invariance extension to the corner regime.
-  - Corollary 5 unbiased corner solution: $\bar Q \ge 0$ weakly convex, selecting $a^{SE} = 1$ under physical feasibility.
+  - Corollary 5 unbiased corner solution: $\bar Q \ge 0$ weakly convex, selecting $a^{SE} = 1$ under physical feasibility, achieving First-Best with zero pooling loss at zero bias under linear risk.
+  - Table 1 recomputed with exact clipped payoff differences confirming asking strictly dominates guessing across all 11 configurations.
 - **Model II: Screening Mechanism (Section 5):**
   - Proposition 5: Full efficiency survives private cost information under an unbiased leader ($\Pi_\kappa \equiv U$), recovering First-Best with slack IC constraints.
-  - Proposition 6: Downward distortion of high-cost type under under-asking bias ($a_H^{SB} < 1$), proven globally via IC boundary geometry under explicit complexity threshold $k > k_{\text{crit}}$ with off-menu deterrence schedule.
-  - Active constraint characterization: $\text{IC}_L$ binds alone under moderate bias; $\text{IC}_H$ becomes co-active under extreme bias.
+  - Proposition 6: Downward distortion of high-cost type under under-asking bias ($a_H^{SB} < 1$), proven globally via IC boundary geometry under explicit bias condition $0 < \lambda_A - c_Q < \mu_A(\Lambda - c_Q)$, complexity threshold $k > k_{\text{crit}}$, and exact $\text{IC}_L$ violation condition $\kappa_L(k + m_H^B) > 2c_Q$.
+  - Active constraint characterization: $\text{IC}_L$ binds alone under moderate bias; distortion intensifies as cost heterogeneity narrows; $\text{IC}_H$ becomes co-active under extreme bias.
 - **Robustness & Computational Verification Suite:**
   - Master test runner `run_all_math_checks.py` executing 14 mathematical checks with zero hardcoded passes (100% verified).
   - Robustness to exact conjunctive success probabilities $q(a,g)^{k-m}$ across parameter grids.
