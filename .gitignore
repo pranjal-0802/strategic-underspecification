@@ -11,3 +11,6 @@ runs.db
 .env
 .env.*
 .DS_Store
+scratch/
+*.scratch.md
+THINKING.md

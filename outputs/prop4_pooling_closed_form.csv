@@ -1,3 +1,3 @@
 case,k,Lambda,c_Q,lambda_A,mu_A,Q_bar,L_bar,soc_value,is_concave,a_SE_closed,a_SE_grid,a_SE_primitives,discrepancy,matches,note
 Valid_SOC_Regime,5.0,4.0,2.0,7.8908876747357075,1.0,-32.91358349626246,32.91358349626246,-32.91358349626246,True,0.5,0.5,0.5,0.0,True,Concave regime (Q_bar=-32.9136 < 0): interior optimum a_SE = 0.5000.
-Unbiased_Baseline_Regime,10.0,5.0,2.0,2.0,1.0,12.364682831050796,-11.215609436835983,12.364682831050796,False,0.4535340529993538,1.0,1.0,0.0,True,Convex/linear regime (Q_bar=12.3647 >= 0): stationary point 0.4535 is a minimum; optimum is corner a_SE=1.0 (Pi(1)-Pi(0)=1.1491).
+Unbiased_Baseline_Regime,10.0,5.0,2.0,2.0,1.0,12.364682831050796,-11.215609436835983,12.364682831050796,False,0.4535340529993538,1.0,1.0,0.0,True,Convex/linear regime (Q_bar=12.3647 >= 0): optimum is corner a_SE=1.0.

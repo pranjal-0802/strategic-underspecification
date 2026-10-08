@@ -58,6 +58,7 @@ def test_interiority(
         lambda_A=c_Q,
         c_Q=c_Q,
         params=params,
+        clip_m=False,
     )
 
     kappa_arr = np.asarray(F_samples, dtype=float)
@@ -124,14 +125,14 @@ def test_bias_direction(
     lambda_A_sweep: Optional[Sequence[float]] = None,
 ) -> BiasDirectionSweepResult:
     r"""
-    Checks Corollary 2 (Corrected):
+    Checks Corollary 2 on the valid physical domain (m <= k, \bar{R}_0 > 0):
     On the interior branch (\bar{Q} < 0),
-      \partial a^{SE} / \partial \lambda_A = - (\bar{R}_0 / \bar{\gamma}) * (\mu_A * s) / (\mu_A * s - 2*b)^2 > 0
-    when \bar{R}_0 < 0 (under-specification regime).
+      \partial a^{SE} / \partial \lambda_A = - (\bar{R}_0 / \bar{\gamma}) * (\mu_A * s) / (\mu_A * s - 2*b)^2 <= 0.
+    More perceived asking friction suppresses asking!
     Verifies that:
     1. The parameters yield \bar{Q} < 0 (SOC holds, regime is strictly interior).
     2. a^{SE} is strictly interior (in (0, 1)) across the entire sweep.
-    3. The empirical slope \Delta a^{SE} / \Delta \lambda_A is strictly positive everywhere.
+    3. The empirical slope \Delta a^{SE} / \Delta \lambda_A is strictly negative everywhere.
     4. The empirical slope matches the closed-form analytical derivative within tolerance.
     """
     if F_samples is None:
@@ -141,15 +142,11 @@ def test_bias_direction(
     inv_mean = float(np.mean(1.0 / kappa_arr))
 
     if params is None:
-        # Calibrated primitives where Q_bar < 0 and a^SE in (0.25, 0.85)
-        # Lambda = 2.0, c_Q = 1.0, mu_A = 1.0 => s = 1.0
-        # gamma_bar = s * inv_mean
-        # k = Lambda * inv_mean - 1.90 * gamma_bar => R0_bar = -1.90 * gamma_bar < 0
+        # Feasible domain calibration (k=3.0, m* <= k, R0_bar > 0)
         Lambda = 2.0
         c_Q = 1.0
         mu_A = 1.0
-        gamma_bar = (Lambda - c_Q) * inv_mean
-        k = float(Lambda * inv_mean - 1.90 * gamma_bar)
+        k = 3.0
         params = ModelParams(k=k, g=0.5, L=4.0, c_Q=c_Q, mu_A=mu_A, V=100.0)
 
     Lambda = params.Lambda
@@ -157,9 +154,9 @@ def test_bias_direction(
     c_Q = params.c_Q
 
     if lambda_A_sweep is None:
-        # Sweeping lambda_A in [2.2, 5.0] guarantees b in [1.2, 4.0],
-        # Q_bar = (s - 2b)*gamma_bar/2 < 0 (concave), and a^SE in [0.27, 0.82] strictly interior
-        lambda_A_sweep = np.linspace(2.2, 5.0, 20)
+        # Feasible sweep where a^SE smoothly transitions downward:
+        # e.g., lambda_A in [1.75, 1.95] gives a^SE in [0.51, 0.06]
+        lambda_A_sweep = np.linspace(1.75, 1.95, 21)
 
     records: List[Dict[str, Any]] = []
     a_list: List[float] = []
@@ -174,12 +171,13 @@ def test_bias_direction(
             lambda_A=lam,
             c_Q=c_Q,
             params=params,
+            clip_m=True,
         )
         a_list.append(res.a_SE)
         regimes.append(res.regime)
         soc_list.append(res.soc_value)
 
-        # Closed-form analytical derivative from Corollary 2
+        # Closed-form analytical derivative from Corollary 2 (negative on valid domain)
         s = Lambda - c_Q
         b = lam - c_Q
         analytical_deriv = float(- (res.R0_bar / res.gamma_bar) * (mu_A * s) / ((mu_A * s - 2.0 * b) ** 2))
@@ -209,22 +207,22 @@ def test_bias_direction(
 
         # Midpoint analytical derivative
         mid_deriv = 0.5 * (deriv_list[i] + deriv_list[i + 1])
-        rel_err = abs(slope - mid_deriv) / mid_deriv
+        rel_err = abs(slope - mid_deriv) / abs(mid_deriv)
         relative_errors.append(rel_err)
 
     all_interior = all(r == "interior" for r in regimes)
-    all_positive_slopes = all(s > 0.0 for s in slopes)
+    all_negative_slopes = all(s < 0.0 for s in slopes)
     all_soc_concave = all(s < -1e-9 for s in soc_list)
     max_err = float(np.max(relative_errors)) if relative_errors else 0.0
     deriv_matches = max_err < 0.06  # Within 6% finite difference tolerance
 
-    passed = all_interior and all_positive_slopes and all_soc_concave and deriv_matches
+    passed = all_interior and all_negative_slopes and all_soc_concave and deriv_matches
 
     summary = (
-        f"Corollary 2 (Corrected): Swept lambda_A in [{lambda_A_sweep[0]:.2f}, {lambda_A_sweep[-1]:.2f}] "
-        f"across {len(lambda_A_sweep)} points. All {len(a_list)} points strictly interior (a_SE in [{min(a_list):.3f}, {max(a_list):.3f}]). "
-        f"All empirical slopes strictly positive (min slope={min(slopes):.4f}). "
-        f"Matches analytical derivative - (R0_bar/gamma_bar) * (mu_A * s) / (mu_A * s - 2b)^2 (max rel err={max_err:.2%}). "
+        f"Corollary 2 (Feasible Domain): Swept lambda_A in [{lambda_A_sweep[0]:.2f}, {lambda_A_sweep[-1]:.2f}] "
+        f"across {len(lambda_A_sweep)} points on k={params.k}. All points interior (a_SE in [{min(a_list):.3f}, {max(a_list):.3f}]). "
+        f"All empirical slopes strictly negative (max slope={max(slopes):.4f}). "
+        f"Matches analytical derivative - (R0_bar/gamma_bar) * (mu_A * s) / (mu_A * s - 2b)^2 <= 0 (max rel err={max_err:.2%}). "
         f"Passed: {passed}."
     )
 

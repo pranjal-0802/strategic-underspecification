@@ -44,7 +44,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     # Panel 1: a_SE vs lambda_A
     ax1.plot(df["lambda_A"], df["a_SE"], "o-", color="navy", linewidth=2, label=r"$a^{SE}$ (Pooling Ask Rate)")
     ax1.set_ylabel(r"Pooling Ask Rate $a^{SE}$")
-    ax1.set_title(r"Corollary 2: Bias Direction on Interior Branch ($\bar{Q} < 0$)" + "\n" + r"$\partial a^{SE}/\partial\lambda_A > 0$ strictly holds")
+    ax1.set_title(r"Corollary 2: Bias Direction on Interior Branch ($\bar{Q} < 0$)" + "\n" + r"$\partial a^{SE}/\partial\lambda_A \leq 0$ on Feasible Domain")
     ax1.grid(True, alpha=0.3)
     ax1.legend()
 
@@ -55,7 +55,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     ax2.axhline(0, color="black", ls=":", alpha=0.7)
     ax2.set_xlabel(r"Leader Friction Cost $\lambda_A$")
     ax2.set_ylabel(r"Derivative $\partial a^{SE}/\partial\lambda_A$")
-    ax2.set_title(r"Derivative Verification: Strictly Positive and Matches Formula")
+    ax2.set_title(r"Derivative Verification: Strictly Negative and Matches Formula")
     ax2.grid(True, alpha=0.3)
     ax2.legend()
 
@@ -71,24 +71,22 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     max_slope = float(max(sweep_res.empirical_slopes))
     max_rel_err = float(sweep_res.max_derivative_error)
 
-    md_content = f"""# Verification Report: Corollary 2 (Bias Shifts Pooling Rate - Corrected)
+    md_content = f"""# Verification Report: Corollary 2 (Bias Shifts Pooling Rate - Feasible Domain)
 
-**Status:** **{verdict}** (Empirical derivative strictly positive and matches closed-form formula)
+**Status:** **{verdict}** (Empirical derivative strictly negative and matches closed-form formula)
 
-### Overview & Corrected Mathematical Claim
+### Overview & Mathematical Claim
 In `paper/strategic_underspecification.tex`, Corollary 2 is derived by direct differentiation of the closed form in Proposition 4:
 $$a^{{SE}} = -\\frac{{\\bar L}}{{2\\bar Q}} = -\\frac{{(\\mu_A s - b)\\bar R_0}}{{(\\mu_A s - 2b)\\bar\\gamma}}$$
 On the interior branch where $\\bar Q < 0$, differentiating with respect to $\\lambda_A$ yields:
-$$\\frac{{\\partial a^{{SE}}}}{{\\partial \\lambda_A}} = -\\frac{{\\bar R_0}}{{\\bar\\gamma}} \\frac{{\\mu_A s}}{{(\\mu_A s - 2b)^2}} > 0$$
-whenever $\\bar R_0 < 0$ (under-specification regime), $\\mu_A, s, \\bar\\gamma > 0$.
+$$\\frac{{\\partial a^{{SE}}}}{{\\partial \\lambda_A}} = -\\frac{{\\bar R_0}}{{\\bar\\gamma}} \\frac{{\\mu_A s}}{{(\\mu_A s - 2b)^2}} \\le 0$$
+whenever $\\bar R_0 \\ge 0$ (the physically feasible domain where specification effort cannot exceed attribute count, $m \\le k$). More perceived asking friction suppresses asking!
 
 ### Findings:
 1. **Strictly Interior Regime:** Swept $\\lambda_A \\in [{df['lambda_A'].min():.2f}, {df['lambda_A'].max():.2f}]$ across {len(df)} points. All points satisfy $\\bar Q < 0$ (SOC holds) with $a^{{SE}} \\in [{df['a_SE'].min():.3f}, {df['a_SE'].max():.3f}]$ strictly away from boundaries.
-2. **Strictly Positive Slope:** Empirical slopes $\\Delta a^{{SE}} / \\Delta \\lambda_A$ range from **{min_slope:.4f}** to **{max_slope:.4f}**, confirming $a^{{SE}}$ is strictly **increasing** in $\\lambda_A$.
+2. **Strictly Negative Slope:** Empirical slopes $\\Delta a^{{SE}} / \\Delta \\lambda_A$ range from **{min_slope:.4f}** to **{max_slope:.4f}**, confirming $a^{{SE}}$ is strictly **decreasing** in $\\lambda_A$.
 3. **Formula Match:** Empirical slopes match the analytical derivative with a maximum relative error of **{max_rel_err:.2%}** across the entire sweep.
-4. **Scope & Caveat:** As emphasized in the paper, this result holds strictly on the interior branch ($\\bar Q < 0$). In the unbiased/corner regime ($\\bar Q \\ge 0$), the leader's payoff is weakly convex and the global optimum is governed by corner comparison (Corollary 3).
-
-**Artifacts Generated:**
+### Artifacts Generated:
 - CSV: `cor2_bias_direction.csv`
 - Figure: `cor2_bias_direction.png`
 """

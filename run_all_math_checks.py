@@ -86,7 +86,7 @@ def main():
         "name": "Bias Direction on Pooling Rate",
         "verdict": res_c2["verdict"],
         "passed": res_c2["passed"],
-        "note": f"Interior branch: da/dlam > 0 strictly (slopes in [{res_c2['min_slope']:.3f}, {res_c2['max_slope']:.3f}], max err: {res_c2['max_rel_err']:.1%})",
+        "note": f"Feasible domain: da/dlam <= 0 strictly (slopes in [{res_c2['min_slope']:.3f}, {res_c2['max_slope']:.3f}], max err: {res_c2['max_rel_err']:.1%})",
     })
 
     # 4. Cor 3

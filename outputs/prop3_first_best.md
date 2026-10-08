@@ -1,14 +1,10 @@
-# Verification Report: Proposition 3 (First-Best Threshold)
+# Verification Report: Proposition 3 (First-Best on Feasible Domain)
 
 **Status:** **PASS**
 
-- **Theoretical Threshold:** $\kappa^* = \frac{\Lambda + c_Q}{2k} = \frac{5.0 + 2.0}{20.0} = 0.3500$
-- **Observed Flip:**
-  - For $\kappa < \kappa^*$: $a^{FB} = 0.0$ across all 250 test points.
-  - For $\kappa > \kappa^*$: $a^{FB} = 1.0$ across all 350 test points.
-  - Flip occurs strictly at $\kappa^*$.
-- **Optimality Verification (Grid Search Check):**
-  - Evaluated against 671 alternative $(m, a)$ bundles per type.
+- **Theoretical Domain Feasibility:** For all feasible $m \in [0, k]$ and $\Lambda > c_Q$, $\frac{\partial U}{\partial a} = (\Lambda - c_Q)(k - m) \ge 0$.
+- **Result:** Asking ($a^{FB} = 1$) weakly dominates guessing ($a=0$) across all 601 types on $[0, k]$.
+- **Independent Grid Search Verification:** Evaluated against 1111 alternative $(m, a)$ pairs on $[0, k] \times [0, 1]$.
   - Max violation observed: `0.00e+00` (numerical tolerance threshold: `1e-7`).
   - All test points verified as global argmax: `True`.
 

@@ -46,6 +46,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
         params=params_valid_soc,
         grid_points=20001,
         tolerance=1e-2,
+        clip_m=False,
     )
 
     # Ground truth from primitives (leader_payoff_per_type)
@@ -67,6 +68,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
         params=params_unbiased,
         grid_points=20001,
         tolerance=1e-2,
+        clip_m=False,
     )
 
     prim_vals_unb = [

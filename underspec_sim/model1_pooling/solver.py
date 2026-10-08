@@ -59,15 +59,15 @@ def solve_pooling_equilibrium(
     params: Optional[ModelParams] = None,
     grid_points: int = 10001,
     tolerance: float = 1e-2,
+    clip_m: bool = True,
 ) -> PoolingEquilibriumResult:
     r"""
     Solves for the leader's optimal pooling ask rate a^{SE} on [0, 1].
-    
-    Implements:
-    (a) Compute Q_bar and check its sign (Q_bar < 0 means concave).
-    (b) If Q_bar < 0, use closed-form interior a_SE = - L_bar / (2 * Q_bar).
-    (c) If Q_bar >= 0, evaluate Pi(0) and Pi(1) directly, returning the larger.
-        Sets regime to "corner" vs "interior".
+
+    Parameters:
+    - clip_m: if True, enforces physical constraint m^*(\kappa; a) \in [0, k]
+              when evaluating expected leader payoffs.
+              if False, uses the unconstrained quadratic approximation.
     """
     if params is None:
         params = ModelParams()
@@ -93,15 +93,28 @@ def solve_pooling_equilibrium(
     L_bar = (mu * s - b) * R0_bar
     is_concave = Q_bar < -1e-12
 
+    from underspec_sim.model1_pooling.payoff import leader_payoff_pooling_clipped
+
     # Payoffs at boundaries
-    pi_0 = float(leader_payoff_pooling(0.0, F_samples, mu, lam, cq, effective_params))
-    pi_1 = float(leader_payoff_pooling(1.0, F_samples, mu, lam, cq, effective_params))
+    if clip_m:
+        pi_0 = float(leader_payoff_pooling_clipped(0.0, F_samples, mu, lam, cq, effective_params))
+        pi_1 = float(leader_payoff_pooling_clipped(1.0, F_samples, mu, lam, cq, effective_params))
+    else:
+        pi_0 = float(leader_payoff_pooling(0.0, F_samples, mu, lam, cq, effective_params))
+        pi_1 = float(leader_payoff_pooling(1.0, F_samples, mu, lam, cq, effective_params))
     pi_diff = pi_1 - pi_0
 
     # Grid search on [0, 1]
     a_grid = np.linspace(0.0, 1.0, grid_points)
-    pi_grid = leader_payoff_pooling(a_grid, F_samples, mu, lam, cq, effective_params)
-    best_idx = int(np.argmax(pi_grid))
+    if clip_m:
+        pi_grid = leader_payoff_pooling_clipped(a_grid, F_samples, mu, lam, cq, effective_params)
+    else:
+        pi_grid = leader_payoff_pooling(a_grid, F_samples, mu, lam, cq, effective_params)
+    max_val = float(np.max(pi_grid))
+    if np.isclose(pi_grid[-1], max_val, atol=1e-8):
+        best_idx = len(a_grid) - 1
+    else:
+        best_idx = int(np.argmax(pi_grid))
     a_SE_grid = float(a_grid[best_idx])
 
     # Unbounded grid search over [-5, 5]
@@ -110,36 +123,38 @@ def solve_pooling_equilibrium(
     best_unb_idx = int(np.argmax(pi_grid_unb))
     a_SE_grid_unb = float(a_grid_unb[best_unb_idx])
 
-    # Raw Proposition 4 closed form formula
+    # Raw Proposition 4 closed form formula (unconstrained quadratic)
     if abs(Q_bar) < 1e-12:
         a_SE_closed = float("nan")
     else:
         a_SE_closed = - L_bar / (2.0 * Q_bar)
 
-    # Determine true optimum a_SE on [0, 1]
-    if is_concave:
-        # Concave: interior peak exists if in [0, 1]
-        if 0.0 <= a_SE_closed <= 1.0:
-            a_SE = a_SE_closed
-            regime = "interior"
-            note = f"Concave regime (Q_bar={Q_bar:.4f} < 0): interior optimum a_SE = {a_SE:.4f}."
-        else:
-            # Clipped to boundary
-            a_SE = 1.0 if a_SE_closed > 1.0 else 0.0
+    # Determine optimum a_SE on [0, 1]
+    if clip_m:
+        a_SE = a_SE_grid
+        if a_SE <= 1e-4 or a_SE >= 1.0 - 1e-4:
             regime = "corner"
-            note = f"Concave regime (Q_bar={Q_bar:.4f} < 0): stationary point {a_SE_closed:.4f} outside [0, 1], clipped to boundary {a_SE:.1f}."
-    else:
-        # Non-negative: strictly convex or linear on [0, 1], optimum is at a corner
-        regime = "corner"
-        if pi_1 >= pi_0:
-            a_SE = 1.0
+            note = f"Clipped domain optimum is corner a_SE = {a_SE:.4f}."
         else:
-            a_SE = 0.0
-        note = (
-            f"Convex/linear regime (Q_bar={Q_bar:.4f} >= 0): "
-            f"stationary point {a_SE_closed:.4f} is a minimum; "
-            f"optimum is corner a_SE={a_SE:.1f} (Pi(1)-Pi(0)={pi_diff:.4f})."
-        )
+            regime = "interior"
+            note = f"Clipped domain optimum is interior a_SE = {a_SE:.4f}."
+    else:
+        if is_concave:
+            if 0.0 <= a_SE_closed <= 1.0:
+                a_SE = a_SE_closed
+                regime = "interior"
+                note = f"Concave regime (Q_bar={Q_bar:.4f} < 0): interior optimum a_SE = {a_SE:.4f}."
+            else:
+                a_SE = 1.0 if a_SE_closed > 1.0 else 0.0
+                regime = "corner"
+                note = f"Concave regime (Q_bar={Q_bar:.4f} < 0): stationary point {a_SE_closed:.4f} outside [0, 1], clipped to boundary {a_SE:.1f}."
+        else:
+            regime = "corner"
+            a_SE = 1.0 if pi_1 >= pi_0 else 0.0
+            note = (
+                f"Convex/linear regime (Q_bar={Q_bar:.4f} >= 0): "
+                f"optimum is corner a_SE={a_SE:.1f}."
+            )
 
     discrepancy = abs(a_SE - a_SE_grid)
     matches = discrepancy <= tolerance

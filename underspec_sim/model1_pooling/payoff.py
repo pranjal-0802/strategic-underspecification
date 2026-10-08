@@ -64,3 +64,45 @@ def leader_payoff_pooling(
 
     a_arr = np.asarray(a)
     return const + L_bar * a_arr + Q_bar * (a_arr ** 2)
+
+
+def leader_payoff_pooling_clipped(
+    a: Union[float, np.ndarray],
+    F_samples: Sequence[float],
+    mu_A: Optional[float] = None,
+    lambda_A: Optional[float] = None,
+    c_Q: Optional[float] = None,
+    params: Optional[ModelParams] = None,
+) -> Union[float, np.ndarray]:
+    r"""
+    True expected leader pooling payoff \mathbb{E}_\kappa[\Pi_\kappa(m^*(\kappa; a), a)]
+    enforcing the physical constraint m^*(\kappa; a) \in [0, k] for all types.
+    Fully vectorized over a and \kappa.
+    """
+    from underspec_sim.core.payoffs import leader_payoff_per_type
+
+    if params is None:
+        params = ModelParams()
+    mu = params.mu_A if mu_A is None else mu_A
+    lam = params.lambda_A if lambda_A is None else lambda_A
+    cq = params.c_Q if c_Q is None else c_Q
+
+    effective_params = params.model_copy(update={"mu_A": mu, "lambda_A": lam, "c_Q": cq})
+    kap = np.asarray(F_samples, dtype=float)
+    is_scalar = isinstance(a, (int, float, np.floating))
+    a_arr = np.atleast_1d(a).astype(float)
+
+    a_mat = a_arr[:, None]
+    kap_mat = kap[None, :]
+
+    Lambda = effective_params.Lambda
+    k = effective_params.k
+    m_uncon = (Lambda * (1.0 - a_mat) + a_mat * cq) / kap_mat
+    m_stars = np.clip(m_uncon, 0.0, k)
+
+    payoffs = leader_payoff_per_type(m_stars, a_mat, kap_mat, effective_params)
+    exp_payoffs = np.mean(payoffs, axis=1)
+
+    if is_scalar:
+        return float(exp_payoffs[0])
+    return exp_payoffs

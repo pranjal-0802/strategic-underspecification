@@ -49,7 +49,7 @@ def run_verification(output_dir: str = "outputs", raise_on_failure: bool = False
     r0_b = k_bias - Lambda_bias * inv_kap_mean
     b_target = s_bias * (r0_b + 0.5 * gamma_b) / (r0_b + gamma_b)
     params_interior = ModelParams(k=k_bias, g=0.5, L=8.0, c_Q=c_Q_bias, mu_A=1.0, lambda_A=float(c_Q_bias + b_target), V=100.0)
-    res_interior = solve_pooling_equilibrium(F_samples=F_samples, params=params_interior)
+    res_interior = solve_pooling_equilibrium(F_samples=F_samples, params=params_interior, clip_m=False)
 
     # 4. Comprehensive sweep across parameter grid to verify 100% agreement with corner formula
     sweep_records: List[Dict[str, Any]] = []

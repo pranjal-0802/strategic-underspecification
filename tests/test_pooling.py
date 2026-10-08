@@ -69,7 +69,7 @@ def test_prop4_closed_form_matches_exact_quadratic_argmax():
 
     p = ModelParams(k=k, g=0.5, L=8.0, c_Q=c_Q, mu_A=1.0, lambda_A=lam_target, V=100.0)
 
-    res = solve_pooling_equilibrium(F_samples, params=p)
+    res = solve_pooling_equilibrium(F_samples, params=p, clip_m=False)
     assert res.is_concave is True
     assert res.matches is True
     assert res.a_SE_closed == pytest.approx(0.5, abs=1e-3)
@@ -114,35 +114,32 @@ def test_unbiased_pooling_always_corner_matching_formula():
                     assert p.Lambda == pytest.approx(lam)
                     assert p.is_unbiased is True
 
-                    res = solve_pooling_equilibrium(F, params=p)
+                    # 1. Unconstrained algebraic benchmark
+                    res_uncon = solve_pooling_equilibrium(F, params=p, clip_m=False)
+                    assert res_uncon.regime == "corner"
+                    assert res_uncon.a_SE in (0.0, 1.0)
+                    assert res_uncon.soc_value >= -1e-9
 
-                    # 1. Must be corner regime
-                    assert res.regime == "corner"
-                    assert res.a_SE in (0.0, 1.0)
-
-                    # 2. SOC must be weakly positive (convex)
-                    assert res.soc_value >= -1e-9
-
-                    # 3. Predict corner via Corollary 3 formula:
                     inv_kap = float(np.mean(1.0 / F))
                     R0_bar = k_val - lam * inv_kap
                     gamma_bar = (lam - cq) * inv_kap
                     pi_diff_formula = (lam - cq) * (R0_bar + 0.5 * gamma_bar)
                     expected_corner = 1.0 if pi_diff_formula >= 0.0 else 0.0
 
-                    assert res.a_SE == expected_corner
-                    assert res.a_SE == pytest.approx(res.a_SE_grid, abs=1e-2)
+                    assert res_uncon.a_SE == expected_corner
+                    assert res_uncon.a_SE == pytest.approx(res_uncon.a_SE_grid, abs=1e-2)
+
+                    # 2. Feasible domain: asking weakly dominates when lam > cq
+                    res_clip = solve_pooling_equilibrium(F, params=p, clip_m=True)
+                    if lam > cq:
+                        assert res_clip.a_SE == 1.0
 
 
 def test_cor2_derivative_sign_on_interior_branch():
     r"""
-    Regression Test for Corollary 2 (Corrected):
-    On the interior branch (Q_bar < 0),
-      \partial a^{SE} / \partial \lambda_A = - (R0_bar / gamma_bar) * (mu_A * s) / (mu_A * s - 2b)^2 > 0
-    strictly when R0_bar < 0. Tests that:
-    1. The analytical derivative is strictly positive for all valid \lambda_A.
-    2. Empirical finite-difference slopes \Delta a^{SE} / \Delta \lambda_A are strictly positive.
-    3. Empirical slopes match the analytical formula within numerical tolerance.
+    Regression Test for Corollary 2 on the valid physical domain:
+    \partial a^{SE} / \partial \lambda_A = - (R0_bar / gamma_bar) * (mu_A * s) / (mu_A * s - 2b)^2 <= 0.
+    More perceived friction suppresses asking.
     """
     from underspec_sim.model1_pooling.properties import test_bias_direction
 
@@ -150,8 +147,8 @@ def test_cor2_derivative_sign_on_interior_branch():
     assert res.passed is True
     assert all(r == "interior" for r in res.regimes)
     assert all(s < 0.0 for s in res.soc_values)
-    assert all(s > 0.0 for s in res.empirical_slopes)
-    assert all(d > 0.0 for d in res.analytical_derivatives)
+    assert all(s < 0.0 for s in res.empirical_slopes)
+    assert all(d < 0.0 for d in res.analytical_derivatives)
     assert res.max_derivative_error < 0.06
 
 
@@ -183,62 +180,47 @@ def test_ground_truth_regression_against_primitives():
 
 def test_ground_truth_argmax_grid_search_against_primitives():
     r"""
-    P0 Regression Test (Audit §2): Grid-search leader_payoff_per_type (primitives)
-    averaged over F_samples as ground truth, and assert that solve_pooling_equilibrium
-    (and the Proposition 4 closed-form formula) matches the empirical argmax.
+    Grid-search leader_payoff_per_type (primitives) averaged over F_samples
+    as ground truth, and assert that solve_pooling_equilibrium matches the empirical argmax.
     Tests:
-    1. Unbiased benchmark (k=10, k* approx 9.61) -> argmax is 1.0 (always ask).
-    2. Unbiased below-threshold (k=5, k* approx 9.61) -> argmax is 0.0 (never ask).
-    3. Concave interior regime -> argmax is interior (0.500) matching closed form.
+    1. Feasible domain (clip_m=True): for unbiased leader, a=1.0 is optimal across all k.
+    2. Feasible interior regime (k=3.0, lambda_A=1.85): interior argmax matches grid.
+    3. Unconstrained benchmark (clip_m=False): unclipped grid matches unconstrained solver.
     """
-    # 1. Unbiased benchmark (k=10)
-    p_unb = ModelParams(k=10.0, g=0.5, L=10.0, c_Q=2.0, mu_A=1.0, lambda_A=2.0, V=100.0)
     F_unb = np.linspace(0.2, 0.6, 200)
     a_grid = np.linspace(0.0, 1.0, 501)
 
-    prim_vals_unb = [
-        float(np.mean([leader_payoff_per_type(user_best_response(kap, a, p_unb, clip=False), a, kap, p_unb) for kap in F_unb]))
+    # 1. Feasible domain unbiased benchmark (k=10.0 and k=5.0)
+    for k_val in [10.0, 5.0]:
+        p_unb = ModelParams(k=k_val, g=0.5, L=10.0, c_Q=2.0, mu_A=1.0, lambda_A=2.0, V=100.0)
+        prim_vals = [
+            float(np.mean([leader_payoff_per_type(user_best_response(kap, a, p_unb, clip=True), a, kap, p_unb) for kap in F_unb]))
+            for a in a_grid
+        ]
+        best_a = a_grid[np.argmax(prim_vals)]
+        res = solve_pooling_equilibrium(F_unb, params=p_unb, clip_m=True)
+        assert best_a == 1.0
+        assert res.a_SE == 1.0
+
+    # 2. Feasible interior regime (k=3.0, lambda_A=1.85)
+    p_int = ModelParams(k=3.0, g=0.5, L=4.0, c_Q=1.0, mu_A=1.0, lambda_A=1.85, V=100.0)
+    F_int = np.linspace(0.8, 1.25, 200)
+    prim_vals_int = [
+        float(np.mean([leader_payoff_per_type(user_best_response(kap, a, p_int, clip=True), a, kap, p_int) for kap in F_int]))
         for a in a_grid
     ]
-    best_a_prim_unb = a_grid[np.argmax(prim_vals_unb)]
-    res_unb = solve_pooling_equilibrium(F_unb, params=p_unb)
-    assert best_a_prim_unb == 1.0
-    assert res_unb.a_SE == 1.0
+    best_a_int = a_grid[np.argmax(prim_vals_int)]
+    res_int = solve_pooling_equilibrium(F_int, params=p_int, clip_m=True)
+    assert abs(best_a_int - res_int.a_SE) <= 0.01
 
-    # 2. Unbiased below-threshold (k=5)
+    # 3. Unconstrained benchmark matching unclipped formulas
     p_k5 = ModelParams(k=5.0, g=0.5, L=10.0, c_Q=2.0, mu_A=1.0, lambda_A=2.0, V=100.0)
     prim_vals_k5 = [
         float(np.mean([leader_payoff_per_type(user_best_response(kap, a, p_k5, clip=False), a, kap, p_k5) for kap in F_unb]))
         for a in a_grid
     ]
     best_a_prim_k5 = a_grid[np.argmax(prim_vals_k5)]
-    res_k5 = solve_pooling_equilibrium(F_unb, params=p_k5)
+    res_k5 = solve_pooling_equilibrium(F_unb, params=p_k5, clip_m=False)
     assert best_a_prim_k5 == 0.0
     assert res_k5.a_SE == 0.0
-
-    # 3. Concave interior regime targeting a* = 0.500
-    k = 5.0
-    c_Q = 2.0
-    Lambda = 4.0
-    F_int = np.linspace(0.25, 0.35, 200)
-    inv_kap = float(np.mean(1.0 / F_int))
-    s = Lambda - c_Q
-    gamma_b = s * inv_kap
-    r0_b = k - Lambda * inv_kap
-    b_target = s * (r0_b + 0.5 * gamma_b) / (r0_b + gamma_b)
-    lam_target = float(c_Q + b_target)
-    p_int = ModelParams(k=k, g=0.5, L=8.0, c_Q=c_Q, mu_A=1.0, lambda_A=lam_target, V=100.0)
-
-    prim_vals_int = [
-        float(np.mean([leader_payoff_per_type(user_best_response(kap, a, p_int, clip=False), a, kap, p_int) for kap in F_int]))
-        for a in a_grid
-    ]
-    best_a_prim_int = a_grid[np.argmax(prim_vals_int)]
-    res_int = solve_pooling_equilibrium(F_int, params=p_int)
-    assert res_int.regime == "interior"
-    assert res_int.is_concave is True
-    assert abs(best_a_prim_int - 0.5) <= 0.005
-    assert abs(res_int.a_SE - 0.5) <= 0.005
-    assert abs(res_int.a_SE_closed - 0.5) <= 0.005
-    assert abs(best_a_prim_int - res_int.a_SE) <= 0.005
 

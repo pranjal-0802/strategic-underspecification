@@ -52,15 +52,15 @@ def compute_pooling_derivatives(
     # d a_SE / d mu_A
     p_mu_hi = params.model_copy(update={"mu_A": mu_A + h, "lambda_A": lambda_A, "c_Q": c_Q})
     p_mu_lo = params.model_copy(update={"mu_A": max(1e-4, mu_A - h), "lambda_A": lambda_A, "c_Q": c_Q})
-    a_mu_hi = solve_pooling_equilibrium(F_samples, params=p_mu_hi).a_SE
-    a_mu_lo = solve_pooling_equilibrium(F_samples, params=p_mu_lo).a_SE
+    a_mu_hi = solve_pooling_equilibrium(F_samples, params=p_mu_hi, clip_m=False).a_SE
+    a_mu_lo = solve_pooling_equilibrium(F_samples, params=p_mu_lo, clip_m=False).a_SE
     da_dmu = float((a_mu_hi - a_mu_lo) / (2.0 * h))
 
     # d a_SE / d lambda_A
     p_lam_hi = params.model_copy(update={"mu_A": mu_A, "lambda_A": lambda_A + h, "c_Q": c_Q})
     p_lam_lo = params.model_copy(update={"mu_A": mu_A, "lambda_A": max(1e-4, lambda_A - h), "c_Q": c_Q})
-    a_lam_hi = solve_pooling_equilibrium(F_samples, params=p_lam_hi).a_SE
-    a_lam_lo = solve_pooling_equilibrium(F_samples, params=p_lam_lo).a_SE
+    a_lam_hi = solve_pooling_equilibrium(F_samples, params=p_lam_hi, clip_m=False).a_SE
+    a_lam_lo = solve_pooling_equilibrium(F_samples, params=p_lam_lo, clip_m=False).a_SE
     da_dlam = float((a_lam_hi - a_lam_lo) / (2.0 * h))
 
     ratio = float(da_dmu / da_dlam) if abs(da_dlam) > 1e-8 else np.nan
@@ -92,7 +92,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     records_mu: List[Dict[str, Any]] = []
 
     for mu in mu_sweep:
-        res = solve_pooling_equilibrium(F_samples, mu_A=mu, lambda_A=lam_anchor, c_Q=c_Q, params=params_base)
+        res = solve_pooling_equilibrium(F_samples, mu_A=mu, lambda_A=lam_anchor, c_Q=c_Q, params=params_base, clip_m=False)
         da_dmu, da_dlam, ratio = compute_pooling_derivatives(F_samples, mu, lam_anchor, c_Q, params_base)
         analytical_ratio = - (lam_anchor - c_Q) / mu
         ratio_error = abs(ratio - analytical_ratio) if not np.isnan(ratio) else 0.0
@@ -121,7 +121,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     records_2d: List[Dict[str, Any]] = []
     for i, mu in enumerate(mu_grid):
         for j, lam in enumerate(lam_grid):
-            res_ij = solve_pooling_equilibrium(F_samples, mu_A=mu, lambda_A=lam, c_Q=c_Q, params=params_base)
+            res_ij = solve_pooling_equilibrium(F_samples, mu_A=mu, lambda_A=lam, c_Q=c_Q, params=params_base, clip_m=False)
             a_matrix[i, j] = res_ij.a_SE
             records_2d.append({
                 "mu_A": mu,
