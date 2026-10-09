@@ -93,8 +93,8 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     # Plot
     fig, ax = plt.subplots(figsize=(8, 5))
     x_labels = ["Type L (Low Cost)", "Type H (High Cost)"]
-    opt_a = [res_uncon.res.a_L, res_uncon.res.a_H]
-    fb_a = [res_uncon.a_FB_L, res_uncon.a_FB_H]
+    opt_a = [res_con.res.a_L, res_con.res.a_H]
+    fb_a = [res_con.a_FB_L, res_con.a_FB_H]
     w = 0.35
     x = np.arange(len(x_labels))
 
@@ -113,19 +113,19 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     plt.savefig(png_path, dpi=150)
     plt.close()
 
-    passed = bool(res_uncon.passed)
+    passed = bool(res_con.passed)
     md_content = f"""# Verification Report: Proposition 5 (Efficiency Survives Private Information Without Bias)
 
 **Status:** **{'PASS' if passed else 'FAIL'}**
 
-### Key Results:
+### Key Results (Feasible Domain $m \\le k$):
 - **Parameters:** $\\kappa_L = {kappa_L}$, $\\kappa_H = {kappa_H}$, $\\mu_A = 1.0, \\lambda_A = c_Q = {params.c_Q}$.
 - **Numerical Menu Recovery:**
-  - Type L: $(m_L^*, a_L^*) = ({res_uncon.res.m_L:.4f}, {res_uncon.res.a_L:.4f})$ matches First-Best $({res_uncon.m_FB_L:.4f}, {res_uncon.a_FB_L:.4f})$.
-  - Type H: $(m_H^*, a_H^*) = ({res_uncon.res.m_H:.4f}, {res_uncon.res.a_H:.4f})$ matches First-Best $({res_uncon.m_FB_H:.4f}, {res_uncon.a_FB_H:.4f})$.
+  - Type L: $(m_L^*, a_L^*) = ({res_con.res.m_L:.4f}, {res_con.res.a_L:.4f})$ matches First-Best $({res_con.m_FB_L:.4f}, {res_con.a_FB_L:.4f})$.
+  - Type H: $(m_H^*, a_H^*) = ({res_con.res.m_H:.4f}, {res_con.res.a_H:.4f})$ matches First-Best $({res_con.m_FB_H:.4f}, {res_con.a_FB_H:.4f})$.
 - **Incentive Compatibility Check:**
-  - $IC_L$ slack: `{res_uncon.IC_L_slack:.4f}` $> 0$ (strictly slack!).
-  - $IC_H$ slack: `{res_uncon.IC_H_slack:.4f}` $> 0$ (strictly slack!).
+  - $IC_L$ slack: `{res_con.IC_L_slack:.4f}` $> 0$ (strictly slack!).
+  - $IC_H$ slack: `{res_con.IC_H_slack:.4f}` $> 0$ (strictly slack!).
 - **Conclusion:** As predicted by Proposition 5, when principal and agent share an objective (unbiased), incentive compatibility is free, and private information incurs zero distortion!
 
 **Artifacts Generated:**
@@ -139,8 +139,8 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     return {
         "proposition": "Prop 5",
         "passed": passed,
-        "res_uncon": res_uncon,
         "res_con": res_con,
+        "res_uncon": res_uncon,
         "csv_path": csv_path,
         "png_path": png_path,
         "md_path": md_path,

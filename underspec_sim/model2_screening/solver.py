@@ -126,11 +126,24 @@ def solve_menu(
     m_B_L, a_B_L = biased_first_best(kappa_L, effective_params, clip=(not unconstrained_m))
     m_B_H, a_B_H = biased_first_best(kappa_H, effective_params, clip=(not unconstrained_m))
 
+    # Closed-form Prop 6 candidate
+    s_val = effective_params.Lambda - effective_params.c_Q
+    rho_val = (effective_params.lambda_A - effective_params.c_Q) / effective_params.mu_A if effective_params.mu_A > 0 else 0.0
+    denom = s_val * (kappa_H - kappa_L) + rho_val * kappa_L
+    m_H_prop6 = min(k, (effective_params.Lambda * rho_val) / denom) if denom > 0 else m_B_H
+    u_diff = (k - m_H_prop6) * (0.5 * kappa_L * (k + m_H_prop6) - effective_params.c_Q)
+    a_H_prop6 = max(0.0, min(1.0, 1.0 - u_diff / (s_val * (k - m_H_prop6)))) if (k > m_H_prop6 and s_val > 0) else 1.0
+
     candidates_x0 = [
         [float(m_FB_L), float(a_FB_L), float(m_FB_H), float(a_FB_H)],
         [float(m_B_L), float(a_B_L), float(m_B_H), float(a_B_H)],
+        [float(k), 0.0, float(m_H_prop6), float(a_H_prop6)],
+        [float(k), 0.0, float(k), 0.0],
+        [float(m_FB_L), 1.0, float(m_FB_L), 1.0],
+        [float(m_FB_H), 1.0, float(m_FB_H), 1.0],
         [k * 0.8, 0.0, k * 0.4, 1.0],
         [k * 0.5, 0.5, k * 0.5, 0.5],
+        [k * 0.9, 0.2, k * 0.7, 0.8],
     ]
 
     best_res = None
@@ -177,7 +190,14 @@ def solve_menu(
             constraints=constraints,
             options={"ftol": 1e-9, "maxiter": 1000},
         )
-        best_res = res
+        is_fallback_feasible = (
+            ic_L_con(res.x) >= -active_tol
+            and ic_H_con(res.x) >= -active_tol
+            and ir_L_con(res.x) >= -active_tol
+            and ir_H_con(res.x) >= -active_tol
+        )
+        if best_res is None or (is_fallback_feasible and res.fun < best_val):
+            best_res = res
 
     opt_x = best_res.x
     mL, aL, mH, aH = float(opt_x[0]), float(opt_x[1]), float(opt_x[2]), float(opt_x[3])

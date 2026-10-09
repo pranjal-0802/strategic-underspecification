@@ -138,6 +138,12 @@ def solve_pooling_equilibrium(
         else:
             regime = "interior"
             note = f"Clipped domain optimum is interior a_SE = {a_SE:.4f}."
+        if is_concave:
+            a_target = float(np.clip(a_SE_closed, 0.0, 1.0))
+        else:
+            a_target = 1.0 if pi_1 >= pi_0 else 0.0
+        discrepancy = abs(a_SE_grid - a_target)
+        matches = discrepancy <= tolerance
     else:
         if is_concave:
             if 0.0 <= a_SE_closed <= 1.0:
@@ -155,9 +161,8 @@ def solve_pooling_equilibrium(
                 f"Convex/linear regime (Q_bar={Q_bar:.4f} >= 0): "
                 f"optimum is corner a_SE={a_SE:.1f}."
             )
-
-    discrepancy = abs(a_SE - a_SE_grid)
-    matches = discrepancy <= tolerance
+        discrepancy = abs(a_SE - a_SE_grid)
+        matches = discrepancy <= tolerance
 
     return PoolingEquilibriumResult(
         a_SE=a_SE,

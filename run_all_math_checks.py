@@ -63,10 +63,10 @@ def main():
     res_p3 = verify_prop3(output_dir=args.output_dir)
     results.append({
         "item": "Prop 3",
-        "name": "First-Best Threshold & Argmax",
+        "name": "First-Best Asking Dominance & Argmax",
         "verdict": "PASS" if res_p3["passed"] else "FAIL",
         "passed": res_p3["passed"],
-        "note": f"Flipped at kappa*={res_p3['kappa_star']:.3f}; verified argmax on grid",
+        "note": f"Asking weakly dominates on feasible domain (a_FB=1); verified argmax on grid",
     })
 
     # 2. Prop 4
@@ -122,7 +122,7 @@ def main():
         "name": "Screening Recovers First Best",
         "verdict": "PASS" if res_p5["passed"] else "FAIL",
         "passed": res_p5["passed"],
-        "note": f"Recovers FB; IC strictly slack (IC_L={res_p5['res_uncon'].IC_L_slack:.3f}, IC_H={res_p5['res_uncon'].IC_H_slack:.3f})",
+        "note": f"Recovers FB; IC strictly slack on feasible domain (IC_L={res_p5['res_con'].IC_L_slack:.3f}, IC_H={res_p5['res_con'].IC_H_slack:.3f})",
     })
 
     # 7. Prop 6

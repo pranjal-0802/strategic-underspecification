@@ -1,9 +1,9 @@
 r"""
 underspec_sim.verifications.verify_prop3:
 Verifies Proposition 3:
-1. Bang-bang threshold at \kappa^* = (\Lambda + c_Q) / (2k).
-2. Sweep \kappa across fine grid, confirm a_FB flips from 0 to 1 exactly at \kappa^*.
-3. Global optimality: confirm U(m_FB, a_FB; \kappa) >= U(m, a; \kappa) for a grid
+1. Feasible domain asking dominance: for any m <= k and Lambda > c_Q, asking weakly dominates (a^{FB} = 1).
+2. Sweep kappa across fine grid, confirm a_FB = 1 everywhere on the physical domain m in [0, k].
+3. Global optimality: confirm U(m_FB, a_FB; kappa) >= U(m, a; kappa) for a grid
    of alternative (m, a) pairs across the entire parameter domain.
 Outputs:
 - outputs/prop3_first_best.csv
