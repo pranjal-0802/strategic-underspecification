@@ -134,10 +134,15 @@ def solve_menu(
     u_diff = (k - m_H_prop6) * (0.5 * kappa_L * (k + m_H_prop6) - effective_params.c_Q)
     a_H_prop6 = max(0.0, min(1.0, 1.0 - u_diff / (s_val * (k - m_H_prop6)))) if (k > m_H_prop6 and s_val > 0) else 1.0
 
+    c_Q_eff = effective_params.c_Q + rho_val
+    t_share = (f_H / f_L) * (s_val - rho_val) / s_val if (f_L > 0 and s_val > 0) else 0.0
+    m_L_relax = min(k, c_Q_eff / kappa_L) if kappa_L > 0 else k
+
     candidates_x0 = [
         [float(m_FB_L), float(a_FB_L), float(m_FB_H), float(a_FB_H)],
         [float(m_B_L), float(a_B_L), float(m_B_H), float(a_B_H)],
         [float(k), 0.0, float(m_H_prop6), float(a_H_prop6)],
+        [float(m_L_relax), 1.0, float(m_B_H), 1.0],
         [float(k), 0.0, float(k), 0.0],
         [float(m_FB_L), 1.0, float(m_FB_L), 1.0],
         [float(m_FB_H), 1.0, float(m_FB_H), 1.0],

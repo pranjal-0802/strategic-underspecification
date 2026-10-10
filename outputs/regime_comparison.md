@@ -1,4 +1,4 @@
-# Verification Report: Section 6 Regime Comparison (Dominance of Menus)
+# Verification Report: Section 7 Regime Comparison (Dominance of Menus)
 
 **Status:** **PASS** (Dominance Corollary Confirmed With Corrected Pooling Solver)
 
@@ -6,7 +6,7 @@
 - **Dominance Corollary Verified:** Across all 25 2D grid points, Model II payoff weakly exceeds Model I (Min gap: `-0.000000`, Mean gap: `0.1806`, Max gap: `1.1111`).
 - **Audit Against Corrected Solver:**
   - Evaluated using the updated pooling solver with explicit corner-checking ($\Delta\bar\gamma \le 0$).
-  - In this 2D grid ($k=10, L=10, c_Q=2$), pooling is at a corner in 100% of grid points (`pooling_regime: {'corner': 23, 'interior': 2}`).
+  - In this 2D grid ($k=10, L=10, c_Q=2$), pooling selects a corner in 23 of 25 grid points (92.0%), with 2 interior points (breakdown: `{'corner': 23, 'interior': 2}`).
   - Model I payoff reaches a maximum of `86.19` and minimum of `77.92`.
   - Model II payoff reaches a maximum of `86.19` and minimum of `77.92`.
   - Because revealed preference guarantees that any single pooling ask rate $a \in [0, 1]$ is a feasible menu $(m^*(a), a, m^*(a), a)$, the screening policy weakly dominates pooling under both corner and interior pooling regimes.

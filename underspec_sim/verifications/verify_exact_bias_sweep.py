@@ -88,7 +88,7 @@ def solve_exact_screening_menu_point(
         mL, aL, mH, aH = x
         pL = pi_k(mL, aL, kappa_L)
         pH = pi_k(mH, aH, kappa_H)
-        return -(f_L * pL + f_H * pH) + 1e-8 * aL
+        return -(f_L * pL + f_H * pH)
 
     def ic_L(x):
         return exact_user_utility(x[0], x[1], kappa_L, g, k, c_Q, V) - exact_user_utility(x[2], x[3], kappa_L, g, k, c_Q, V)
@@ -136,10 +136,17 @@ def solve_exact_screening_menu_point(
         best_opt = minimize(objective, candidates_x0[0], method="SLSQP", bounds=bounds_4d, constraints=cons)
 
     mL, aL, mH, aH = [float(val) for val in best_opt.x]
-    ic_L_slack = float(ic_L(best_opt.x))
-    ic_H_slack = float(ic_H(best_opt.x))
-    ir_L_slack = float(ir_L(best_opt.x))
-    ir_H_slack = float(ir_H(best_opt.x))
+    # At full specification m = k, residual uncertainty is 0, so asking rate is payoff-irrelevant
+    if mL >= k - 1e-4:
+        aL = 0.0
+    if mH >= k - 1e-4:
+        aH = 0.0
+    opt_x_clean = [mL, aL, mH, aH]
+
+    ic_L_slack = float(ic_L(opt_x_clean))
+    ic_H_slack = float(ic_H(opt_x_clean))
+    ir_L_slack = float(ir_L(opt_x_clean))
+    ir_H_slack = float(ir_H(opt_x_clean))
 
     active_cons = []
     if abs(ic_L_slack) <= 1e-4:

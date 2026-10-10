@@ -247,3 +247,18 @@ def test_table1_clipped_payoff_differences():
     assert abs(g3_k5["unclipped_delta"] - (-36.80)) < 0.05
 
 
+def test_prop5_guessing_trap():
+    """Verify Proposition 5 (The Guessing Trap) verification runner."""
+    from underspec_sim.verifications.verify_prop5_guessing_trap import run_verification
+    res = run_verification()
+    assert res["passed"] is True
+
+
+def test_welfare_ordering_across_bias_bands():
+    """Verify welfare ordering across bias bands between pooling and screening."""
+    from underspec_sim.verifications.verify_welfare_ordering import run_verification
+    res = run_verification()
+    assert res["passed"] is True
+
+
+

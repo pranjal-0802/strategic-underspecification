@@ -72,10 +72,12 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     passed = all_dominate and (min_gap >= -1e-4)
 
     regimes_counts = df["pooling_regime"].value_counts().to_dict()
-    max_gap = float(df["payoff_gap"].max())
     mean_gap = float(df["payoff_gap"].mean())
+    max_gap = float(df["payoff_gap"].max())
+    n_corner = regimes_counts.get("corner", 0)
+    pct_corner = (n_corner / len(df)) * 100 if len(df) > 0 else 0.0
 
-    md_content = fr"""# Verification Report: Section 6 Regime Comparison (Dominance of Menus)
+    md_content = fr"""# Verification Report: Section 7 Regime Comparison (Dominance of Menus)
 
 **Status:** **{'PASS' if passed else 'FAIL'}** (Dominance Corollary Confirmed With Corrected Pooling Solver)
 
@@ -83,7 +85,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 - **Dominance Corollary Verified:** Across all {len(df)} 2D grid points, Model II payoff weakly exceeds Model I (Min gap: `{min_gap:.6f}`, Mean gap: `{mean_gap:.4f}`, Max gap: `{max_gap:.4f}`).
 - **Audit Against Corrected Solver:**
   - Evaluated using the updated pooling solver with explicit corner-checking ($\Delta\bar\gamma \le 0$).
-  - In this 2D grid ($k=10, L=10, c_Q=2$), pooling is at a corner in 100% of grid points (`pooling_regime: {regimes_counts}`).
+  - In this 2D grid ($k=10, L=10, c_Q=2$), pooling selects a corner in {n_corner} of {len(df)} grid points ({pct_corner:.1f}%), with {len(df) - n_corner} interior points (breakdown: `{regimes_counts}`).
   - Model I payoff reaches a maximum of `{df['pi_pooling'].max():.2f}` and minimum of `{df['pi_pooling'].min():.2f}`.
   - Model II payoff reaches a maximum of `{df['pi_screening'].max():.2f}` and minimum of `{df['pi_screening'].min():.2f}`.
   - Because revealed preference guarantees that any single pooling ask rate $a \in [0, 1]$ is a feasible menu $(m^*(a), a, m^*(a), a)$, the screening policy weakly dominates pooling under both corner and interior pooling regimes.

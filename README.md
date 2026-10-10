@@ -37,15 +37,16 @@ The table below maps every proposition, corollary, and robustness check in the p
 | **Sec 4.1** | **Prop 3** (First-Best Policy on Feasible Domain) | `underspec_sim/verifications/verify_prop3.py` | `tests/test_first_best.py` | `outputs/prop3_first_best.csv`, `.png`, `.md` | **PASS** *(verified on grid)* |
 | **Sec 5.1** | **Prop 4** (Stackelberg Pooling Rate $a^{SE}$) | `underspec_sim/verifications/verify_prop4.py` | `tests/test_pooling.py` | `outputs/prop4_pooling_closed_form.csv`, `.png`, `.md` | **PASS** *(matches grid under SOC)* |
 | **Sec 5.1** | **Cor 2** (Friction Bias Suppresses Pooling Rate) | `underspec_sim/verifications/verify_cor2.py` | `tests/test_pooling.py` | `outputs/cor2_bias_direction.csv`, `.png`, `.md` | **PASS** *(strictly $\partial a^{SE}/\partial\lambda_A \le 0$ on valid domain)* |
-| **Sec 5.1** | **Lemma 1** (Effective Question Cost & Ray Invariance) | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(derivative ratio $= -\tilde\rho$)* |
+| **Sec 5.1** | **Lemma 1** (Welfare Friction Wedge & Ray Invariance) | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(derivative ratio $= -\tilde\rho$)* |
 | **Sec 5.1** | **Cor 3** (Continuous Transition Across Friction Regimes) | `underspec_sim/verifications/verify_mu_lambda_corner.py` | `tests/test_mu_lambda_corner.py` | `outputs/mu_lambda_corner.csv`, `.png`, `.md` | **PASS** *(transitions continuously across regimes)* |
 | **Sec 5.1** | **Cor 4** (Pooling is a Corner Solution in Unbiased Case) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `outputs/cor3_interiority.csv`, `.png`, `.md` | **PASS** *(unbiased is corner; biased is interior)* |
-| **Sec 5.2** | **Prop 5** (The Guessing Trap: Capability Reversal) | `underspec_sim/verifications/verify_prop5.py` | `tests/test_pooling.py` | `outputs/prop5_screening_no_bias.csv`, `.png`, `.md` | **PASS** *($da^{SE}/dg < 0$, prompt lengthening verified)* |
+| **Sec 5.2** | **Prop 5** (The Guessing Trap: Capability Reversal) | `underspec_sim/verifications/verify_prop5_guessing_trap.py` | `tests/test_pooling.py` | `outputs/prop5_guessing_trap.csv`, `.png`, `.md` | **PASS** *($da^{SE}/dg < 0$, prompt lengthening verified)* |
 | **Sec 7.1** | **Table 1** (Unbiased Pooling Sensitivity & Clipped Differences) | `underspec_sim/verifications/generate_table1.py` | `tests/test_pooling.py` | `outputs/table1_unbiased_sensitivity.csv`, `.md` | **PASS** *(all 11 rows strictly positive in [+0.15, +20.10])* |
 | **Sec 6.1** | **Prop 6** (Zero Distortion Without Bias) | `underspec_sim/verifications/verify_prop5.py` | `tests/test_screening.py` | `outputs/prop5_screening_no_bias.csv`, `.png`, `.md` | **PASS** *(recovers FB; IC slack)* |
 | **Sec 6.2** | **Prop 7** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `outputs/prop6_screening_biased.csv`, `.png`, `.md`, `outputs/prop6_bias_sweep_active_constraints.csv`, `.png` | **PASS** *(active set characterized)* |
 | **Sec 6.2** | **Remark** (Heterogeneity vs Bias Separability) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `outputs/distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** *(2D sweep verified)* |
 | **Sec 7** | **Cor 5** (Dominance of Menus over Pooling) | `underspec_sim/verifications/compare_regimes_runner.py` | `tests/test_comparison.py` | `outputs/regime_comparison.csv`, `.png`, `.md` | **PASS** *(dominance verified across grid)* |
+| **Sec 7** | **Welfare Ordering** (User Welfare Ordering Across Bias Bands) | `underspec_sim/verifications/verify_welfare_ordering.py` | `tests/test_pooling.py` | `outputs/welfare_ordering.csv`, `.png`, `.md` | **PASS** *(mild bias: pool wins; mod bias: screen wins; tie at shutdown)* |
 | **Sec 10** | **Robustness 1** (Exact vs Linear-Risk Conjunctive Model) | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `outputs/exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner survives in 100% of tested points)* |
 | **Sec 10** | **Robustness 2** (Assumption 1 Regularity Grid Audit) | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `outputs/assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(corrected $\ge -1$ holds in 89.9%)* |
 | **Sec 10** | **Robustness 3** (Monotonicity Survival & Tightness) | `underspec_sim/verifications/verify_monotonicity_survival.py` | `tests/test_monotonicity_survival.py` | `outputs/monotonicity_survival.csv`, `.png`, `.md` | **PASS** *(mono holds 100% under Ass1; breaks in 96.7% outside)* |
@@ -59,16 +60,16 @@ The computational verification suite evaluates the analytical claims across repr
 
 ### 1. Corollary 4 (Pooling is a Corner Solution in the Unbiased Case)
 - **Proposition 4** provides the closed-form pooling stationary point derived directly from primitives:
-  $$\Pi(a) = \text{const} + \bar L\,a + \bar Q\,a^2, \qquad a^{SE} = -\frac{\bar L}{2\bar Q} = -\frac{(\mu_A s - b)\bar R_0}{(\mu_A s - 2b)\bar\gamma}$$
-  provided $\bar Q < 0$ (strict concavity SOC, equivalent to $2(\lambda_A - c_Q) > \mu_A(\Lambda - c_Q)$), where $s \equiv \Lambda - c_Q$ and $b \equiv \lambda_A - c_Q$.
+  $$\Pi(a) = \text{const} + \alpha_1\,a + \alpha_2\,a^2, \qquad a^{SE} = -\frac{\alpha_1}{2\alpha_2} = -\frac{(\mu_A s - b)\bar R_0}{(\mu_A s - 2b)\bar\gamma}$$
+  provided $\alpha_2 < 0$ (strict concavity SOC, equivalent to $2(\lambda_A - c_Q) > \mu_A(\Lambda - c_Q)$), where $s \equiv \Lambda - c_Q$ and $b \equiv \lambda_A - c_Q$.
 - In the unbiased baseline ($\mu_A = 1, \lambda_A = c_Q \implies b = 0$):
-  $$\bar Q = \frac{s\,\bar\gamma}{2} = \frac{s^2\,\mathbb{E}[1/\kappa]}{2} = \frac{(\Lambda - c_Q)^2\,\mathbb{E}[1/\kappa]}{2} \ge 0 \quad \text{always}$$
-- Because $\bar Q \ge 0$, **the leader payoff $\Pi(a)$ is weakly convex in $a$** on $[0, 1]$.
+  $$\alpha_2 = \frac{s\,\bar\gamma}{2} = \frac{s^2\,\mathbb{E}[1/\kappa]}{2} = \frac{(\Lambda - c_Q)^2\,\mathbb{E}[1/\kappa]}{2} \ge 0 \quad \text{always}$$
+- Because $\alpha_2 \ge 0$, **the leader payoff $\Pi(a)$ is weakly convex in $a$** on $[0, 1]$.
 - Any weakly convex function on a compact interval achieves its maximum at a **boundary corner** ($a = 0$ or $a = 1$).
 - Direct comparison in unclipped algebra yields the selection criterion:
-  $$\Pi(1) - \Pi(0) = \bar L + \bar Q = (\Lambda - c_Q)\left(\bar R_0 + \frac{\bar\gamma}{2}\right) = (\Lambda - c_Q)\left[k - \frac{\Lambda + c_Q}{2}\mathbb{E}\left[\frac{1}{\kappa}\right]\right]$$
+  $$\Pi(1) - \Pi(0) = \alpha_1 + \alpha_2 = (\Lambda - c_Q)\left(\bar R_0 + \frac{\bar\gamma}{2}\right) = (\Lambda - c_Q)\left[k - \frac{\Lambda + c_Q}{2}\mathbb{E}\left[\frac{1}{\kappa}\right]\right]$$
   When followers are constrained to the feasible domain $m \le k$, Proposition 3 implies that asking ($a^{SE} = 1$) weakly dominates guessing unconditionally under linear risk.
-- **Biased Regime:** Away from the unbiased baseline, when friction is sufficiently high ($2b > \mu_A s$), $\bar Q < 0$ and $\Pi(a)$ becomes strictly concave, producing a true interior stationary maximum.
+- **Biased Regime:** Away from the unbiased baseline, when friction is sufficiently high ($2b > \mu_A s$), $\alpha_2 < 0$ and $\Pi(a)$ becomes strictly concave, producing a true interior stationary maximum.
 - The solver and automated verification suite agree with this closed-form selection rule across all tested configurations.
 
 ### 2. Corollary 2 (Friction Bias Suppresses Pooling Rate on Interior Branch)
@@ -99,14 +100,14 @@ The computational verification suite evaluates the analytical claims across repr
   - Across tested finite-difference parameter intervals in $(k, q, \kappa) \in [5, 15] \times [0.70, 0.99] \times [0.20, 2.00]$, whenever Assumption 1 holds ($(k-m^*)\ln q \ge -1$), $m^*(g)$ is weakly decreasing in $g$ without exception.
   - Where Assumption 1 fails ($(k-m^*)\ln q < -1$), the cross-partial turns positive and monotonicity breaks in the vast majority of intervals, confirming the necessity of the regularity condition.
 
-### 6. Lemma 1: Effective Question Cost & Ray-Invariance
-- The leader objective satisfies $\Pi(m, a) = \mu_A [U(m, a) - \tilde\rho a(k-m)]$, proving mathematical isomorphism to an unbiased planner with effective question cost $c_Q^{eff} = c_Q + \tilde\rho$.
+### 6. Lemma 1: Leader Objective as User Welfare with an Asking Friction Wedge
+- The leader objective satisfies $\Pi(m, a) = \mu_A [U(m, a) - \tilde\rho a(k-m)]$, pricing clarification at $c_Q^{eff} = c_Q + \tilde\rho$ from the leader's perspective, while followers continue to optimize against true private question cost $c_Q$.
 - On the interior branch, the marginal rate of substitution between bias parameters is:
   $$\frac{\partial a^{SE} / \partial \mu_A}{\partial a^{SE} / \partial \lambda_A} = -\frac{\lambda_A - c_Q}{\mu_A} = -\tilde\rho$$
 - Level curves of $a^{SE}$ form constant rays along $\tilde\rho = \text{constant}$, establishing observational equivalence along rays of normalized friction.
 
 ### 7. Corollary 3: Continuous Transition Across Friction Regimes
-- On the strictly concave branch ($\bar Q < 0$), the optimal pooling policy transitions continuously across three friction regimes: universal asking ($a^{SE} = 1$) for $\tilde\rho \le \tilde\rho_1$, interior asking ($a^{SE} \in (0, 1)$) for $\tilde\rho_1 < \tilde\rho < s$, and shutdown ($a^{SE} = 0$) for $\tilde\rho \ge s$.
+- On the strictly concave branch ($\alpha_2 < 0$), the optimal pooling policy transitions continuously across three friction regimes: universal asking ($a^{SE} = 1$) for $\tilde\rho \le \tilde\rho_1$, interior asking ($a^{SE} \in (0, 1)$) for $\tilde\rho_1 < \tilde\rho < s$, and shutdown ($a^{SE} = 0$) for $\tilde\rho \ge s$.
 - In the corner regime, the selection difference satisfies $\Pi(1) - \Pi(0) = \mu_A \cdot \left[ s(\bar R_0 + \bar\gamma/2) - \tilde\rho(\bar R_0 + \bar\gamma) \right]$, so the sign of $\Pi(1) - \Pi(0)$ depends strictly and solely on the ratio $\tilde\rho = (\lambda_A - c_Q)/\mu_A$.
 
 ### 8. Constraint Co-activity ($\text{IC}_H$) Under Extreme Bias
@@ -132,10 +133,10 @@ pip install -e .
 ```
 
 ### Running Non-LLM Mathematical Verifications
-Runs all 15 verification and follow-up robustness suites, generates all CSVs and PNGs in `outputs/`, and prints a formatted summary table (~75s runtime):
+Runs all 17 verification and follow-up robustness suites, generates all CSVs and PNGs in `outputs/`, and prints a formatted summary table (~80s runtime):
 
 ```bash
-# Strict mode: exits nonzero (1) if any proposition fails (offline, fast ~75s)
+# Strict mode: exits nonzero (1) if any proposition fails (offline, fast ~80s)
 python3 run_all_math_checks.py
 
 # Non-strict reporting mode: prints table and exits 0
@@ -143,7 +144,7 @@ python3 run_all_math_checks.py --ignore-failures
 ```
 
 ### Running Unit Tests (pytest)
-Runs 50 comprehensive algebraic, numerical, regression, and symbolic tests:
+Runs 52 comprehensive algebraic, numerical, regression, and symbolic tests:
 ```bash
 pytest tests/ -q
 ```
@@ -199,12 +200,12 @@ strategic-underspecification/
 │   ├── model1_pooling/                 # Quadratic pooling payoff & closed-form solver
 │   ├── model2_screening/               # Constrained menu solver & active-set audit
 │   ├── comparison/                     # Regime dominance & welfare decomposition
-│   ├── verifications/                  # 15 standalone proposition & robustness runners
+│   ├── verifications/                  # 17 standalone proposition & robustness runners
 │   ├── llm/                            # Anthropic client with retry, SQLite logging, dry-run
 │   └── experiments_llm/                # Simulated user experiments
-├── tests/                              # Pytest test suite (50 unit, regression & symbolic tests)
+├── tests/                              # Pytest test suite (52 unit, regression & symbolic tests)
 ├── outputs/                            # Generated artifacts (CSVs, high-res PNGs, Markdown)
-└── run_all_math_checks.py              # Master runner executing all 15 mathematical checks
+└── run_all_math_checks.py              # Master runner executing all 17 mathematical checks
 ```
 
 ---
