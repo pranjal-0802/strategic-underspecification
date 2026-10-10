@@ -187,6 +187,9 @@ def solve_exact_screening_menu_point(
 
 
 def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    if output_dir == "outputs":
+        output_dir = os.path.join(repo_root, "outputs")
     os.makedirs(output_dir, exist_ok=True)
 
     # Primitives aligned with verify_prop6.py and verify_exact_conjunctive.py
@@ -293,15 +296,24 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     passed = bool(both_ic_count > 0)
     verdict = "PASS" if passed else "FAIL"
 
+    lin_none_count = int((~df_linear['IC_L_active'] & ~df_linear['IC_H_active']).sum()) if df_linear is not None else 'N/A'
+    lin_none_pct = f"{((~df_linear['IC_L_active'] & ~df_linear['IC_H_active']).mean()*100):.1f}%" if df_linear is not None else 'N/A'
+
+    lin_icl_count = int((df_linear['IC_L_active'] & ~df_linear['IC_H_active']).sum()) if df_linear is not None else 'N/A'
+    lin_icl_pct = f"{((df_linear['IC_L_active'] & ~df_linear['IC_H_active']).mean()*100):.1f}%" if df_linear is not None else 'N/A'
+
+    lin_both_count = int((df_linear['IC_L_active'] & df_linear['IC_H_active']).sum()) if df_linear is not None else 'N/A'
+    lin_both_pct = f"{((df_linear['IC_L_active'] & df_linear['IC_H_active']).mean()*100):.1f}%" if df_linear is not None else 'N/A'
+
     # Generate Markdown Report
     md_content = f"""# Verification Report: Constraint Binding Under Exact Conjunctive Payoff
 
 ## Overview
-- **Reference**: `paper/strategic_underspecification.tex`, Proposition 6, Remark following Proposition 6, Section 8 (Discussion).
+- **Reference**: `paper/strategic_underspecification.tex`, Proposition 7, Remark 7, Section 10 (Discussion).
 - **Key Question**: Does the extreme-bias reversal (where $\\text{{IC}}_H$ binds alongside $\\text{{IC}}_L$ under severe bias) occur under the **EXACT** conjunctive payoff $q(a,g)^{{k-m}}$, or does the exact form prevent $\\text{{IC}}_H$ from ever binding?
 - **Grid Swept**: $\\lambda_A \\in [c_Q, 10 c_Q] = [2.0, 20.0]$ (10 values), $\\mu_A \\in [0.1, 1.0]$ (10 values), totaling **{total_points}** screening menu optimizations.
 
----
+***
 
 ## Executive Summary & Verdict: **{verdict}**
 
@@ -310,11 +322,9 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
    - In the exact conjunctive model, $\\text{{IC}}_H$ **does indeed bind** under extreme bias.
    - Out of {total_points} grid points:
      - **None bind** (unbiased / low bias, first-best implementable): **{none_active_count} points ({none_active_count/total_points*100:.1f}%)**
-     - **$\\text{{IC}}_L$ alone binds** (standard Proposition 6 screening regime): **{ic_l_only_count} points ({ic_l_only_count/total_points*100:.1f}%)**
+     - **$\\text{{IC}}_L$ alone binds** (standard Proposition 7 screening regime): **{ic_l_only_count} points ({ic_l_only_count/total_points*100:.1f}%)**
      - **$\\text{{IC}}_L + \\text{{IC}}_H$ both bind** (extreme bias regime): **{both_ic_count} points ({both_ic_count/total_points*100:.1f}%)**
-   - The paper's caveat in the Remark following Proposition 6:
-     > *"IC_H could plausibly bind under sufficiently extreme bias"*
-     is **strictly validated** under the exact conjunctive payoff.
+   - The paper's analysis in Remark 7 is confirmed under the exact conjunctive payoff.
 
 2. **Structural Concordance Between Exact and Linear-Risk Models**:
    - Both models partition the $(\\mu_A, \\lambda_A)$ plane into the identical three qualitative regimes:
@@ -323,26 +333,22 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
      3. **Extreme Bias** ($\\lambda_A \\ge 8.0$ at $\\mu_A = 1.0$, or low $\\mu_A \\le 0.3$): $\\text{{IC}}_H$ becomes active alongside $\\text{{IC}}_L$, pooling or severely compressing the menu.
    - The boundary between moderate and extreme bias shifts slightly under the exact payoff ($\\lambda_A \\approx 6.0$ to $8.0$ at $\\mu_A = 1.0$), but the qualitative topology of the contract space is preserved identically.
 
----
+***
 
 ## Active Constraint Distribution Table
 | Active Constraints | Description | Exact Model Count | Exact % | Linear Model Count | Linear % |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| **None** | First-Best Implementable | {none_active_count} | {none_active_count/total_points*100:.1f}% | {int((~df_linear['IC_L_active'] & ~df_linear['IC_H_active']).sum()) if df_linear is not None else 'N/A'} | {((~df_linear['IC_L_active'] & ~df_linear['IC_H_active']).mean()*100):.1f}% |
-| **$\\text{{IC}}_L$ Only** | Proposition 6 Standard Regime | {ic_l_only_count} | {ic_l_only_count/total_points*100:.1f}% | {int((df_linear['IC_L_active'] & ~df_linear['IC_H_active']).sum()) if df_linear is not None else 'N/A'} | {((df_linear['IC_L_active'] & ~df_linear['IC_H_active']).mean()*100):.1f}% |
-| **$\\text{{IC}}_L + \\text{{IC}}_H$** | Extreme Bias Reversal | {both_ic_count} | {both_ic_count/total_points*100:.1f}% | {int((df_linear['IC_L_active'] & df_linear['IC_H_active']).sum()) if df_linear is not None else 'N/A'} | {((df_linear['IC_L_active'] & df_linear['IC_H_active']).mean()*100):.1f}% |
+| :--: | :--: | :--: | :--: | :--: | :--: |
+| **None** | First-Best Implementable | {none_active_count} | {none_active_count/total_points*100:.1f}% | {lin_none_count} | {lin_none_pct} |
+| **$\\text{{IC}}_L$ Only** | Proposition 7 Standard Regime | {ic_l_only_count} | {ic_l_only_count/total_points*100:.1f}% | {lin_icl_count} | {lin_icl_pct} |
+| **$\\text{{IC}}_L + \\text{{IC}}_H$** | Extreme Bias Reversal | {both_ic_count} | {both_ic_count/total_points*100:.1f}% | {lin_both_count} | {lin_both_pct} |
 | **$\\text{{IC}}_H$ Only** | Reverse Screening | 0 | 0.0% | 0 | 0.0% |
 
----
+***
 
-## Resolution of the Open Question in Section 8
-The paper stated in Section 8 (Discussion):
-> *"the further finding (Remark following Proposition 6) that $\\text{{IC}}_H$ can bind under sufficiently extreme bias was established only under the linear-risk approximation and has not yet been confirmed under the exact conjunctive form; that remains open."*
-
-**Answer**: **The open question is resolved affirmatively.**
+## Conclusion
 The extreme-bias binding of $\\text{{IC}}_H$ is NOT an artifact of the linear-risk approximation. It is an intrinsic feature of the Stackelberg screening game when the leader's subjective objective diverges severely from the users' true welfare.
 
----
+***
 
 ## Artifacts Generated
 - CSV: `outputs/exact_bias_sweep.csv`

@@ -40,10 +40,37 @@ def test_prop5_unbiased_menu():
 
 
 def test_prop6_biased_menu_distortion():
-    """Proposition 6: Downward distortion of high-cost type under under-asking bias."""
+    """Proposition 6/7: Downward distortion of high-cost type under under-asking bias."""
     p = ModelParams(k=10.0, g=0.5, L=10.0, c_Q=2.0, V=100.0, mu_A=1.0, lambda_A=4.0)
     res = check_distortion_under_bias(kappa_L=0.3, kappa_H=0.5, lambda_A=4.0, params=p, unconstrained_m=False)
     assert res.passed is True
     assert res.a_L_at_corner is True
     assert res.a_H_strictly_below_biased_fb is True
     assert "IC_L" in res.active_constraints
+
+
+def test_prop7_boundary_saturation_narrow_heterogeneity():
+    """Proposition 7 Claim 4: When m_H^* > k (narrow heterogeneity), menu collapses to boundary pooling at (k, 0)."""
+    p = ModelParams(k=10.0, g=0.5, L=10.0, c_Q=2.0, V=100.0, mu_A=1.0, lambda_A=3.0)
+    res = solve_menu(kappa_L=0.26, kappa_H=0.31, f_L=0.5, f_H=0.5, mu_A=1.0, lambda_A=3.0, c_Q=2.0, params=p, unconstrained_m=False)
+    assert res.m_L == pytest.approx(10.0, abs=1e-5)
+    assert res.m_H == pytest.approx(10.0, abs=1e-5)
+    assert res.a_L == pytest.approx(0.0, abs=1e-5)
+    assert res.a_H == pytest.approx(0.0, abs=1e-5)
+
+
+def test_prop7_effort_distortion_regime():
+    """Proposition 7 Claim 2: Intermediate complexity k_slack < k <= k_crit yields pure effort distortion (a_H = 1, m_H < m_H^B)."""
+    p = ModelParams(k=7.5, g=0.5, L=10.0, c_Q=2.0, V=100.0, mu_A=1.0, lambda_A=3.0)
+    # k_slack = 4 / 0.3 - 3 / 0.5 = 7.333
+    # m_H^* = 5 / (3 * 0.2 + 0.3) = 5.556
+    # k_crit = 4 / 0.3 - 5.556 = 7.778
+    # k = 7.5 lies strictly in (k_slack, k_crit]
+    res = solve_menu(kappa_L=0.3, kappa_H=0.5, f_L=0.5, f_H=0.5, mu_A=1.0, lambda_A=3.0, c_Q=2.0, params=p, unconstrained_m=False)
+    assert "IC_L" in res.active_constraints
+    assert res.a_H == pytest.approx(1.0, abs=1e-4)
+    expected_m_H = 2.0 * 2.0 / 0.3 - 7.5  # 5.8333...
+    assert res.m_H == pytest.approx(expected_m_H, abs=1e-4)
+    # Compare with unconstrained biased benchmark m_H^B = c_Q^eff / kappa_H = 3.0 / 0.5 = 6.0
+    assert res.m_H < 6.0
+

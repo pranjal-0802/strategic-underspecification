@@ -4,6 +4,7 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{mathtools}
 \usepackage{enumitem}
+\usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{natbib}
 \usepackage{booktabs}
@@ -23,9 +24,9 @@
 \maketitle
 
 \begin{abstract}
-Users of coding assistants routinely write terse prompts, relying on the assistant to handle missing details through guessing or clarifying questions. We develop a contract-theoretic model of endogenous clarification in human--AI interaction. Prompt shortening is not driven by moral hazard: by the envelope theorem, improving raw guessing accuracy weakly improves user welfare despite shortening prompts, reflecting rational effort substitution ($m^*(a) \le m^*(0)$). When clarification policies are opaque, naive users who overestimate clarification willingness ($a^\dagger > a_A$) under-specify relative to the assistant's true policy ($m^*_{\text{naive}} < m^*_{\text{soph}}$), incurring quadratic deadweight losses. Under Stackelberg commitment with transparent policies, however, an assistant with under-asking friction bias ($\lambda_A > c_Q$) suppresses clarification, which paradoxically forces sophisticated users to over-specify upstream ($m^* > m^{FB}$) to defensively insure against guessing errors.
+Users of coding assistants routinely write terse prompts, relying on the assistant to handle missing details through guessing or clarifying questions. We develop a contract-theoretic model of endogenous clarification in human--AI interaction. Prompt shortening is not driven by moral hazard: by the envelope theorem, improving raw guessing accuracy weakly improves user welfare despite shortening prompts, reflecting rational effort substitution ($m^*(a) \le m^*(0)$). When clarification policies are opaque, naive users who overestimate clarification willingness ($a^\dagger > a_A$) under-specify relative to the assistant's true policy ($m^*_{\text{naive}} < m^*_{\text{soph}}$), incurring quadratic deadweight losses $\frac{s^2(a^\dagger - a_A)^2}{2\kappa}$. Under Stackelberg commitment with transparent policies, however, an assistant with under-asking friction bias ($\lambda_A > c_Q$) suppresses clarification, which paradoxically forces sophisticated users to over-specify upstream ($m^* > m^{FB}$) to defensively insure against guessing errors.
 
-Closing the loop under uniform \emph{pooling} and effort-conditioned \emph{screening} governance regimes, we establish that on the physically feasible domain ($m \le k$), asking weakly dominates guessing whenever clarification is cost-effective ($c_Q < \Lambda$). Under pooling, provider asking friction ($\lambda_A > c_Q$) suppresses clarification ($\partial a^{SE}/\partial \lambda_A \le 0$). This induces an equilibrium capability reversal (the ``guessing trap''): higher raw guessing accuracy reduces the return to asking, leading biased assistants to slash clarification so sharply that users must write longer prompts ($d\mathbb{E}[m^*]/dg > 0$) and suffer lower welfare ($dW/dg < 0$). Under screening, provider bias induces adverse-selection downward distortion on terse users ($a_H^{SB} < a_H^B$) when low-cost effort saturates ($\kappa_L \le \bar\kappa_L$), while boundary relaxation ($\bar\kappa_L < \kappa_L \le c_Q^{eff}/k$) tempers this distortion. We delineate genuine screening distortion from technological clarification shutdown ($c_Q^{eff} \ge \Lambda$), show that nonlinear probability curvature generates interior trade-offs, and propose an empirical randomized controlled trial.
+Closing the loop under uniform \emph{pooling} and effort-conditioned \emph{screening} governance regimes, we establish that on the physically feasible domain ($m \le k$), asking weakly dominates guessing whenever clarification is cost-effective ($c_Q < \Lambda$). Under pooling, provider asking friction ($\lambda_A > c_Q$) suppresses clarification ($\partial a^{SE}/\partial \lambda_A \le 0$). This can induce an equilibrium capability reversal (the ``guessing trap''): when the assistant's asking rate declines sufficiently steeply with guessing capability, users must write longer prompts ($d\mathbb{E}[m^*]/dg > 0$) and suffer lower welfare ($dW/dg < 0$). Under screening, provider bias induces adverse-selection downward distortion on terse users ($a_H^{SB} < a_H^B$) when low-cost effort saturates ($\kappa_L \le \bar\kappa_L$) and task complexity satisfies $k > k_{\text{crit}}$, while intermediate complexity induces an effort-distortion regime ($a_H = 1, m_H < m_H^B$), and boundary relaxation ($\bar\kappa_L < \kappa_L \le c_Q^{eff}/k$) tempers asking distortion. We delineate genuine screening distortion from technological clarification shutdown ($c_Q^{eff} \ge \Lambda$), show that nonlinear probability curvature generates interior trade-offs, and evaluate empirical implementation protocols.
 
 \vspace{0.75em}
 \noindent\textbf{Keywords:} Human--AI Interaction, Clarification Policies, Stackelberg Games, Contract Theory, Adverse Selection.
@@ -34,7 +35,7 @@ Closing the loop under uniform \emph{pooling} and effort-conditioned \emph{scree
 \noindent\textbf{Code Availability:} Simulation suite and verification scripts are available at \url{https://github.com/pranjal-0802/strategic-underspecification}.
 
 \vspace{0.25em}
-\noindent\textbf{AI-Use Disclosure:} Generative AI tools were used for code testing, simulation harnesses, and LaTeX syntax checking. All conceptual formulations, economic arguments, and mathematical proofs were developed and verified by the author.
+\noindent\textbf{AI-Use Disclosure:} AI assistance tools were used for simulation code development, test suites, and copy-editing suggestions. All conceptual formulations, economic models, mathematical proofs, and analytical interpretations were developed and verified by the author.
 \end{abstract}
 
 \section{Introduction}
@@ -233,7 +234,16 @@ In the exact conjunctive model $U(m,a) = V q(a,g)^{k-m} - c(m) - a c_Q (k-m)$, t
 Even when Assumption~\ref{ass:reg} holds, the question-answering cost term $+c_Q$ can dominate if questions are costly relative to baseline task value $V$. For example, with $k=5, V=10, \kappa=0.5, g=0.8, c_Q=2, a_A=0.1$, and $a^\dagger=0.6$, Assumption~\ref{ass:reg} holds across the domain, yet sophisticated users choose $m^*_{\text{soph}} = 3.15$ while naive users choose $m^*_{\text{naive}} = 3.92$. Here, the naive user anticipates substantial clarification costs and over-specifies upstream to avoid conversational interruptions. Proposition~\ref{prop:bias} thus isolates the regime where clarification is socially cost-effective ($\Lambda > c_Q$), which is the relevant environment for helpful automated assistants.
 \end{remark}
 
-This identifies the mechanism of welfare loss under opaque policies: an unobserved gap between the user's belief regarding the assistant's policy and the assistant's actual policy. In Section~\ref{sec:stackelberg}, we close the loop by modeling the assistant as a strategic Stackelberg leader. Under transparent commitment, sophisticated users know the true policy $a_A$. As we show in Sections~\ref{sec:model1}--\ref{sec:model2}, provider asking friction ($\lambda_A > c_Q$) suppresses clarification ($a < 1$), leading sophisticated users to over-specify relative to first-best ($m^*(a) > m^{FB}$) to defensively insure against guessing errors.
+This identifies the dual nature of specification distortions across informational regimes:
+\begin{enumerate}[leftmargin=*]
+\item \emph{Opaque policies and strategic under-specification:} When users naively trust the assistant to provide first-best clarification ($a^\dagger = a^{FB} = 1$), they write concise prompts calibrated to full assistance ($m^*_{\text{naive}} = m^{FB} = c_Q/\kappa$). If the assistant is a biased Stackelberg leader implementing an asking-suppressed policy $a_A = a^{SE} < 1$, naive users under-specify relative to what the biased environment demands ($m^*_{\text{naive}} < m^*_{\text{soph}}$). Their welfare shortfall from misplaced trust is:
+\[
+\Delta U_{\text{naive}} \;\equiv\; U(m^*_{\text{soph}}; a^{SE}) \;-\; U(m^*_{\text{naive}}; a^{SE}) \;=\; \frac{(\Lambda - c_Q)^2}{2\kappa}\big(1 - a^{SE}\big)^2 \;=\; \frac{s^2 (1 - a^{SE})^2}{2\kappa},
+\]
+which is strictly positive whenever the leader strategically withholds clarification ($a^{SE} < 1$).
+\item \emph{Transparent policies and defensive over-specification:} Under transparent Stackelberg commitment, sophisticated users know the leader's operational policy $a^{SE}$. Because the biased leader under-asks ($a^{SE} < 1$), sophisticated users cannot rely on clarification downstream. They compensate by defensively lengthening prompts beyond the first-best level ($m^*(a^{SE}) > m^{FB}$), substituting costly private effort for missing automated assistance.
+\end{enumerate}
+Sections~\ref{sec:stackelberg}--\ref{sec:compare} close the loop by modeling how the assistant endogenously chooses this clarification policy under pooling and screening governance mechanisms.
 
 \section{The Assistant's Policy as a Stackelberg Game}
 \label{sec:stackelberg}
@@ -253,7 +263,11 @@ where $\mu_A \in (0,1]$ discounts the leader's weight on true downstream user we
 \item \emph{Asking friction bias} ($\lambda_A > c_Q$): Reinforcement learning from human feedback (RLHF) and preference optimization algorithms (e.g., DPO) commonly evaluate conversation turns in isolation. Reward models systematically penalize ``evasive'' clarifying questions in favor of immediate code generation because users in rating pools favor direct answers. Furthermore, multi-turn interactions increase token costs, context-window expansion, and inference latency, creating provider-side pressure to suppress clarification turns.
 \item \emph{Downstream welfare discounting} ($\mu_A < 1$): Turn-level user satisfaction signals (such as prompt acceptance or immediate positive feedback) capture immediate session fluency. In contrast, the true economic loss $L$ from broken conventions, subtle edge-case errors, or security defects is typically discovered hours or days later in downstream execution, test suites, or code review. Consequently, training objectives tuned to immediate session retention tend to discount downstream correctness.
 \end{enumerate}
-When asking friction is aligned ($\lambda_A = c_Q$), the leader's objective satisfies $\Pi_\kappa \equiv \mu_A U(\cdot;\kappa)$, sharing the identical preferences and policy maximizers as true user welfare for any positive welfare weight $\mu_A > 0$. Downstream welfare discounting $\mu_A < 1$ creates policy distortion only through interaction with excess asking friction ($\lambda_A \ne c_Q$), which inflates the effective asking friction per unit of altruism $(\lambda_A - c_Q)/\mu_A$. The leader solves $\pi^* = \arg\max_\pi \mathbb{E}_{\kappa\sim F}[\Pi_\kappa(m^*(\kappa;\pi),\pi)]$, a bilevel program.
+When asking friction is aligned ($\lambda_A = c_Q$), the leader's objective satisfies $\Pi_\kappa \equiv \mu_A U(\cdot;\kappa)$, sharing the identical preferences and policy maximizers as true user welfare for any positive welfare weight $\mu_A > 0$. Because user utility $U$ already incorporates private questioning cost $-a c_Q (k-m)$, expanding the leader's objective yields:
+\[
+\Pi_\kappa(m,a) \;=\; \mu_A\left[ V \;-\; \Lambda(1-a)(k-m) \;-\; \frac{\kappa}{2}m^2 \right] \;-\; \Big( \lambda_A - (1 - \mu_A)c_Q \Big)\,a\,(k-m).
+\]
+The total effective weight multiplying clarification volume $-a(k-m)$ in $\Pi_\kappa$ is therefore $\lambda_A - (1 - \mu_A)c_Q$, which simplifies directly to $\lambda_A$ in the benchmark case $\mu_A = 1$. Downstream welfare discounting $\mu_A < 1$ creates policy distortion through interaction with excess asking friction ($\lambda_A \ne c_Q$), inflating the effective friction per unit of altruism $(\lambda_A - c_Q)/\mu_A$. The leader solves $\pi^* = \arg\max_\pi \mathbb{E}_{\kappa\sim F}[\Pi_\kappa(m^*(\kappa;\pi),\pi)]$, a bilevel program.
 
 \begin{remark}[Existence]
 For Model I below ($\pi=a\in[0,1]$, a compact scalar policy), $m^*(\kappa;a)$ is
@@ -265,13 +279,15 @@ continuous (bilinear in $(m,a)$ and quadratic in $m$) IC/IR constraints on the c
 two types.
 \end{remark}
 
-For tractability in what follows we replace the exact conjunctive success
-probability $q^{k-m}$ with its first-order (small-risk) linear approximation around
-$q\to 1$: expected loss $\approx L(1-q)(k-m)$. When linearizing total task value $V q^{k-m} \approx V - V(1-q)(k-m)$, the per-attribute loss parameter satisfies $L = V$; more generally, $L \le V$ parameterizes settings where individual unresolved attributes cause localized defect losses without necessarily destroying the entire project value. With $\Lambda \equiv L(1-g)$,
-the user's payoff becomes
+For tractability in what follows we evaluate the linear-risk objective:
 \[
-U(m,a;\kappa) \;=\; V \;-\; \Lambda(1-a)(k-m) \;-\; \frac{\kappa}{2}m^2 \;-\; a\,c_Q\,(k-m).
+U(m,a;\kappa) \;=\; V \;-\; \Lambda(1-a)(k-m) \;-\; \frac{\kappa}{2}m^2 \;-\; a\,c_Q\,(k-m),
 \]
+where $\Lambda \equiv L(1-g)$. This specification admits two complementary economic microfoundations:
+\begin{enumerate}[leftmargin=*]
+\item \emph{Additive independent defects ($k L \le V$):} Each unaddressed attribute independently produces a localized defect cost $L \le V/k$. Total project value is destroyed only if defects accumulate across attributes. Our benchmark calibration sets $k=10, L=10, V=100$, where full failure ($k L = 100$) exhausts task value $V$.
+\item \emph{Systemic bottleneck conjunctive model ($L = V$):} The project succeeds only if all attributes are defect-free: $V q(a,g)^{k-m}$. A first-order Taylor expansion around $q \to 1$ yields $V q^{k-m} \approx V - V(1-q)(k-m)$, which corresponds to setting per-attribute stake $L = V = 100$.
+\end{enumerate}
 Throughout Sections~\ref{sec:firstbest}--\ref{sec:model2}, we maintain the physical feasibility constraint $m \in [0, k]$, so that followers cannot specify more attributes than exist in the task. When unconstrained first-order conditions yield $m^*(\kappa;a) = \frac{\Lambda(1-a) + ac_Q}{\kappa} > k$ (which occurs for low-cost types with $\kappa < \Lambda/k$), best-response effort saturates at the physical boundary $m^* = k$.
 
 \subsection{The first-best benchmark and physical feasibility}
@@ -393,6 +409,13 @@ a^{SE} \;=\; -\,\frac{\alpha_1}{2\alpha_2} \;=\; -\,\frac{(\mu_A s - b)\,\bar R_
 When this stationary point lies in $[0,1]$, it is the unique global maximum of $\Pi(a)$ on $[0,1]$.
 \end{proposition}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.72\textwidth]{figures/prop4_pooling_closed_form.png}
+\caption{Leader pooling payoff $\Pi(a)$ and equilibrium ask rate $a^{SE}$ under Model I, comparing the unclipped closed form against numerical grid optimization.}
+\label{fig:prop4_pooling}
+\end{figure}
+
 \begin{corollary}[Friction bias suppresses the pooling ask rate on the interior branch]
 \label{cor:bias-direction}
 On the interior branch $\alpha_2 < 0$, differentiating the closed form in Proposition~\ref{prop:aSE} directly with respect to $\lambda_A$ (holding primitives $\mu_A,\Lambda,c_Q,\bar R_0,\bar\gamma$ fixed) gives:
@@ -406,20 +429,28 @@ For populations supported on the interior specification domain ($\kappa \ge \Lam
 On this interior domain, higher perceived clarification friction $\lambda_A$ strictly suppresses the assistant's equilibrium asking rate. When the population includes lower-cost types ($\kappa < \Lambda/k$) whose effort saturates at $m^* = k$, the unclipped linear moment decomposition is modified by boundary clipping; numerical optimization across the clipped distribution confirms that higher friction $\lambda_A$ continues to weakly suppress asking, transitioning monotonically from $a^{SE} = 1$ to $a^{SE} = 0$.
 \end{corollary}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.72\textwidth]{figures/cor2_bias_direction.png}
+\caption{Perceived asking friction $\lambda_A$ suppresses the Stackelberg pooling ask rate ($\partial a^{SE}/\partial\lambda_A \le 0$) across varying altruism levels $\mu_A$.}
+\label{fig:cor2_bias}
+\end{figure}
+
 \begin{corollary}[Continuous transition of the pooling ask rate across friction regimes]
 \label{cor:continuous-trans}
 Under asking friction bias ($\lambda_A > c_Q$), the second-order coefficient satisfies $\alpha_2 < 0$ if and only if $\tilde\rho > s/2$.
-On this concave branch, the optimal pooling policy transitions continuously on $[0, 1]$ across three distinct friction regimes:
+For a continuum population supported on the interior specification domain ($\kappa \ge \Lambda/k$, so that $\bar R_0 > 0$), the endpoint crossover threshold satisfies $\tilde\rho^* \equiv \frac{s(\bar R_0 + \bar\gamma/2)}{\bar R_0 + \bar\gamma} > s/2$ strictly. Consequently, on the entire convex branch ($\tilde\rho \le s/2 < \tilde\rho^*$), the leader strictly prefers universal clarification ($\Pi(1) > \Pi(0)$), selecting $a^{SE} = 1$ unconditionally.
+On the strictly concave branch ($\tilde\rho > s/2$), the optimal pooling policy transitions continuously on $[0, 1]$ across three distinct friction regimes:
 \begin{enumerate}[leftmargin=*]
 \item \emph{Mild bias ($\tilde\rho \le \tilde\rho_1$):} For $\tilde\rho \le \tilde\rho_1 \equiv \frac{s(\bar R_0 + \bar\gamma)}{\bar R_0 + 2\bar\gamma}$, the unconstrained stationary point satisfies $-\alpha_1/(2\alpha_2) \ge 1$, so the constrained maximum on $[0, 1]$ is universal clarification: $a^{SE} = 1$.
 \item \emph{Moderate bias ($\tilde\rho_1 < \tilde\rho < s$):} The unconstrained stationary point is strictly interior, so the optimal ask rate is uniquely:
 \[
 a^{SE} \;=\; -\,\frac{\alpha_1}{2\alpha_2} \;=\; \frac{(s - \tilde\rho)\bar R_0}{(2\tilde\rho - s)\bar\gamma} \;\in\; (0, 1),
 \]
-which is strictly decreasing in friction ($\partial a^{SE}/\partial\tilde\rho < 0$).
+which is strictly decreasing in friction ($\partial a^{SE}/\partial\tilde\rho < 0$). At the crossover value $\tilde\rho = \tilde\rho^* \in (\tilde\rho_1, s)$, endpoint payoffs satisfy $\Pi(1) = \Pi(0)$, while the interior maximum remains smooth.
 \item \emph{Prohibitive friction ($\tilde\rho \ge s$, equivalently $c_Q^{eff} \ge \Lambda$):} The leader unconstrainedly prefers zero clarification ($-\alpha_1/(2\alpha_2) \le 0$), shutting down asking completely: $a^{SE} = 0$.
 \end{enumerate}
-The endpoint crossover threshold $\tilde\rho^* \equiv \frac{s(\bar R_0 + \bar\gamma/2)}{\bar R_0 + \bar\gamma}$ satisfies $\tilde\rho_1 < \tilde\rho^* < s$. When $\alpha_2 \ge 0$ (weak convexity, as in the unbiased case $\tilde\rho = 0 \le s/2$), $\Pi(a)$ is convex and $\tilde\rho^*$ uniquely dictates the bang-bang corner choice. When $\alpha_2 < 0$, $\Pi(a)$ is strictly concave and the maximum at $\tilde\rho = \tilde\rho^*$ is interior ($a^{SE} \in (0, 1)$), with $\Pi(1) = \Pi(0)$ indicating payoff equality at the endpoints rather than a discontinuous jump.
+This continuous transition characterizes the single unclipped quadratic representation with continuous type support; in discrete type distributions (such as two-type populations $\kappa \in \{\kappa_L, \kappa_H\}$) or under boundary clipping, piecewise best-response regimes can induce discrete policy shifts.
 \end{corollary}
 
 \begin{corollary}[Pooling is a corner solution in the unbiased case]\label{cor:corner}
@@ -433,6 +464,13 @@ The second-order condition for an interior maximum therefore fails: $\Pi(a)$ is 
 \]
 which yields the formal unclipped threshold $k^* \equiv \frac{\Lambda + c_Q}{2}\mathbb{E}[1/\kappa]$. When follower best responses are physically constrained to the feasible domain $m \le k$, Proposition~\ref{prop:firstbest} implies that asking ($a = 1$) weakly dominates guessing for every individual type in the support, so unbiased pooling under physical feasibility selects $a^{SE} = 1$ unconditionally. Genuine interior trade-offs between asking and guessing at the population level emerge under the exact conjunctive success model, as analyzed in Section~\ref{sec:discussion}.
 \end{corollary}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.72\textwidth]{figures/cor3_interiority.png}
+\caption{Payoff curvature across friction regimes: weakly convex corner solution in the unbiased regime ($\mu_A=1, \lambda_A=c_Q$) versus strictly concave interior optimum under friction bias ($\lambda_A > c_Q$).}
+\label{fig:cor3_interiority}
+\end{figure}
 
 \begin{proposition}[Equilibrium Reversal of Guessing Capability: The Guessing Trap]
 \label{prop:guessing-trap}
@@ -462,7 +500,7 @@ Differentiating with respect to $g$ and collecting terms in $\mu_A, b, s(g), \ba
 \frac{da^{SE}}{dg} \;=\; -\,\frac{L}{\bar\gamma(g)(2b - \mu_A s(g))}\left[ \mu_A \bar R_0(g) \;-\; (\mu_A s(g) - b)\mathbb{E}\left[\frac{1}{\kappa}\right]\big(1 - 2a^{SE}\big) \right].
 \]
 Because the prefactor $-\frac{L}{\bar\gamma(g)(2b - \mu_A s(g))}$ is strictly negative on the concave interior branch ($2b > \mu_A s$), it follows that $da^{SE}/dg < 0$ if and only if $\mu_A \bar R_0(g) > (\mu_A s(g) - b)\mathbb{E}[1/\kappa](1 - 2a^{SE})$.
-When $a^{SE} \ge 1/2$, $(1 - 2a^{SE}) \le 0$, ensuring the condition is satisfied unconditionally. Conversely, when $a^{SE} < 1/2$, the right-hand side is strictly positive; for example, with $k=12, L=17, c_Q=4.5, \lambda_A=11.5$, and $\kappa \sim \text{Uniform}[1.4, 1.5]$, unclipped effort remains interior but $a^{SE}$ increases from $0.211$ to $0.230$ as $g$ rises from $0.05$ to $0.10$.
+When $a^{SE} \ge 1/2$, $(1 - 2a^{SE}) \le 0$, ensuring the condition is satisfied unconditionally.
 
 By the chain rule, total equilibrium follower effort satisfies:
 \[
@@ -473,9 +511,14 @@ Similarly, by the envelope theorem on follower choice of $m^*$, total equilibriu
 \frac{dW}{dg} \;=\; \mathbb{E}\left[ \left.\frac{\partial U}{\partial g}\right|_{m^*} \right] \;+\; \mathbb{E}\left[ \left.\frac{\partial U}{\partial a}\right|_{m^*} \right]\frac{da^{SE}}{dg} \;=\; \mathbb{E}[(k - m^*)]\left[ L(1 - a^{SE}) \;+\; s(g)\frac{da^{SE}}{dg} \right].
 \]
 Because $\mathbb{E}[k - m^*] > 0$ and $\mathbb{E}[1/\kappa] > 0$, prompt lengthening ($d\mathbb{E}[m^*]/dg > 0$) and welfare decline ($dW/dg < 0$) are mathematically equivalent and hold simultaneously if and only if $-da^{SE}/dg > \frac{L(1 - a^{SE})}{s(g)}$.
-
-Evaluating this mechanism on the physically admissible domain for binary attributes ($g \in [0.50, 0.65]$ under benchmark parameters $k=10, L=10, c_Q=2, b=1.2, \kappa \sim \text{Uniform}[0.2, 0.6]$): as guessing capability improves from $g = 0.50$ to $g = 0.60$, the equilibrium ask rate collapses from $a^{SE} = 0.661$ to $a^{SE} = 0.424$. In response to this withdrawal of clarification, average prompt specification expands from $\mathbb{E}[m] = 7.728$ to $7.953$, and expected user welfare declines from $W = 82.134$ to $81.843$ (verified in \path{underspec_sim/verifications/verify_prop5_guessing_trap.py}).
 \end{proof}
+
+\begin{remark}[Analytical Conditions versus Clipped Numerical Calibration]
+\label{rmk:guessing-trap-calibration}
+Proposition~\ref{prop:guessing-trap} characterizes the unclipped interior branch where best responses remain interior ($m^*(\kappa) < k$). When $a^{SE} < 1/2$, the derivative condition can reverse; for example, in open-domain tasks with multiple alternatives where guessing accuracy satisfies $g \in [0.05, 0.10]$ (with $k=12, L=17, c_Q=4.5, \lambda_A=11.5$, and $\kappa \sim \text{Uniform}[1.4, 1.5]$), all types remain unclipped and $a^{SE}$ rises from $0.211$ to $0.230$, confirming the necessity of the condition.
+
+In the benchmark calibration ($k=10, L=10, c_Q=2, b=1.2, \kappa \sim \text{Uniform}[0.2, 0.6]$), unclipped moments give $\bar R_0 = -3.73$ and $\alpha_2 = +2.47$. On the physically admissible domain for binary attributes ($g \in [0.50, 0.65]$), followers are subject to boundary clipping $m^*(\kappa) = \min\{k, \dots\}$. Evaluating the exact clipped model via numerical quadrature (\path{underspec_sim/verifications/verify_prop5_guessing_trap.py}): as guessing capability improves from $g = 0.50$ to $g = 0.60$, the equilibrium ask rate collapses from $a^{SE} = 0.661$ to $a^{SE} = 0.424$. In response to this withdrawal of clarification, average prompt specification expands from $\mathbb{E}[m] = 7.728$ to $7.953$, and expected user welfare declines from $W = 82.134$ to $81.843$. Across random parameter sweeps in the clipped model, simultaneous prompt lengthening and welfare reduction occur in approximately 7\% of overall draws, and in 35\% of draws with an interior $a^{SE}$.
+\end{remark}
 
 This property proves essential for the comparative analysis in Section~\ref{sec:compare}:
 Model I exhibits welfare loss relative to the first best primarily through objective bias, which shifts $a^{SE}$ (Corollary~\ref{cor:bias-direction}) and suppresses the operational clarification rate.
@@ -553,22 +596,26 @@ $\Lambda,c_Q$ replaced by their $\mu_A,\lambda_A$-weighted counterparts), no lon
 automatically satisfies IC, because $\Pi_\kappa$ and the user's true $U(\cdot;\kappa)$
 now rank bundles differently.
 
-\begin{proposition}[Downward distortion of the high-cost type's service]
+\begin{proposition}[Second-Best Screening Menu and Distortion Regimes]
 \label{prop:distortion}
-Assume $\Lambda > c_Q$, under-asking bias ($0 < \lambda_A - c_Q < \mu_A(\Lambda - c_Q)$, so that $c_Q < c_Q^{eff} < \Lambda$), cost heterogeneity $\kappa_L < c_Q^{eff}/k < \kappa_H$, and task complexity $k > k_{\text{crit}}$ (defined in~\eqref{eq:kcrit}). Let population shares be $f_L, f_H > 0$ with $f_L + f_H = 1$, and define the relative share weight $t \equiv \frac{f_H}{f_L}\frac{s - \tilde\rho}{s}$.
+Assume $\Lambda > c_Q$, under-asking bias ($0 < \lambda_A - c_Q < \mu_A(\Lambda - c_Q)$, so that $c_Q < c_Q^{eff} < \Lambda$), and cost heterogeneity $\kappa_L < c_Q^{eff}/k < \kappa_H$. Let population shares be $f_L, f_H > 0$ with $f_L + f_H = 1$, define the relative share weight $t \equiv \frac{f_H}{f_L}\frac{s - \tilde\rho}{s}$, and define the stationary candidate:
+\[
+m_H^* \;\equiv\; \frac{\Lambda \tilde\rho}{s(\kappa_H - \kappa_L) + \tilde\rho\kappa_L}.
+\]
+Define the complexity thresholds $k_{\text{slack}} \equiv \frac{2 c_Q}{\kappa_L} - \frac{c_Q^{eff}}{\kappa_H}$ and $k_{\text{crit}} \equiv \frac{2 c_Q}{\kappa_L} - m_H^*$, where $k_{\text{slack}} < k_{\text{crit}}$.
 Then:
 \begin{enumerate}[leftmargin=*]
-\item \textbf{Incentive violation of unconstrained menu:} If the low-cost type receives the unconstrained boundary bundle $(m_L^B, a_L^B) = (k, 0)$ and the high-cost type receives $(m_H^B, a_H^B) = (c_Q^{eff}/\kappa_H, 1)$, $\text{IC}_L$ is strictly violated if and only if $\kappa_L(k + m_H^B) > 2c_Q$.
-\item \textbf{Downward distortion:} Under the optimal incentive-compatible menu, the high-cost type's ask rate is strictly distorted downward relative to the leader's unconstrained preference:
+\item \textbf{Unconstrained slack regime ($k \le k_{\text{slack}}$):} The unconstrained menu $((k, 0), (m_H^B, 1))$ satisfies $\text{IC}_L$ with strict slack ($\kappa_L(k + m_H^B) \le 2 c_Q$). Both types receive their unconstrained preferred bundles, with zero distortion in effort and asking.
+\item \textbf{Effort-distortion regime ($k_{\text{slack}} < k \le k_{\text{crit}}$):} $\text{IC}_L$ binds, but asking remains at the efficient level $a_H = 1$. The distortion manifests purely in downward effort distortion on the high-cost type:
 \[
-a_H^{SB} \;<\; a_H^B \;=\; 1,
+m_H^{SB} \;=\; \frac{2 c_Q}{\kappa_L} - k \;<\; m_H^B, \qquad a_H^{SB} \;=\; 1.
 \]
-in the saturation regime $\kappa_L \le \bar\kappa_L$.
-\item \textbf{Closed form under saturation of low-cost effort:} If $\kappa_L \le \bar\kappa_L \equiv \frac{c_Q^{eff} + t c_Q}{k(1 + t)}$, the leader sets $(m_L^{SB}, a_L^{SB}) = (k, 0)$, and the high-cost contract is uniquely given in closed form by:
+\item \textbf{Asking-distortion regime ($k > k_{\text{crit}}$ with $k \ge m_H^*$):} In the saturation regime $\kappa_L \le \bar\kappa_L \equiv \frac{c_Q^{eff} + t c_Q}{k(1 + t)}$, the leader sets $(m_L^{SB}, a_L^{SB}) = (k, 0)$, and the high-cost contract is uniquely given in closed form by:
 \[
-m_H^* \;=\; \frac{\Lambda \tilde\rho}{s(\kappa_H - \kappa_L) + \tilde\rho\kappa_L}, \qquad a_H^{SB} \;=\; 1 \;-\; \frac{\frac{\kappa_L(k + m_H^*)}{2} - c_Q}{s}.
+m_H^{SB} \;=\; m_H^*, \qquad a_H^{SB} \;=\; 1 \;-\; \frac{\frac{\kappa_L(k + m_H^*)}{2} - c_Q}{s} \;<\; 1.
 \]
-In this saturation regime, downward distortion $1 - a_H^{SB}$ intensifies as $\kappa_L$ increases toward $\bar\kappa_L$. At $m_L = k$, zero residual attributes remain ($k - m_L = 0$), so $a_L$ is payoff-irrelevant to both parties.
+Downward distortion $1 - a_H^{SB}$ intensifies as $\kappa_L$ increases toward $\bar\kappa_L$. At $m_L = k$, zero residual attributes remain ($k - m_L = 0$), so $a_L$ is payoff-irrelevant to both parties.
+\item \textbf{Boundary saturation regime ($k < m_H^*$):} When cost heterogeneity is narrow ($\kappa_H - \kappa_L$ small) so that $m_H^* > k$, the physical feasibility constraint $m_H \le k$ binds. By strict concavity of $\Pi_{\kappa_H}$, optimal effort hits $m_H = k$, at which point residual attributes vanish ($k - m_H = 0$), asking is payoff-irrelevant, and the menu collapses to boundary pooling at $(k, 0)$.
 \item \textbf{Boundary relaxation:} If $\bar\kappa_L < \kappa_L < c_Q^{eff}/k$, the leader optimally offers type $L$ clarification service ($a_L^{SB} = 1, m_L^{SB} < k$) to increase $U_L$, which relaxes $\text{IC}_L$ and moderates the downward distortion on type $H$ ($a_H^{SB}$ rises toward 1 as $\kappa_L \to c_Q^{eff}/k$, and can reach $a_H^{SB} = 1$ when $f_L$ is sufficiently small).
 \end{enumerate}
 \end{proposition}
@@ -582,64 +629,33 @@ For type $H$ with $\kappa_H > c_Q^{eff}/k$, because $c_Q^{eff} < \Lambda$, $\Pi_
 For type $L$ with $\kappa_L < c_Q^{eff}/k$, the partial derivative with respect to effort satisfies $\partial \Pi_{\kappa_L}/\partial m = \mu_A[\Lambda(1-a) + a c_Q^{eff} - \kappa_L m] \ge \mu_A[c_Q^{eff} - \kappa_L k] > 0$ for all $m \in [0, k]$ and all $a \in [0, 1]$. Hence $\Pi_{\kappa_L}$ is strictly increasing in $m$, and attains its unconstrained maximum on $[0, k] \times [0, 1]$ at $m_L^B = k$. At $m_L^B = k$, zero attributes remain unspecified ($k - m_L^B = 0$), so asking is payoff-irrelevant to both the user and the leader ($\Pi_{\kappa_L}(k, a) = \mu_A[V - \frac{\kappa_L}{2}k^2]$ for all $a$). Setting $a_L^B = 0$ is the unconstrained benchmark choice because it gives zero asking service, minimizing the temptation of type $H$ to mimic type $L$.
 
 \paragraph{Step 2: Upward temptation to mimic ($\text{IC}_L$ violation).}
-Evaluating type $\kappa_L$'s payoff from mimicking the high type's bundle $(m_H^B, 1)$ versus accepting its own bundle $(k, 0)$:
-\[
-U(m_H^B, 1; \kappa_L) - U(k, 0; \kappa_L) \;=\; \left[ V - c_Q(k - m_H^B) - \frac{\kappa_L}{2}(m_H^B)^2 \right] \;-\; \left[ V - \frac{\kappa_L}{2}k^2 \right].
-\]
-Factoring terms:
+Evaluating type $\kappa_L$'s payoff from mimicking the high type's unconstrained bundle $(m_H^B, 1)$ versus accepting its own bundle $(k, 0)$:
 \[
 U(m_H^B, 1; \kappa_L) - U(k, 0; \kappa_L) \;=\; (k - m_H^B)\left[ \frac{\kappa_L(k + m_H^B)}{2} - c_Q \right].
 \]
-Because $m_H^B < k$, this difference is strictly positive if and only if $\kappa_L(k + m_H^B) > 2c_Q$. When this condition holds, type $\kappa_L$ strictly prefers the high type's asking contract over completing all attributes itself, violating $\text{IC}_L$.
+Because $m_H^B < k$, this difference is strictly positive if and only if $\kappa_L(k + m_H^B) > 2c_Q$, which is equivalent to $k > k_{\text{slack}} \equiv \frac{2 c_Q}{\kappa_L} - m_H^B = \frac{2 c_Q}{\kappa_L} - \frac{c_Q^{eff}}{\kappa_H}$. When $k \le k_{\text{slack}}$, $\text{IC}_L$ is strictly satisfied at the unconstrained bundles, establishing claim 1.
 
 \paragraph{Step 3: Slackness of participation ($\text{IR}_H$).}
 In classical adverse selection with monetary transfers (Baron--Myerson, Laffont--Tirole), the principal's payoff is linearly reduced by agent rent, driving the inefficient agent's $\text{IR}$ to bind at reservation $\underline{U}$.
-Here, the principal's payoff $\Pi_{\kappa_H}$ directly incorporates $\mu_A U(\cdot;\kappa_H)$. Depressing $U_H$ directly penalizes the leader's own objective. Thus, the leader adjusts the bundle $(m_H, a_H)$ only as far as necessary to restore $\text{IC}_L$, leaving $\text{IR}_H$ strictly slack: $U(m_H^{SB}, a_H^{SB}; \kappa_H) > \underline{U}$.
+Here, the principal's payoff $\Pi_{\kappa_H}$ directly incorporates $\mu_A U(\cdot;\kappa_H)$. Depressing $U_H$ directly penalizes the leader's own objective. Thus, the leader adjusts the bundle $(m_H, a_H)$ only as far as necessary to restore $\text{IC}_L$, leaving $\text{IR}_H$ strictly slack: $U(m_H^{SB}, a_H^{SB}; \kappa_H) > \underline{U}$. Furthermore, in the saturation regime $\kappa_L \le \bar\kappa_L$, type $L$ receives $(k, 0)$, so $U_L = \underline{U}(\kappa_L) \equiv V - \frac{\kappa_L}{2}k^2$, meaning individual rationality binds at the bottom of the distribution; in the boundary relaxation regime, $U_L > \underline{U}(\kappa_L)$, so $\text{IR}_L$ is strictly slack.
 
-\paragraph{Step 4: Global optimization along the $\text{IC}_L$ boundary and low-cost saturation.}
-When $\text{IC}_L$ binds, any feasible allocation must satisfy $U(m_H, a_H; \kappa_L) \le U(m_L, a_L; \kappa_L)$.
-First, consider candidate menus that fix type $L$'s bundle at the unconstrained boundary $(m_L, a_L) = (k, 0)$, which fixes type $L$'s utility at $U_L^0 \equiv U(k, 0; \kappa_L) = V - \frac{\kappa_L}{2}k^2$.
-To implement this direct mechanism when the follower chooses specification effort $m$, the assistant specifies the off-menu deterrence schedule:
+\paragraph{Step 4: Global optimization along the $\text{IC}_L$ boundary and regimes.}
+When $\text{IC}_L$ binds, any feasible allocation must satisfy $U(m_H, a_H; \kappa_L) \le U_L^0 \equiv V - \frac{\kappa_L}{2}k^2$.
+To implement this direct mechanism, the assistant specifies the off-menu deterrence schedule $a(m) = a_H^{SB}$ if $m = m_H^{SB}$, $a(k) = 0$, and $a(m) = 0$ otherwise.
+Along the binding boundary $U(m_H, a_H; \kappa_L) = U_L^0$, utility is strictly linear in $a_H$, uniquely determining:
 \[
-a(m) \;=\; \begin{cases}
-a_H^{SB}, & \text{if } m = m_H^{SB}, \\
-a_L^{SB} = 0, & \text{if } m = m_L^{SB} = k, \\
-0, & \text{if } m \notin \{m_L^{SB}, m_H^{SB}\}.
-\end{cases}
+a_H(m_H) \;=\; 1 \;-\; \frac{U(m_H, 1; \kappa_L) - U_L^0}{s(k - m_H)} \;=\; 1 \;-\; \frac{\frac{\kappa_L(k + m_H)}{2} - c_Q}{s}.
 \]
-Any deviation to an off-menu choice $m \notin \{m_L^{SB}, m_H^{SB}\}$ receives zero clarification ($a=0$) and is strictly dominated for both types. (We note that this discontinuous step penalty is the standard theoretical off-path construction of the revelation principle; practical implementations would employ smooth or threshold policies, as examined in Section~\ref{sec:empirical}.)
-
-Along the binding boundary $U(m_H, a_H; \kappa_L) = U_L^0$, utility is strictly linear in $a_H$:
+Substituting this boundary into the leader's objective $\Pi_{\kappa_H}$ yields a strictly concave quadratic in $m_H$ with unconstrained stationary point:
 \[
-V - \Lambda(k - m_H) + a_H s(k - m_H) - \frac{\kappa_L}{2}m_H^2 \;=\; U_L^0,
+m_H^* \;=\; \frac{b\Lambda}{\mu_A s(\kappa_H - \kappa_L) + b\kappa_L} \;=\; \frac{\Lambda \tilde\rho}{s(\kappa_H - \kappa_L) + \tilde\rho\kappa_L}.
 \]
-where $s \equiv \Lambda - c_Q > 0$. Because $s(k - m_H) > 0$ for all $m_H < k$, this uniquely determines the required asking rate $a_H$ as a function of specification effort $m_H$:
-\[
-a_H(m_H) \;=\; 1 \;-\; \frac{U(m_H, 1; \kappa_L) - U_L^0}{s(k - m_H)}.
-\]
-Next, evaluate the leader's payoff $\Pi_{\kappa_H}(m_H, a_H) = \mu_A U(m_H, a_H; \kappa_H) - b a_H (k - m_H)$ along this boundary, where $b \equiv \lambda_A - c_Q > 0$. Using the rent identity $U(m_H, a_H; \kappa_H) = U_L^0 - \frac{\kappa_H - \kappa_L}{2}m_H^2$ and substituting $a_H(m_H)(k - m_H)$, the leader's reduced objective becomes:
-\[
-\Pi_{\kappa_H}(m_H) \;=\; \left(\mu_A - \frac{b}{s}\right) U_L^0 \;+\; \frac{b}{s}(V - \Lambda k) \;+\; \frac{b\Lambda}{s}m_H \;-\; \frac{1}{2}\left[ \mu_A(\kappa_H - \kappa_L) + \frac{b}{s}\kappa_L \right] m_H^2.
-\]
-The second derivative with respect to $m_H$ is:
-\[
-\frac{d^2 \Pi_{\kappa_H}}{dm_H^2} \;=\; -\left[ \mu_A(\kappa_H - \kappa_L) + \frac{b}{s}\kappa_L \right] \;=\; -\,\frac{\mu_A s(\kappa_H - \kappa_L) + b\kappa_L}{s} \;<\; 0,
-\]
-which is strictly negative everywhere on $[0, k]$ because $\kappa_H > \kappa_L$, $\mu_A > 0$, $s > 0$, and $b > 0$. Therefore, along the binding $\text{IC}_L$ boundary, the leader's objective is globally strictly concave in $m_H$, with unique interior maximizer:
-\[
-m_H^* \;=\; \frac{b\Lambda}{\mu_A s(\kappa_H - \kappa_L) + b\kappa_L} \;=\; \frac{\Lambda \tilde\rho}{s(\kappa_H - \kappa_L) + \tilde\rho\kappa_L},
-\]
-where $\tilde\rho \equiv b/\mu_A = (\lambda_A - c_Q)/\mu_A$.
-Evaluating the asking rate at this global boundary optimum:
-\[
-a_H^{SB} \;=\; a_H(m_H^*) \;=\; 1 \;-\; \frac{U(m_H^*, 1; \kappa_L) - U_L^0}{s(k - m_H^*)}.
-\]
-Because $s(k - m_H^*) > 0$ for all $m_H^* < k$, strict downward distortion $a_H^{SB} < 1$ holds if and only if $U(m_H^*, 1; \kappa_L) - U_L^0 > 0$, which is strictly positive if and only if:
-\begin{equation}
-\label{eq:kcrit}
-k \;>\; k_{\text{crit}}(\kappa_L, \kappa_H, \Lambda, c_Q, \lambda_A, \mu_A) \;\equiv\; \frac{2 c_Q}{\kappa_L} - m_H^*.
-\end{equation}
-Whenever $k > k_{\text{crit}}$, $U(m_H^*, 1; \kappa_L) > U_L^0$ holds strictly, which guarantees $a_H^{SB} < 1$.
+Now consider the interaction between the constraints $m_H \le k$ and $a_H \le 1$:
+\begin{itemize}[leftmargin=*]
+\item If $k_{\text{slack}} < k \le k_{\text{crit}} \equiv \frac{2 c_Q}{\kappa_L} - m_H^*$, then $\frac{\kappa_L(k + m_H^*)}{2} \le c_Q$. Evaluating $a_H(m_H^*)$ would yield $a_H \ge 1$. Since $a_H \le 1$, the upper bound $a_H = 1$ binds! Along $a_H = 1$, satisfying $\text{IC}_L$ with equality requires $(k - m_H)[\frac{\kappa_L(k + m_H)}{2} - c_Q] = 0$, which uniquely sets $m_H = \frac{2 c_Q}{\kappa_L} - k < m_H^B$. The distortion manifests entirely through prompt effort, establishing claim 2.
+\item If $k > k_{\text{crit}}$ and $k \ge m_H^*$, then $\frac{\kappa_L(k + m_H^*)}{2} > c_Q$, yielding interior asking distortion $a_H^{SB} = a_H(m_H^*) < 1$ with effort $m_H^{SB} = m_H^*$, establishing claim 3.
+\item If $k < m_H^*$ (which occurs when cost heterogeneity $\kappa_H - \kappa_L$ is small), the stationary point exceeds the physical attribute count ($m_H^* > k$). By strict concavity of $\Pi_{\kappa_H}(m_H)$ on $[0, k]$, the constrained maximizer is $m_H^{SB} = k$. At $m_H = k$, residual attributes vanish ($k - m_H = 0$), so asking is payoff-irrelevant and the menu collapses to pooling at $(k, 0)$, establishing claim 4.
+\end{itemize}
 
 We now analytically determine when $(m_L^{SB}, a_L^{SB}) = (k, 0)$ is the global optimum.
 Consider departing from $m_L = k$ by offering type $L$ clarification service ($a_L = 1$) with $m_L < k$. Since $\kappa_L > c_Q/k$, reducing $m_L$ below $k$ increases type $L$'s utility at marginal rate $\left.\frac{\partial U}{\partial m_L}\right|_{m_L = k} = c_Q - \kappa_L k < 0$, yielding a utility increase of $\kappa_L k - c_Q > 0$.
@@ -654,11 +670,11 @@ Dividing by $f_L \mu_A$ and substituting $\tilde\rho = b/\mu_A$ and $t \equiv \f
 t(\kappa_L k - c_Q) \;\le\; c_Q^{eff} - \kappa_L k \iff \kappa_L \;\le\; \bar\kappa_L \;\equiv\; \frac{c_Q^{eff} + t c_Q}{k(1 + t)}.
 \]
 When $f_L = f_H = 0.5$, $t = \frac{s - \tilde\rho}{s}$ and $\bar\kappa_L$ simplifies to $\frac{s c_Q^{eff} + (s - \tilde\rho)c_Q}{k(2s - \tilde\rho)}$.
-When $\kappa_L \le \bar\kappa_L$, the leader strictly prefers to keep type $L$ at the corner $(k, 0)$. In this regime, $(m_L^{SB}, a_L^{SB}) = (k, 0)$ is the exact global second-best optimum, and our closed form for $(m_H^*, a_H^{SB})$ is exact.
-When $\bar\kappa_L < \kappa_L < c_Q^{eff}/k$, the leader departs from $(k, 0)$ by setting $a_L^{SB} = 1$ and $m_L^{SB} < k$. Raising $U_L$ relaxes $\text{IC}_L$, allowing $a_H^{SB}$ to rise toward 1 while preserving incentive compatibility.
+When $\kappa_L \le \bar\kappa_L$, the leader strictly prefers to keep type $L$ at the corner $(k, 0)$. In this regime, $(m_L^{SB}, a_L^{SB}) = (k, 0)$ is the exact global second-best optimum.
+When $\bar\kappa_L < \kappa_L < c_Q^{eff}/k$, the leader departs from $(k, 0)$ by setting $a_L^{SB} = 1$ and $m_L^{SB} < k$. Raising $U_L$ relaxes $\text{IC}_L$, allowing $a_H^{SB}$ to rise toward 1 while preserving incentive compatibility, establishing claim 5.
 
 \paragraph{Step 5: Comparative statics across the cost spectrum.}
-In the low-cost saturation regime ($\kappa_L \le \bar\kappa_L$):
+In the low-cost saturation regime ($\kappa_L \le \bar\kappa_L$ with $k > k_{\text{crit}}$ and $k \ge m_H^*$):
 \[
 1 - a_H^{SB} \;=\; \frac{\frac{\kappa_L(k + m_H^*)}{2} - c_Q}{s}.
 \]
@@ -667,15 +683,24 @@ In the boundary relaxation regime ($\bar\kappa_L < \kappa_L < c_Q^{eff}/k$), the
 Finally, when friction reaches or exceeds task stakes ($c_Q^{eff} \ge \Lambda$, or $\lambda_A - c_Q \ge \mu_A(\Lambda - c_Q)$), the leader unconstrainedly prefers zero asking for all types ($\partial\Pi/\partial a \le 0$). Clarification is uniformly shut down: $a_L = a_H = 0$ and $m_L = m_H = k$. Both types receive the identical bundle $(k, 0)$, so $\text{IC}_L$ and $\text{IC}_H$ hold with equality ($0 = 0$). This boundary co-activity reflects technological clarification shutdown due to prohibitive friction, whereas genuine adverse-selection screening distortion ($a_H^{SB} < a_H^B = 1$) operates strictly in the cost-effective asking regime $c_Q < c_Q^{eff} < \Lambda$.
 \end{proof}
 
-\begin{remark}[Active Constraint Regimes and Clarification Shutdown]
+\begin{remark}[Active Constraint Regimes and Effort versus Asking Distortions]
 \label{rmk:active-constraints}
-In classical transfer-based screening (such as Baron--Myerson), $\text{IC}_L$ and $\text{IR}_H$ typically bind while $\text{IC}_H$ and $\text{IR}_L$ remain slack. In our setting, solving the full four-variable constrained problem reveals three distinct operational regimes:
+In classical transfer-based screening (such as Baron--Myerson), $\text{IC}_L$ and $\text{IR}_H$ typically bind while $\text{IC}_H$ and $\text{IR}_L$ remain slack. In our setting, solving the full four-variable constrained problem reveals five distinct operational regimes:
 \begin{enumerate}[leftmargin=*]
-\item \emph{Small bias regime ($c_Q^{eff} \approx c_Q$):} When asking friction is close to true cost, the temptation of type $L$ to mimic the asking bundle is weak or absent ($k \le k_{\text{crit}}$), yielding negligible or zero distortion ($a_H^{SB} \approx a_H^B = 1$) with constraints slack.
-\item \emph{Moderate bias regime ($c_Q < c_Q^{eff} < \Lambda$ with $k > k_{\text{crit}}$):} Type $L$ faces a strict temptation to mimic, and $\text{IC}_L$ binds alone while $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ remain strictly slack. The leader directly penalizes itself by depressing follower utility, which keeps participation constraints slack and forces downward distortion $a_H^{SB} < a_H^B = 1$ purely to satisfy $\text{IC}_L$.
+\item \emph{Unconstrained slack regime ($k \le k_{\text{slack}}$):} When task complexity is small, the temptation of type $L$ to mimic is absent ($\kappa_L(k + m_H^B) \le 2 c_Q$), so $\text{IC}_L$ and $\text{IC}_H$ are strictly slack at the unconstrained menu.
+\item \emph{Effort-distortion regime ($k_{\text{slack}} < k \le k_{\text{crit}}$):} Type $L$ faces a temptation to mimic, but the assistant absorbs the entire distortion through specification effort ($m_H = \frac{2c_Q}{\kappa_L} - k < m_H^B$) while preserving full clarification service ($a_H = 1$). Here $\text{IC}_L$ binds while asking is undistorted.
+\item \emph{Adverse-selection asking distortion regime ($k > k_{\text{crit}}$ with $k \ge m_H^*$):} Specification distortion alone is insufficient, forcing the assistant to distort asking downward ($a_H^{SB} < 1$) alongside effort $m_H = m_H^*$.
+\item \emph{Boundary saturation regime ($k < m_H^*$):} Narrow cost heterogeneity forces the interior effort candidate above task complexity ($m_H^* > k$), causing the physical ceiling $m_H \le k$ to bind and collapsing the menu to boundary pooling at $(k, 0)$.
 \item \emph{Prohibitive friction regime ($c_Q^{eff} \ge \Lambda$, equivalently $\lambda_A - c_Q \ge \mu_A(\Lambda - c_Q)$):} Asking friction exceeds the entire task risk resolved, so the leader unconstrainedly prefers zero asking for all types ($\partial\Pi/\partial a \le 0$). Clarification is uniformly shut down: $a_L = a_H = 0$ and $m_L = m_H = k$. Both types receive the identical bundle $(k, 0)$, so $\text{IC}_L$ and $\text{IC}_H$ hold with equality trivially. This boundary co-activity reflects technological shutdown, not an adverse-selection screening distortion.
 \end{enumerate}
 \end{remark}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/distortion_sweep_2d.png}
+\caption{Screening menu distortion across cost heterogeneity $(\kappa_L, \kappa_H)$ and provider friction $\lambda_A$, illustrating adverse-selection downward distortion $a_H^{SB} < 1$.}
+\label{fig:distortion_sweep_2d}
+\end{figure}
 
 \begin{remark}[Directionality of Policy Misalignment]
 \label{rmk:bias-direction}
@@ -735,7 +760,7 @@ $0.70$ & $3.0$ & $6.87$ & $8$ & $+1.13$ & $+1.71$ \\
 $0.70$ & $3.0$ & $6.87$ & $10$ & $+3.13$ & $+3.32$ \\
 \bottomrule
 \end{tabular}
-\caption{Sensitivity of the unbiased pooling corner choice across task complexity $k$ and guessing capability $g$, for $L=10, c_Q=2, \kappa \sim \text{Uniform}[0.2, 0.6]$, where $\Delta\Pi \equiv \Pi(1) - \Pi(0)$. Columns compare the unconstrained closed form $(\Lambda - c_Q)[k - k^*]$ against the physically feasible clipped payoff difference computed via vectorized numerical integration (\texttt{underspec\_sim/\allowbreak verifications/\allowbreak generate\_table1.py}, recorded in \texttt{outputs/\allowbreak table1\_unbiased\_sensitivity.csv}). In the unclipped algebra, guessing appears to win whenever $k < k^*$ (e.g., $-36.80$ at $g=0.30, k=5$), but when followers are constrained to feasible effort $m \le k$, asking strictly dominates across all rows ($+0.15$ at $g=0.30, k=5$), confirming Proposition~\ref{prop:firstbest}.}
+\caption{Sensitivity of the unbiased pooling corner choice across task complexity $k$ and guessing capability $g$, for $L=10, c_Q=2, \kappa \sim \text{Uniform}[0.2, 0.6]$, where $\Delta\Pi \equiv \Pi(1) - \Pi(0)$. Columns compare the unconstrained closed form $(\Lambda - c_Q)[k - k^*]$ against the physically feasible clipped payoff difference computed via vectorized numerical integration (\texttt{underspec\_sim/\allowbreak verifications/\allowbreak generate\_table1.py}, recorded in \texttt{outputs/\allowbreak table1\_unbiased\_sensitivity.csv}). In the unclipped algebra, guessing appears to win whenever $k < k^*$ (e.g., $-36.80$ at $g=0.30, k=5$), but when followers are constrained to feasible effort $m \le k$, asking strictly dominates across all rows ($+0.15$ at $g=0.30, k=5$), confirming Proposition~\ref{prop:firstbest}. While binary symmetric attributes naturally correspond to baseline guessing accuracy $g = 0.50$, configurations with $g = 0.30$ and $g = 0.70$ represent tasks with non-binary attribute domains (such as multi-choice syntactical options where random guessing yields $1/M < 0.5$, or informed priors where guessing yields $> 0.5$).}
 \label{tab:unbiased_sensitivity}
 \end{table}
 
@@ -743,7 +768,8 @@ As shown in Table~\ref{tab:unbiased_sensitivity}, once followers are restricted 
 At $k=5$, for all $\kappa \in [0.2, 0.6]$, the unassisted specification choice under guessing is $\min\{5, \Lambda/\kappa\} = 5 = k$ across all $g \in \{0.30, 0.50, 0.70\}$, because $\Lambda \ge 3.0$ and $\kappa \le 0.6$. When followers fully saturate specification effort under silence, the task risk parameter $\Lambda$ drops out completely from the comparison, and the net gain from asking $\Delta\Pi = \mathbb{E}[U(m^*(1); 1) - U(k; 0)] = +0.15$ depends strictly on $c_Q = 2$ and $\kappa$. In contrast, when evaluated under the exact conjunctive success function $q(a,g)^{k-m}$, non-linear probability curvature generates genuine interior trade-offs where guessing beats asking even on the interior domain (Section~\ref{sec:discussion}).
 
 \begin{remark}[Welfare vs Leader Payoff Ordering Across Bias Bands]
-While screening weakly dominates pooling in leader payoff ($\Pi_{II} \ge \Pi_I$) by revealed preference (Corollary~\ref{cor:dominance}), the ranking of user welfare $W \equiv \mathbb{E}[U]$ depends non-monotonically on provider asking friction $\lambda_A$ (verified in \path{underspec_sim/verifications/verify_welfare_ordering.py}):
+\label{rmk:welfare-ordering}
+While screening weakly dominates pooling in leader payoff ($\Pi_{II} \ge \Pi_I$) by revealed preference (Corollary~\ref{cor:dominance}), the ranking of user welfare $W \equiv \mathbb{E}[U]$ depends non-monotonically on provider asking friction $\lambda_A$ (evaluated at $\kappa_L=0.3, \kappa_H=0.5, f_L=0.5, k=10, L=10, g=0.5, c_Q=2, V=100$, and $\mu_A=1.0$, verified in \path{underspec_sim/verifications/verify_welfare_ordering.py}):
 \begin{enumerate}[leftmargin=*]
 \item \emph{Mild bias ($\lambda_A \in [2.5, 3.0]$):} Pooling maintains universal clarification ($a^{SE} = 1$) and achieves strictly higher user welfare than screening ($W_{\text{pool}} = 85.33$ vs $W_{\text{screen}} = 85.00$ at $\lambda_A = 2.5$, gap $-0.33$; $W_{\text{pool}} = 85.33$ vs $W_{\text{screen}} = 84.52$ at $\lambda_A = 3.0$, gap $-0.81$). Here, pooling forces the assistant to provide first-best clarification to everyone, whereas screening distorts asking downward on terse users ($a_H^{SB} < 1$) to protect provider payoff against information rents.
 \item \emph{Moderate bias ($\lambda_A \in [3.5, 4.5]$):} Pooling collapses to zero asking ($a^{SE} = 0$, yielding baseline unassisted welfare $W_{\text{pool}} = 80.00$), whereas screening continues to provide partial clarification to terse users ($a_H^{SB} > 0$), delivering strictly higher user welfare ($W_{\text{screen}} = 82.45$ at $\lambda_A = 3.5$, gap $+2.45$; $W_{\text{screen}} = 81.53$ at $\lambda_A = 4.0$, gap $+1.53$; $W_{\text{screen}} = 80.71$ at $\lambda_A = 4.5$, gap $+0.71$).
@@ -751,6 +777,13 @@ While screening weakly dominates pooling in leader payoff ($\Pi_{II} \ge \Pi_I$)
 \end{enumerate}
 In the exact conjunctive model, an additional structural instrument-restriction gap appears even at zero bias, separating technological restriction from behavioral misalignment.
 \end{remark}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/regime_comparison.png}
+\caption{Leader payoff under Model II (screening menu) versus Model I (pooling policy) across assistant bias $\lambda_A - c_Q$ and type heterogeneity $\kappa_H - \kappa_L$, illustrating weak dominance ($\Pi_{II} \ge \Pi_I$) and the zero-gap baseline at zero bias under linear risk.}
+\label{fig:regime_comparison}
+\end{figure}
 
 \section{Testable Predictions}
 \label{sec:predictions}
@@ -783,7 +816,7 @@ declining specification effort across an interactive session (following Section~
 condition on declared specification effort, terse users receive fewer clarifying questions
 than the assistant's unconstrained per-type preference would prescribe ($a_H^{SB} < a_H^B$). This downward distortion arises
 specifically from the incentive-compatibility constraint $\text{IC}_L$. In the low-cost saturation regime ($\kappa_L \le \bar\kappa_L$), downward distortion intensifies as cost heterogeneity narrows ($\kappa_L$ approaches $\bar\kappa_L$), requiring deeper distortion to prevent mimicry; in the boundary relaxation regime ($\bar\kappa_L < \kappa_L < c_Q^{eff}/k$), the assistant grants clarification to low-cost users ($a_L^{SB} = 1$), relaxing $\text{IC}_L$ and dampening downward distortion ($a_H^{SB}$ rises toward 1 as $\kappa_L \to c_Q^{eff}/k$).
-\item[\textbf{P8}] (Prop.~\ref{prop:guessing-trap}) Under an assistant with under-asking friction bias ($\lambda_A > c_Q$), higher model guessing capability $g$ perversely lengthens user prompts ($d\mathbb{E}[m^*]/dg > 0$) and lowers user welfare ($dW/dg < 0$). This equilibrium capability reversal operates because improved guessing reduces the assistant's incentive to ask, forcing users to over-specify upstream to defensively insure against guessing errors.
+\item[\textbf{P8}] (Prop.~\ref{prop:guessing-trap}) Under an assistant with under-asking friction bias ($\lambda_A > c_Q$), higher model guessing capability $g$ can perversely lengthen user prompts ($d\mathbb{E}[m^*]/dg > 0$) and lower user welfare ($dW/dg < 0$). This equilibrium capability reversal occurs if and only if the assistant's ask-rate reduction is sufficiently steep to outpace direct guessing gains ($-\frac{da^{SE}}{dg} > \frac{L(1 - a^{SE})}{\Lambda(g) - c_Q}$), forcing users to over-specify upstream to defensively insure against guessing errors.
 \end{enumerate}
 
 \section{Empirical Strategy and Experimental Design}
@@ -802,7 +835,7 @@ Participants are randomly assigned to interact with code assistants operating un
 
 \paragraph{Measurement and identification.}
 For each programming session, instrumentation logs: (i) upstream prompt length and specified invariants\slash edge cases ($m$); (ii) clarification turn count ($a(k-m)$); (iii) downstream test suite execution and correctness; and (iv) post-session subjective developer satisfaction.
-By exogenously varying the clarification policy $a$, this protocol directly tests whether users economize on prompt specification in response to anticipated assistance, distinguishes the substitution channel ($\Lambda > c_Q$) from the pre-emption channel ($c_Q > \Lambda$, Prediction P1$'$), and isolates the welfare losses attributable to objective bias versus pooling restrictions (Predictions P6, P7, and P8).
+By exogenously varying the clarification policy $a$, this protocol directly tests whether users economize on prompt specification in response to anticipated assistance ($m^*(a)$ effort substitution, Prediction P1), distinguishes the substitution channel ($\Lambda > c_Q$) from the pre-emption channel ($c_Q > \Lambda$, Prediction P1$'$), and evaluates whether clarification responds to user specification terseness (Prediction P4). Testing Prediction P3 would further require an explicit information-disclosure treatment arm varying policy transparency, while evaluating the equilibrium welfare consequences of provider backend friction and capability scaling (Predictions P6--P8) requires multi-arm deployments varying assistant training objectives $\lambda_A$ and foundation model capability $g$.
 To validate these protocols prior to live human deployment, we provide a companion open-source simulation harness (\path{underspec_sim/experiments_llm}) supporting both deterministic offline dry-run evaluation and live API interactions across pooling and screening treatments.
 
 \section{Discussion and Limitations}
@@ -820,15 +853,22 @@ Rather than merely replicating the linear model, the exact conjunctive specifica
 Under this exact nonlinear specification across task complexity $k \in [3, 20]$ and guessing accuracy $g \in [0.50, 0.95]$ (30 grid points):
 \begin{enumerate}[leftmargin=*]
 \item The corner-solution property of Corollary~\ref{cor:corner} persists universally ($a^{SE}_{\text{exact}} \in \{0, 1\}$ in all 30 configurations).
-\item Unbiased pooling choices agree between the exact and linear models in 17 of 30 cases (57\%). The discrepancies reflect genuine nonlinear curvature that can make guessing optimal for moderate $k$ and high guessing accuracy $g$. This curvature creates a positive instrument-restriction loss at zero bias in the exact model that is absent in linear risk.
+\item Unbiased pooling choices agree between the exact model and the linear Taylor-expansion baseline ($L = V = 100$) in 25 of 30 configurations (83.3\%), with all 5 divergences concentrated exclusively at small $k = 3$ where compounding ($q^3$) makes autonomous guessing preferred over question friction. For all $k \ge 5$ across all $g \in [0.50, 0.95]$, both models select universal clarification $a^{SE} = 1.0$. Under the localized additive-defect baseline ($L = 10$), agreement is 17 of 30 configurations (56.7\%), with divergences at high $g \ge 0.90$ where localized attribute stakes make guessing cost-effective earlier than systemic failure stakes. This nonlinear curvature creates a positive instrument-restriction loss at zero bias in the exact model that is absent in linear risk.
 \item Downward screening distortion ($a_H^{SB} < a_H^B$) holds in 20 of 30 cases (67\% overall: 20\% at $k \in \{3, 5\}$, 80\% at $k \in \{8, 20\}$, and 100\% at $k \in \{10, 15\}$). The low incidence of distortion at small $k$ stems from boundary saturation: when tasks are simple ($k \le 5$), users can fully specify all attributes ($m = k$), leaving no residual ambiguity for clarification to resolve ($k - m = 0$). Consequently, both $\text{IC}_L$ and $\text{IC}_H$ are active in 15 of 30 cases, concentrated entirely at small task sizes ($k \le 8$).
 \end{enumerate}
 
-Furthermore, numerical solutions of the full four-variable constrained menu problem under the exact payoff across $\lambda_A \in [c_Q, 10c_Q]$ and $\mu_A \in [0.1, 1.0]$ (\path{verify_exact_bias_sweep.py}, recorded in \path{outputs/exact_bias_sweep.csv} and Figure~\path{outputs/exact_bias_sweep.png}) illustrate the boundary transition to clarification shutdown.
+Furthermore, numerical solutions of the full four-variable constrained menu problem under the exact payoff across $\lambda_A \in [c_Q, 10c_Q]$ and $\mu_A \in [0.1, 1.0]$ (\path{verify_exact_bias_sweep.py}, recorded in \path{outputs/exact_bias_sweep.csv} and Figure~\ref{fig:exact_bias_sweep}) illustrate the boundary transition to clarification shutdown.
 In the linear model with $\mu_A = 1.0$, asking friction reaches or exceeds task stakes ($c_Q^{eff} \ge \Lambda$) at $\lambda_A \ge 5.0$. Beyond this threshold, the leader unconstrainedly prefers zero asking for all types ($a_L^B = a_H^B = 0$).
 Under the exact nonlinear payoff, this technological clarification shutdown threshold shifts outward to $\lambda_A \approx 8.0$.
 In this shutdown regime, both types choose full specification $m = k$ and receive $(k, 0)$, so $\text{IC}_H$ and $\text{IC}_L$ both hold with equality ($0 = 0$).
 This co-activity is not an adverse-selection screening distortion, but a technological shutdown artifact where clarification is universally priced out by severe asking friction.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/exact_bias_sweep.png}
+\caption{Screening menu allocations and active constraint boundaries under the exact conjunctive payoff across assistant asking friction $\lambda_A$ and weight $\mu_A$, illustrating the transition to clarification shutdown at $\lambda_A \approx 8.0$.}
+\label{fig:exact_bias_sweep}
+\end{figure}
 
 Another important limitation concerns the off-menu contract schedule. Proposition~\ref{prop:distortion} utilizes the standard direct revelation principle, implementing the second-best menu via a discontinuous off-menu policy $a(m) = 0$ for all $m \ne m_H^*$. While theoretically canonical, implementing discontinuous punishment schedules in conversational AI systems may be practically brittle or unintuitive for end users. Exploring smooth, continuous UI policies $a(m)$ or graded clarification schedules that remain robust to prompt gaming offers a fruitful avenue for applied mechanism design.
 
@@ -909,7 +949,7 @@ Bengt Holmstr{\"o}m. On the theory of delegation. In M.~Boyer and R.~E.~Kihlstro
 Emir Kamenica and Matthew Gentzkow. Bayesian persuasion. \textit{American Economic Review}, 101(6):2590--2615, 2011.
 
 \bibitem[Laban et al.(2025)]{laban2025}
-Philippe Laban, Wojciech Kry{\'s}ci{\'n}ski, Divyansh Agarwal, Richard Socher, and Caiming Xiong.
+Philippe Laban, Hiroaki Hayashi, Yingbo Zhou, and Jennifer Neville.
 LLMs get lost in multi-turn conversation.
 \textit{arXiv preprint arXiv:2505.06120}, 2025.
 

@@ -28,7 +28,7 @@ Canonical release accompanying the manuscript *"Strategic Under-Specification: A
   - Proposition 7: Downward distortion of high-cost type under asking friction bias ($a_H^{SB} < 1$). Characterizes the explicit saturation threshold $\bar\kappa_L \equiv \frac{c_Q^{eff} + t c_Q}{k(1 + t)}$ with $t \equiv \frac{f_H}{f_L}\frac{s - \tilde\rho}{s}$ for arbitrary population shares $f_L, f_H$, and proves that boundary relaxation ($\bar\kappa_L < \kappa_L \le c_Q^{eff}/k$) tempers downward distortion by granting clarification to low-cost types ($a_L = 1, m_L < k$).
   - Participation constraints characterized under endogenous silence outside option $\underline{U}(\kappa) \equiv \max_m U(m, 0; \kappa) = V - \frac{\kappa}{2}k^2$, under which $\text{IR}_L$ binds at the bottom ($U_L = \underline{U}(\kappa_L)$).
   - Clarifies that at $m_L = k$, $a_L$ is multiplied by $k - m_L = 0$ and is payoff-irrelevant.
-  - Active constraint characterization: Three operational regimes delineated (small bias with negligible distortion, moderate bias with $\text{IC}_L$ binding alone, and prohibitive friction with uniform clarification shutdown).
+  - Active constraint characterization: Five operational regimes delineated (unconstrained slack at $k \le k_{\text{slack}}$, pure effort distortion at $k_{\text{slack}} < k \le k_{\text{crit}}$, adverse-selection asking distortion at $k > k_{\text{crit}}$, boundary saturation pooling at $k < m_H^*$, and uniform clarification shutdown at $c_Q^{eff} \ge \Lambda$).
 - **Regime Comparison (Section 7):**
   - Corollary 5 proves menus weakly dominate pooling in leader payoff ($\Pi_{II} \ge \Pi_I$).
   - Characterizes non-monotonic user welfare ranking: pooling yields higher user welfare under mild bias ($W = 85.33$ vs $85.00$ at $\lambda_A = 2.5$; $W = 85.33$ vs $84.52$ at $\lambda_A = 3.0$), while screening yields higher welfare under moderate bias ($W = 82.45$ vs $80.00$ at $\lambda_A = 3.5$; $W = 81.53$ vs $80.00$ at $\lambda_A = 4.0$), with both regimes collapsing to complete clarification shutdown at severe friction ($W = 80.00$ at $\lambda_A \ge 5.0$).
@@ -38,7 +38,7 @@ Canonical release accompanying the manuscript *"Strategic Under-Specification: A
   - Robustness to exact conjunctive success probabilities $q(a,g)^{k-m}$ across parameter grids.
   - Monotonicity survival verified across 2,552 parameter intervals.
 - **Test Suite:**
-  - 52 automated pytest unit, regression, and symbolic tests (100% passing).
+  - 54 automated pytest unit, regression, and symbolic tests (100% passing).
 - **Literature & Scholarly Framing:**
   - Integrated foundational citations: Holmström (1984), Aghion and Tirole (1997), Kamenica and Gentzkow (2011), Hadfield-Menell & Hadfield (2019), Dessein (2002), Laban et al. (2025), Mirrlees (1971), Myerson (1979), and Ben-Porath et al. (2014).
   - Clean academic exposition with keywords, code availability, and AI-use disclosures.
