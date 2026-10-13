@@ -144,7 +144,7 @@ python3 run_all_math_checks.py --ignore-failures
 ```
 
 ### Running Unit Tests (pytest)
-Runs 52 comprehensive algebraic, numerical, regression, and symbolic tests:
+Runs 54 comprehensive algebraic, numerical, regression, and symbolic tests:
 ```bash
 pytest tests/ -q
 ```
@@ -203,7 +203,7 @@ strategic-underspecification/
 │   ├── verifications/                  # 17 standalone proposition & robustness runners
 │   ├── llm/                            # Anthropic client with retry, SQLite logging, dry-run
 │   └── experiments_llm/                # Simulated user experiments
-├── tests/                              # Pytest test suite (52 unit, regression & symbolic tests)
+├── tests/                              # Pytest test suite (54 unit, regression & symbolic tests)
 ├── outputs/                            # Generated artifacts (CSVs, high-res PNGs, Markdown)
 └── run_all_math_checks.py              # Master runner executing all 17 mathematical checks
 ```

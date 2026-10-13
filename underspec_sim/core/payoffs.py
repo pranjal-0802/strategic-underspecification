@@ -49,7 +49,9 @@ def user_utility_exact_conjunctive(
     V = params.V
     q = resolution_probability(a, params.g)
 
-    return V * (q ** (k - m)) - 0.5 * kappa * (m ** 2) - a * c_Q * (k - m)
+    residual = np.maximum(0.0, k - m) if isinstance(m, np.ndarray) else max(0.0, k - m)
+    prob = np.where(residual <= 0.0, 1.0, q ** residual) if isinstance(residual, np.ndarray) else (1.0 if residual <= 0.0 else q ** residual)
+    return V * prob - 0.5 * kappa * (m ** 2) - a * c_Q * residual
 
 
 def leader_payoff_per_type(

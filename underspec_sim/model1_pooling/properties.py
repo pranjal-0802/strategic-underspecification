@@ -3,8 +3,8 @@ underspec_sim.model1_pooling.properties: Verifications for Corollary 2 and Corol
 
 Corollary 2 (Bias shifts the pooling rate on interior branch):
 On the interior branch (\bar{Q} < 0),
-\partial a^{SE} / \partial \lambda_A = - (\bar{R}_0 / \bar{\gamma}) * (\mu_A * s) / (\mu_A * s - 2*b)^2 > 0
-when \bar{R}_0 < 0 (under-specification regime), where s = \Lambda - c_Q and b = \lambda_A - c_Q.
+\partial a^{SE} / \partial \lambda_A = - (\bar{R}_0 / \bar{\gamma}) * (\mu_A * s) / (\mu_A * s - 2*b)^2 <= 0
+when \bar{R}_0 >= 0 (physically feasible interior domain), where s = \Lambda - c_Q and b = \lambda_A - c_Q.
 
 Corollary 3 (Pooling is a corner solution, not a compromise):
 In the unbiased case (\mu_A = 1, \lambda_A = c_Q => b = 0), \bar{Q} = s^2 * \mathbb{E}[1/\kappa] / 2 >= 0 ALWAYS.

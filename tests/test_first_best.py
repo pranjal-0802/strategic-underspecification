@@ -62,3 +62,9 @@ def test_first_best_exact_conjunctive_threshold():
     assert 0.0 <= m_low <= p.k
     assert 0.0 <= m_high <= p.k
     assert a_high == 1.0
+
+    # Parameters where autonomous guessing strictly dominates asking (a_FB = 0.0)
+    p_guess = ModelParams(k=5.0, g=0.95, L=10.0, c_Q=8.0, V=100.0)
+    m_guess, a_guess, u_guess = first_best_exact(10.0, p_guess)
+    assert 0.0 <= m_guess <= p_guess.k
+    assert a_guess == 0.0

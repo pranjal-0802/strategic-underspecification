@@ -135,10 +135,8 @@ def run_llm_trial(
     loss_user = params.L * wrong_guesses
     user_utility = params.V - effort_cost - friction_cost_user - loss_user
 
-    # Leader payoff
-    friction_cost_leader = params.lambda_A * questions_asked
-    loss_leader = params.mu_A * (params.L * wrong_guesses)
-    leader_payoff = params.mu_A * params.V - effort_cost * params.mu_A - friction_cost_leader - loss_leader
+    # Leader payoff: Pi = mu_A * U - (lambda_A - c_Q) * questions_asked
+    leader_payoff = params.mu_A * user_utility - (params.lambda_A - params.c_Q) * questions_asked
 
     return SimulationTrialResult(
         trial_id=trial_id,

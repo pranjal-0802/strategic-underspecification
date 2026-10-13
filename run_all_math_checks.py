@@ -160,10 +160,24 @@ def main():
     # 9. Sweep distortion
     print("[9/17] Running Heterogeneity vs Bias 2D Sweep...")
     res_sweep = sweep_distortion(output_dir=args.output_dir)
+    results.append({
+        "item": "Sweep 2D",
+        "name": "Heterogeneity vs Bias 2D Sweep",
+        "verdict": "PASS" if res_sweep["passed"] else "FAIL",
+        "passed": res_sweep["passed"],
+        "note": f"Dominance holds ({res_sweep['all_dominate']}); downward distortion confirmed",
+    })
 
     # 10. Compare regimes
     print("[10/17] Running Model I vs Model II Regime Comparison...")
     res_comp = compare_regimes_runner(output_dir=args.output_dir)
+    results.append({
+        "item": "Regimes",
+        "name": "Model I vs Model II Regime Comparison",
+        "verdict": "PASS" if res_comp["passed"] else "FAIL",
+        "passed": res_comp["passed"],
+        "note": f"Dominance holds ({res_comp['all_dominate']}); min gap: {res_comp['min_gap']:+.4f}",
+    })
 
     # 11. Welfare Ordering
     print("[11/17] Running User Welfare Ordering across Bias Bands...")
