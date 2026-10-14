@@ -1,6 +1,6 @@
 r"""
 underspec_sim.verifications.verify_prop5:
-Verifies Proposition 5 (No distortion without bias):
+Verifies Proposition 6 in manuscript (formerly Prop 5 in early draft: No distortion without bias):
 At \mu_A = 1, \lambda_A = c_Q:
 - Confirms the solver returns (m_\kappa, a_\kappa) = first_best(\kappa) for both types to numerical tolerance.
 - Confirms IC constraints are strictly slack (not binding).

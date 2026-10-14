@@ -74,3 +74,22 @@ def test_prop7_effort_distortion_regime():
     # Compare with unconstrained biased benchmark m_H^B = c_Q^eff / kappa_H = 3.0 / 0.5 = 6.0
     assert res.m_H < 6.0
 
+
+def test_prop7_boundary_relaxation_dampens_distortion():
+    """Proposition 7 Claim 5: In relaxation band bar_kappa_L < kappa_L < c_Q^eff/k,
+    granting clarification to type L (a_L = 1, m_L < k) relaxes IC_L and dampens
+    downward distortion relative to the rigid (k, 0) saturation benchmark."""
+    p = ModelParams(k=10.0, g=0.5, L=10.0, c_Q=2.0, V=100.0, mu_A=1.0, lambda_A=3.0)
+    # c_Q=2, Lam=5, s=3, rho=1, c_Q_eff=3 => c_Q_eff/k = 0.30
+    # For f_L = 0.5, kappa_H = 0.45: bar_kappa_L = 0.260
+    # At kappa_L = 0.290 in (0.260, 0.300):
+    res = solve_menu(kappa_L=0.29, kappa_H=0.45, f_L=0.5, f_H=0.5, mu_A=1.0, lambda_A=3.0, c_Q=2.0, params=p, unconstrained_m=False)
+    assert res.a_L == pytest.approx(1.0, abs=1e-4)
+    assert res.m_L < 10.0
+
+    # Rigid saturation benchmark without relaxation:
+    m_H_star = (5.0 * 1.0) / (3.0 * (0.45 - 0.29) + 1.0 * 0.29)  # ~ 6.4935
+    a_H_saturation = 1.0 - (0.5 * 0.29 * (10.0 + m_H_star) - 2.0) / 3.0  # ~ 0.8697
+    # Boundary relaxation strictly dampens distortion: a_H > a_H_saturation
+    assert res.a_H > a_H_saturation + 0.05
+

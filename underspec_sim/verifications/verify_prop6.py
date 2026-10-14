@@ -1,12 +1,12 @@
 r"""
 underspec_sim.verifications.verify_prop6:
-Verifies Proposition 6 (Downward distortion of high-cost type's service under bias)
+Verifies Proposition 7 in manuscript (formerly Prop 6 in early draft: Downward distortion of high-cost type's service under bias)
 and conducts an extended active-constraint audit across bias magnitudes.
 
 At \lambda_A > \mu_A * c_Q:
 - Confirms a_L stays at biased-first-best corner a_L^B = 0.
 - Confirms a_H comes in strictly below its biased-first-best a_H^B.
-- Audits active constraint set vs corrected proof sketch (IC_L binding alone, IR_H slack).
+- Audits active constraint set vs proof sketch (IC_L binding alone, IR_H slack).
 - Extended sweep of (\lambda_A, \mu_A): checks whether IC_H or IR_H ever bind under extreme bias.
 
 Outputs:

@@ -117,3 +117,35 @@ def test_sympy_single_crossing_rent():
     expected_rent = (kappa_H - kappa_L) * m_H**2 / 2
 
     assert sp.simplify(rent - expected_rent) == 0
+
+
+def test_sympy_prop7_screening_foc_and_soc():
+    r"""
+    Prove symbolically that along the binding IC_L boundary:
+    1. m_H* = (Lambda * rho) / (s * (kappa_H - kappa_L) + rho * kappa_L) uniquely solves dPi_H/dm_H = 0.
+    2. d2Pi_H/dm_H2 = - mu * (s * (kappa_H - kappa_L) + rho * kappa_L) / s < 0, proving strict concavity.
+    3. IC_H is strictly slack: U_H(m_H*, a_H) - U_H(k, 0) = (kappa_H - kappa_L)*(k^2 - (m_H*)^2)/2 > 0.
+    """
+    m_H, k, s, rho, cq, kap_L, kap_H, mu = sp.symbols('m_H k s rho cq kap_L kap_H mu', positive=True)
+    Lam = s + cq
+
+    # a_H along binding IC_L boundary
+    a_H_sub = 1 - (kap_L * (k + m_H) / 2 - cq) / s
+
+    # Leader objective for H
+    pi_H = mu * (- Lam * (k - m_H) - (kap_H / 2) * m_H**2 + (s - rho) * a_H_sub * (k - m_H))
+    dpi_dm = sp.diff(pi_H, m_H)
+    m_sol = sp.solve(dpi_dm, m_H)[0]
+
+    expected_m = (Lam * rho) / (s * (kap_H - kap_L) + rho * kap_L)
+    assert sp.simplify(m_sol - expected_m) == 0
+
+    d2pi_dm2 = sp.diff(pi_H, m_H, 2)
+    expected_d2 = - mu * (s * (kap_H - kap_L) + rho * kap_L) / s
+    assert sp.simplify(d2pi_dm2 - expected_d2) == 0
+
+    # Rent / IC_H slackness
+    rent_k = (kap_H - kap_L) * k**2 / 2
+    rent_m = (kap_H - kap_L) * m_H**2 / 2
+    ic_h_slack = rent_k - rent_m
+    assert sp.simplify(ic_h_slack - (kap_H - kap_L) * (k**2 - m_H**2) / 2) == 0

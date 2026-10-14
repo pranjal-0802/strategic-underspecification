@@ -2,7 +2,7 @@
 
 **Status:** **PASS** (Ray-Invariance Fully Proved and Numerically Verified)
 
----
+***
 
 ## Executive Summary
 In Model I (pooling), the leader's quadratic objective is:
@@ -22,7 +22,7 @@ $$\tilde{\rho}^* = \frac{s(\bar{R}_0 + \bar{\gamma}/2)}{\bar{R}_0 + \bar{\gamma}
 - When $\tilde{\rho} > \tilde{\rho}^*$: $\Pi(1) - \Pi(0) < 0 \implies a^{SE} = 0$ (never ask), unconditionally for all $\mu_A > 0$.
 - **Conclusion**: The optimal corner solution is **strictly invariant** along any ray $\tilde{\rho} = (\lambda_A - c_Q) / \mu_A = \text{const}$. $\mu_A$ acts purely as a positive multiplicative scale on total profit without altering the sign of the discrete decision.
 
----
+***
 
 ## Numerical Verification Results
 - **Rays Tested**: 11 rays from $\tilde{\rho} = 0.20$ to $\tilde{\rho} = 1.60$ across 10 values of $\mu_A \in [0.1, 1.0]$ (110 evaluations).
@@ -45,7 +45,7 @@ $$\tilde{\rho}^* = \frac{s(\bar{R}_0 + \bar{\gamma}/2)}{\bar{R}_0 + \bar{\gamma}
 | 1.40 | Interior | -4.0925 | **0** | YES |
 | 1.60 | Interior | -5.9075 | **0** | YES |
 
----
+***
 
 ## Artifacts Generated
 - CSV: `outputs/mu_lambda_corner.csv`

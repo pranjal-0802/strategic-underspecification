@@ -183,7 +183,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 
 **Status:** **{verdict}** (Ray-Invariance Fully Proved and Numerically Verified)
 
----
+***
 
 ## Executive Summary
 In Model I (pooling), the leader's quadratic objective is:
@@ -203,7 +203,7 @@ $$\\tilde{{\\rho}}^* = \\frac{{s(\\bar{{R}}_0 + \\bar{{\\gamma}}/2)}}{{\\bar{{R}
 - When $\\tilde{{\\rho}} > \\tilde{{\\rho}}^*$: $\\Pi(1) - \\Pi(0) < 0 \\implies a^{{SE}} = 0$ (never ask), unconditionally for all $\\mu_A > 0$.
 - **Conclusion**: The optimal corner solution is **strictly invariant** along any ray $\\tilde{{\\rho}} = (\\lambda_A - c_Q) / \\mu_A = \\text{{const}}$. $\\mu_A$ acts purely as a positive multiplicative scale on total profit without altering the sign of the discrete decision.
 
----
+***
 
 ## Numerical Verification Results
 - **Rays Tested**: {len(ray_ratios)} rays from $\\tilde{{\\rho}} = {ray_ratios[0]:.2f}$ to $\\tilde{{\\rho}} = {ray_ratios[-1]:.2f}$ across 10 values of $\\mu_A \\in [0.1, 1.0]$ ({total_evals} evaluations).
@@ -226,7 +226,7 @@ $$\\tilde{{\\rho}}^* = \\frac{{s(\\bar{{R}}_0 + \\bar{{\\gamma}}/2)}}{{\\bar{{R}
         md_content += f"| {r:.2f} | {regime} | {norm_diff:+.4f} | **{corner}** | {'YES' if inv else 'NO'} |\n"
 
     md_content += f"""
----
+***
 
 ## Artifacts Generated
 - CSV: `outputs/mu_lambda_corner.csv`

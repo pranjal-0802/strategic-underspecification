@@ -1,7 +1,7 @@
 """
 underspec_sim.model2_screening.properties:
-- Proposition 5 verification (No distortion without bias, slack IC constraints)
-- Proposition 6 verification (Distortion under bias, active constraint set reporting)
+- Proposition 6 verification (No distortion without bias, slack IC constraints) [formerly Prop 5 in early draft]
+- Proposition 7 verification (Distortion under bias, active constraint set reporting) [formerly Prop 6 in early draft]
 - Heterogeneity vs Bias sweep (2D grid testing separability / monotonicity)
 """
 
@@ -43,7 +43,7 @@ def test_no_distortion_without_bias(
     tol: float = 1e-2,
 ) -> NoDistortionCheckResult:
     r"""
-    Proposition 5: At \mu_A = 1, \lambda_A = c_Q (unbiased):
+    Proposition 6 (formerly Prop 5): At \mu_A = 1, \lambda_A = c_Q (unbiased):
     Confirm the solver returns (m_\kappa, a_\kappa) = first_best(\kappa) for both types
     to numerical tolerance, and confirm IC constraints are strictly slack.
     """
@@ -79,13 +79,13 @@ def test_no_distortion_without_bias(
     passed = matches_fb and ic_slack
     if passed:
         msg = (
-            f"PASS (Prop 5): Menu matches First-Best ((mL,aL)=({res.m_L:.3f},{res.a_L:.3f}) vs "
+            f"PASS (Prop 6): Menu matches First-Best ((mL,aL)=({res.m_L:.3f},{res.a_L:.3f}) vs "
             f"FB ({m_FB_L:.3f},{a_FB_L:.3f}), (mH,aH)=({res.m_H:.3f},{res.a_H:.3f}) vs FB ({m_FB_H:.3f},{a_FB_H:.3f})). "
             f"IC constraints strictly slack (IC_L={res.IC_L_slack:.4f}, IC_H={res.IC_H_slack:.4f})."
         )
     else:
         msg = (
-            f"FAIL (Prop 5): matches_fb={matches_fb} (diff_L={diff_L:.4f}, diff_H={diff_H:.4f}), "
+            f"FAIL (Prop 6): matches_fb={matches_fb} (diff_L={diff_L:.4f}, diff_H={diff_H:.4f}), "
             f"ic_slack={ic_slack} (IC_L={res.IC_L_slack:.4f}, IC_H={res.IC_H_slack:.4f})."
         )
 
@@ -131,10 +131,10 @@ def test_distortion_under_bias(
     unconstrained_m: bool = False,
 ) -> DistortionUnderBiasResult:
     r"""
-    Proposition 6: At \lambda_A > \mu_A * c_Q (under-asking bias):
+    Proposition 7 (formerly Prop 6): At \lambda_A > \mu_A * c_Q (under-asking bias):
     - a_L stays at its biased-first-best corner (a_L^{SB} = a_L^B = 0)
     - a_H comes in strictly below its own biased-first-best (a_H^{SB} < a_H^B <= 1)
-    - Report active constraints (Corrected proof sketch: IC_L binding alone, IR_H slack).
+    - Report active constraints (Proof sketch: IC_L binding alone, IR_H slack).
     """
     if params is None:
         params = ModelParams()
@@ -166,10 +166,10 @@ def test_distortion_under_bias(
     assumed_active_str = "IC_L alone"
 
     msg = (
-        f"{'PASS' if passed else 'FAIL'} (Prop 6): a_L={res.a_L:.4f} (biased FB={a_B_L:.4f}), "
+        f"{'PASS' if passed else 'FAIL'} (Prop 7): a_L={res.a_L:.4f} (biased FB={a_B_L:.4f}), "
         f"a_H={res.a_H:.4f} (biased FB={a_B_H:.4f}, distortion={distortion_size:.4f}). "
         f"Observed active constraints: [{active_set_str}] "
-        f"(Paper corrected proof sketch: [{assumed_active_str}]). "
+        f"(Paper proof sketch: [{assumed_active_str}]). "
     )
     if not res.matches_paper_active_set:
         msg += (

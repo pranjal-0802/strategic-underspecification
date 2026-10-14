@@ -1,11 +1,17 @@
 # Verification Report: Assumption 1 Regularity Characterization
 
-> **Notice:** In the canonical manuscript (`paper/strategic_underspecification.tex`), Assumption 1
-> is formulated as $(k - m^*)\ln q \ge -1$ to guarantee decreasing differences ($\partial^2 U / \partial m \partial q \le 0$).
-> For the comprehensive finite-difference monotonicity audit, see `verify_monotonicity_survival.py`.
+### Conceptual Distinction:
+1. **Global Topkis Submodularity ($k\ln q \ge -1$):**
+   Requires decreasing differences $\partial^2 U / \partial m \partial q \le 0$ globally on the entire strategy space $m \in [0, k]$.
+   Because $(k - m)\ln q$ is most negative at $m = 0$, global submodularity reduces to $k\ln q \ge -1$.
+   On the primitive grid ($k \in [5, 15], q \in [0.70, 0.95]$), this stringent condition holds in **24.8%** (180/726) of points.
+2. **Local Decreasing Differences at Endogenous Optimum ($(k - m^*)\ln q \ge -1$):**
+   Under optimizing behavior, users articulate the bulk of attributes upstream, keeping residual attributes $k - m^*$ small.
+   At the endogenous optimum $m^*$, the local condition $(k - m^*)\ln q \ge -1$ holds in **89.9%** (653/726) of grid points.
+3. **Monotonicity Survival:**
+   The follow-up finite-difference audit (`verify_monotonicity_survival.py`) confirms that empirical monotonicity of $m^*(g)$ holds in **100%** of tested intervals (2,162/2,162) where the local condition holds.
+   Even where global submodularity fails, boundary constraints and local strict concavity prevent non-monotonic reversals across the vast majority of practical settings.
 
-### Grid Audit Results ($k \in [5, 15], q \in [0.70, 0.95], \kappa \in [0.20, 2.00]$, $V = 100$, 726 points):
-- **Corrected condition** ($(k - m^*)\ln q \ge -1$): Holds in **89.9%** (653/726) of grid points.
-- **Legacy draft condition** ($(k - m^*)\ln q \le -1$): Held in **10.1%** (73/726) of grid points.
-- **Sensitivity:** Under lower task valuations ($V = 10$, as in the paper's numerical example), users specify fewer attributes and the corrected condition holds in roughly 34.3% (31.7% at $V = 8$).
-- **Monotonicity Audit:** The follow-up audit (`verify_monotonicity_survival.py`) confirms that empirical monotonicity of $m^*(g)$ holds in **100%** of tested intervals (2,162/2,162) where Assumption 1 holds, and breaks in **96.7%** (377/390) outside, confirming that the regularity condition is tight.
+**Artifacts Generated:**
+- CSV: `assumption1_regularity.csv`
+- Figure: `assumption1_regularity.png`

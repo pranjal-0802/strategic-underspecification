@@ -290,7 +290,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 - **Key Question**: Does the monotonicity conclusion of Corollary 1 ($m^*(g)$ weakly decreasing in $g$) hold whenever Assumption 1 ($(k-m^*)\\ln q \\ge -1$) is satisfied, and does monotonicity break when Assumption 1 fails (confirming tightness)?
 - **Grid Swept**: $k \\in [5, 15]$ (11 points), $q \\in [0.70, 0.99]$ (30 points), $\\kappa \\in [0.20, 2.00]$ (8 types), totaling **{total_pairs}** finite-difference intervals.
 
----
+***
 
 ## Executive Summary & Verdict: **{verdict}**
 
@@ -313,7 +313,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
      - Where Assumption 1 holds ($(k - m)\\ln q \\ge -1$), naive users **under-specify** ($m^*_{{\\text{{naive}}}} \\le m^*_{{\\text{{soph}}}}$) in **100.0%** of intervals ({cross_tab_prop2['ass1_holds_naive_underspec']} / {ass1_holds_total}) because $m^*$ decreases with perceived accuracy.
      - Where Assumption 1 fails ($(k - m)\\ln q < -1$), naive users **over-specify** ($m^*_{{\\text{{naive}}}} > m^*_{{\\text{{soph}}}}$) in **93.85%** of intervals ({cross_tab_prop2['ass1_fails_naive_overspec']} / {ass1_fails_total}) because the positive cross-partial makes higher perceived accuracy induce higher specification effort.
 
----
+***
 
 ## Detailed Cross-Tabulation Tables
 
@@ -330,7 +330,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 | **Assumption 1 HOLDS** | **{cross_tab_prop2['ass1_holds_naive_worse']} / {ass1_holds_total} (100%)** | **{cross_tab_prop2['ass1_holds_naive_underspec']}** | **{cross_tab_prop2['ass1_holds_naive_overspec']}** |
 | **Assumption 1 FAILS** | **{cross_tab_prop2['ass1_fails_naive_worse']} / {ass1_fails_total} (100%)** | **{cross_tab_prop2['ass1_fails_naive_underspec']}** | **{cross_tab_prop2['ass1_fails_naive_overspec']}** |
 
----
+***
 
 ## Artifacts Generated
 - CSV: `outputs/monotonicity_survival.csv`

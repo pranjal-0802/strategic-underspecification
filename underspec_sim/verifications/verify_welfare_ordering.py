@@ -6,8 +6,9 @@ Parameters: k=10, L=10, c_Q=2, g=0.5 (s=3), V=100, \kappa_L=0.3, \kappa_H=0.5, f
 
 Regimes:
 1. Mild Bias (\lambda_A in [2.5, 3.0]):
-   - Pooling maintains universal clarification (a^{SE} = 1.0, W_pool = 85.33).
-   - Screening distorts a_H downward (a_H < 1.0, W_screen in [84.52, 85.00]).
+   - Pooling maintains universal clarification (a^{SE} = 1.0, W_pool = 85.33) with autonomous follower effort.
+   - Screening dictates higher prompt effort (m_L=8.33 > 6.67, m_H=5.00 > 4.00 at lambda_A=2.5) to economize
+     on provider friction, reducing user welfare (W_screen = 85.00 at 2.5; W_screen = 84.52 at 3.0).
    - Result: Pooling achieves HIGHER user welfare than screening (W_screen - W_pool < 0).
 2. Moderate Bias (\lambda_A in [3.5, 4.5]):
    - Pooling collapses to zero asking (a^{SE} = 0.0, W_pool = 80.00).
@@ -123,8 +124,8 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 
 ### Key Results Across Friction Bands:
 1. **Mild Bias ($\\lambda_A \\in [2.5, 3.0]$):**
-   - At $\\lambda_A = 2.5$: $W_{{pool}} = {df.loc[df['lambda_A']==2.5, 'W_pool'].values[0]:.2f}$, $W_{{screen}} = {df.loc[df['lambda_A']==2.5, 'W_screen'].values[0]:.2f}$ (Gap: ${df.loc[df['lambda_A']==2.5, 'W_gap'].values[0]:.2f}$). Pooling delivers higher user welfare because it preserves universal clarification ($a=1.0$).
-   - At $\\lambda_A = 3.0$: $W_{{pool}} = {df.loc[df['lambda_A']==3.0, 'W_pool'].values[0]:.2f}$, $W_{{screen}} = {df.loc[df['lambda_A']==3.0, 'W_screen'].values[0]:.2f}$ (Gap: ${df.loc[df['lambda_A']==3.0, 'W_gap'].values[0]:.2f}$).
+   - At $\\lambda_A = 2.5$: $W_{{pool}} = {df.loc[df['lambda_A']==2.5, 'W_pool'].values[0]:.2f}$, $W_{{screen}} = {df.loc[df['lambda_A']==2.5, 'W_screen'].values[0]:.2f}$ (Gap: ${df.loc[df['lambda_A']==2.5, 'W_gap'].values[0]:.2f}$). Pooling delivers higher user welfare because it preserves universal clarification ($a=1.0$) with autonomous follower effort choices ($m_L=6.67, m_H=4.0$), whereas screening exploits contractible specification to dictate higher effort ($m_L=8.33, m_H=5.00$), reducing user welfare.
+   - At $\\lambda_A = 3.0$: $W_{{pool}} = {df.loc[df['lambda_A']==3.0, 'W_pool'].values[0]:.2f}$, $W_{{screen}} = {df.loc[df['lambda_A']==3.0, 'W_screen'].values[0]:.2f}$ (Gap: ${df.loc[df['lambda_A']==3.0, 'W_gap'].values[0]:.2f}$), where screening additionally distorts asking downward ($a_H = 0.96$).
 2. **Moderate Bias ($\\lambda_A \\in [3.5, 4.5]$):**
    - At $\\lambda_A = 3.5$: $W_{{pool}} = {df.loc[df['lambda_A']==3.5, 'W_pool'].values[0]:.2f}$, $W_{{screen}} = {df.loc[df['lambda_A']==3.5, 'W_screen'].values[0]:.2f}$ (Gap: $+{df.loc[df['lambda_A']==3.5, 'W_gap'].values[0]:.2f}$). Screening delivers higher user welfare because pooling collapses to zero asking ($a=0$), while screening preserves partial clarification for high-cost types ($a_H > 0$).
    - At $\\lambda_A = 4.0$: $W_{{pool}} = {df.loc[df['lambda_A']==4.0, 'W_pool'].values[0]:.2f}$, $W_{{screen}} = {df.loc[df['lambda_A']==4.0, 'W_screen'].values[0]:.2f}$ (Gap: $+{df.loc[df['lambda_A']==4.0, 'W_gap'].values[0]:.2f}$).
