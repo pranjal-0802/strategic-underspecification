@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased: Review corrections and strengthenings (2026-10-16)
+
+### Corrected errors
+- **Monotonicity claim (Remark 1, Discussion):** the manuscript said $m^*(g)$ stays monotone in 100% of cases where the local regularity condition fails. The repository's own audit shows that monotonicity *breaks* in 96.7% (377/390) of those intervals. The text now reports this, so the local condition is close to necessary, and Corollary 1 separates the global (Topkis) and local (implicit function theorem) statements.
+- **Proposition 7, IR step:** the proof asserted $\max_m U(m,0;\kappa) = U(k,0;\kappa)$ for both types, which is false when $\kappa_H > \Lambda/k$. It is replaced by Lemma 2 (implementability with free prompt choice), which proves that both types weakly prefer their bundles to any off-menu prompt answered with $a = 0$.
+- **Proposition 7, regime 4:** "collapse to $(k,0)$" fails when $\kappa_L > \bar\kappa_L$ (beaten by the exact optimum in 19/40 draws). The saturation condition now governs regimes 3 and 4. The effort-distortion regime gets its own, correctly derived saturation condition, $f_H(c_Q^{eff} - \kappa_H \hat m) \le f_L(c_Q^{eff} - \kappa_L k)$.
+- **Welfare-ordering remark and P6:** wrong thresholds ($k_{\text{slack}} = 10.33$, $k_{\text{crit}} = 8.33$, $a_H = 0.833$ at $\lambda_A = 3$) are replaced by the exact optimum $(8.67, 1), (5.56, 0.97)$. The pooling breakpoints are exactly $\lambda_A = 3.0$ ($a$: $1 \to 2/3$) and $3.5$ ($\to 0$), not "$\approx 3.33$".
+- **Prohibitive-friction shutdown:** types are left at $\min\{k, \Lambda/\kappa\}$, not always at $m = k$.
+- **Discussion contradiction:** it said that participation does not bind at the bottom of the type distribution, while Section 6 said that it does. Both now state the reversed rent pattern consistently.
+- **Power analysis:** $n = 130$ per arm (not 134); a Bonferroni-corrected requirement and a cell-level caveat were added.
+- **Cost externality:** the effort gap is $(L_{\text{soc}} - L)(1-g)(1-a)/\kappa$; it previously omitted $(1-a)$ and named the wrong primitive.
+- **Unbacked statistic:** the "7% / 35%" guessing-trap incidence was not produced by any script. It is replaced by a reproducible sweep (12.2% / 51.6%, `verify_guessing_trap_incidence.py`).
+
+### New results
+- Unbiased pooling is a corner solution for **any** type distribution **with clipping** (convexity of $\max_m U(m,a)$ in $a$).
+- Corollary 2 now holds for any type distribution, clipped or not (Topkis, decreasing differences in $(a, \lambda_A)$); the numerical claim it replaces is no longer needed.
+- Asking distortion bound $0 < 1 - a_H^{SB} < \tilde\rho/s$.
+- Reversed rent pattern: without transfers, the efficient specifier is held to its outside option and the distorted type keeps a rent.
+- A $4\times2$ experimental design with a policy-disclosure factor, which identifies the belief channel (Prop. 2).
+
+### Verification
+- `verify_prop7_regimes.py`: an exact grid solver, independent of SLSQP. Closed forms match in 201/201 saturated draws; the effort-regime condition is sufficient in 82/82; Lemma 2 holds in 270/270.
+- `verify_guessing_trap_incidence.py`, plus `tests/test_review_strengthenings.py` (7 new tests; 63 total).
+
 ## v1.0.0: Submitted Paper Version
 
 Canonical release accompanying the manuscript *"Strategic Under-Specification: A Stackelberg Game Between User and Assistant"* (Agarwal, 2026).

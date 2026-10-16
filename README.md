@@ -9,9 +9,9 @@ Numerical verification, simulation, and LLM-based experimentation framework for 
 When users query AI coding assistants, they face a fundamental trade-off: spend cognitive effort specifying detailed constraints, edge cases, and architectural invariants, or leave them implicit and rely on the assistant to guess or ask clarifying questions. The assistant, in turn, commits to an asking policy: either a single population-wide ask rate (**Model I: Pooling**) or an incentive-compatible menu of asking rates conditioned on user specification effort (**Model II: Screening**).
 
 This repository provides complete, end-to-end computational verification of the paper's theoretical framework:
-- **First-Best Benchmark (Section 4.1):** Fully-informed, welfare-aligned social optimum $(m^{FB}, a^{FB})$ where asking weakly dominates guessing across the physically feasible domain $m \in [0, k]$ (Proposition 3).
-- **Model I: Pooling Policy (Section 5):** The assistant commits to a single population-wide ask rate $a \in [0, 1]$. In the unbiased baseline, leader payoff is weakly convex, making pooling a corner solution ($a^{SE} \in \{0, 1\}$, Corollary 4); in the biased regime, strict concavity produces an interior optimum, where perceived friction suppresses clarification ($\partial a^{SE}/\partial\lambda_A \le 0$, Corollary 2). Higher guessing accuracy induces an equilibrium capability reversal, lengthening user prompts and lowering welfare (The Guessing Trap, Proposition 5).
-- **Model II: Screening Policy (Section 6):** The assistant offers a menu $\{(m_L, a_L), (m_H, a_H)\}$ separating high- and low-cost specification types. Without bias, screening achieves First-Best (Proposition 6); under bias, asking rates are distorted downward (Proposition 7).
+- **First-Best Benchmark (Section 4.2):** Fully-informed, welfare-aligned social optimum $(m^{FB}, a^{FB})$ where asking weakly dominates guessing across the physically feasible domain $m \in [0, k]$ (Proposition 3).
+- **Model I: Pooling Policy (Section 5):** The assistant commits to a single population-wide ask rate $a \in [0, 1]$. In the unbiased baseline, leader payoff is convex in $a$ even with clipped best responses, making pooling a corner solution ($a^{SE} \in \{0, 1\}$, Corollary 4); in the biased regime, strict concavity can produce an interior optimum, and perceived friction weakly suppresses clarification for any type distribution ($\partial a^{SE}/\partial\lambda_A < 0$ on the interior branch, Corollary 2). When the ask rate falls steeply enough in $g$, higher guessing accuracy lengthens user prompts and lowers welfare (The Guessing Trap, Proposition 5).
+- **Model II: Screening Policy (Section 6):** The assistant offers a menu $\{(m_L, a_L), (m_H, a_H)\}$ separating high- and low-cost specification types. Without bias, screening achieves First-Best (Proposition 6); under bias, asking rates are distorted downward by at most $\tilde\rho/s$, and the menu is implementable with free prompt choice (Proposition 7, Lemma 2).
 - **Regime Comparison (Section 7):** Weak dominance of screening over pooling in leader payoff and non-monotonic ranking of user welfare across bias bands (Corollary 5).
 - **LLM Experimentation Layer:** Simulated users with heterogeneous specification cost types $\kappa$ interact with assistants applying the derived policies, audited in SQLite (`runs.db`) with a deterministic `--dry-run` stub and optional live API execution.
 
@@ -34,7 +34,7 @@ The table below maps every proposition, corollary, and robustness check in the p
 
 | Paper Section | Proposition / Corollary | Script / Module | Test File | Primary Artifacts | Result |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Sec 4.1** | **Prop 3** (First-Best Policy on Feasible Domain) | `underspec_sim/verifications/verify_prop3.py` | `tests/test_first_best.py` | `outputs/prop3_first_best.csv`, `.png`, `.md` | **PASS** *(verified on grid)* |
+| **Sec 4.2** | **Prop 3** (First-Best Policy on Feasible Domain) | `underspec_sim/verifications/verify_prop3.py` | `tests/test_first_best.py` | `outputs/prop3_first_best.csv`, `.png`, `.md` | **PASS** *(verified on grid)* |
 | **Sec 5.1** | **Prop 4** (Stackelberg Pooling Rate $a^{SE}$) | `underspec_sim/verifications/verify_prop4.py` | `tests/test_pooling.py` | `outputs/prop4_pooling_closed_form.csv`, `.png`, `.md` | **PASS** *(matches grid under SOC)* |
 | **Sec 5.1** | **Cor 2** (Friction Bias Suppresses Pooling Rate) | `underspec_sim/verifications/verify_cor2.py` | `tests/test_pooling.py` | `outputs/cor2_bias_direction.csv`, `.png`, `.md` | **PASS** *(strictly $\partial a^{SE}/\partial\lambda_A \le 0$ on valid domain)* |
 | **Sec 5.1** | **Lemma 1** (Welfare Friction Wedge & Ray Invariance) | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(derivative ratio $= -\tilde\rho$)* |
@@ -42,9 +42,11 @@ The table below maps every proposition, corollary, and robustness check in the p
 | **Sec 5.1** | **Cor 4** (Pooling is a Corner Solution in Unbiased Case) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `outputs/cor3_interiority.csv`, `.png`, `.md` | **PASS** *(unbiased is corner; biased is interior)* |
 | **Sec 5.2** | **Prop 5** (The Guessing Trap: Capability Reversal) | `underspec_sim/verifications/verify_prop5_guessing_trap.py` | `tests/test_pooling.py` | `outputs/prop5_guessing_trap.csv`, `.png`, `.md` | **PASS** *($da^{SE}/dg < 0$, prompt lengthening verified)* |
 | **Sec 7.1** | **Table 1** (Unbiased Pooling Sensitivity & Clipped Differences) | `underspec_sim/verifications/generate_table1.py` | `tests/test_pooling.py` | `outputs/table1_unbiased_sensitivity.csv`, `.md` | **PASS** *(all 11 rows strictly positive in [+0.15, +20.10])* |
-| **Sec 6.1** | **Prop 6** (Zero Distortion Without Bias) | `underspec_sim/verifications/verify_prop5.py` | `tests/test_screening.py` | `outputs/prop5_screening_no_bias.csv`, `.png`, `.md` | **PASS** *(recovers FB; IC slack)* |
-| **Sec 6.2** | **Prop 7** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `outputs/prop6_screening_biased.csv`, `.png`, `.md`, `outputs/prop6_bias_sweep_active_constraints.csv`, `.png` | **PASS** *(active set characterized)* |
-| **Sec 6.2** | **Remark** (Heterogeneity vs Bias Separability) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `outputs/distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** *(2D sweep verified)* |
+| **Sec 6.2** | **Prop 6** (Zero Distortion Without Bias) | `underspec_sim/verifications/verify_prop5.py` | `tests/test_screening.py` | `outputs/prop5_screening_no_bias.csv`, `.png`, `.md` | **PASS** *(recovers FB; IC slack)* |
+| **Sec 6.3** | **Prop 7** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `outputs/prop6_screening_biased.csv`, `.png`, `.md`, `outputs/prop6_bias_sweep_active_constraints.csv`, `.png` | **PASS** *(active set characterized)* |
+| **Sec 6.3** | **Prop 7 regimes, distortion bound, Lemma 2** (exact grid solver, independent of SLSQP) | `underspec_sim/verifications/verify_prop7_regimes.py` | `tests/test_review_strengthenings.py` | `outputs/prop7_regimes.csv`, `.md` | **PASS** *(closed forms 201/201 under saturation; effort-regime condition 82/82; implementable 270/270)* |
+| **Sec 5.2** | **Guessing-trap incidence** (clipped pooling model, 2,000 draws) | `underspec_sim/verifications/verify_guessing_trap_incidence.py` | N/A | `outputs/guessing_trap_incidence.csv`, `.md` | **PASS** *(12.2% of draws; 51.6% of interior draws)* |
+| **Sec 6.3** | **Remark** (Heterogeneity vs Bias Separability) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `outputs/distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** *(2D sweep verified)* |
 | **Sec 7** | **Cor 5** (Dominance of Menus over Pooling) | `underspec_sim/verifications/compare_regimes_runner.py` | `tests/test_comparison.py` | `outputs/regime_comparison.csv`, `.png`, `.md` | **PASS** *(dominance verified across grid)* |
 | **Sec 7** | **Welfare Ordering** (User Welfare Ordering Across Bias Bands) | `underspec_sim/verifications/verify_welfare_ordering.py` | `tests/test_pooling.py` | `outputs/welfare_ordering.csv`, `.png`, `.md` | **PASS** *(mild bias: pool wins; mod bias: screen wins; tie at shutdown)* |
 | **Sec 10** | **Robustness 1** (Exact vs Linear-Risk Conjunctive Model) | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `outputs/exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner survives in 100% of tested points)* |
@@ -133,7 +135,7 @@ pip install -e .
 ```
 
 ### Running Non-LLM Mathematical Verifications
-Runs all 17 verification and follow-up robustness suites, generates all CSVs and PNGs in `outputs/`, and prints a formatted summary table (~80s runtime):
+Runs all 19 verification and follow-up robustness suites, generates all CSVs and PNGs in `outputs/`, and prints a formatted summary table (~4 min runtime):
 
 ```bash
 # Strict mode: exits nonzero (1) if any proposition fails (offline, fast ~80s)
@@ -144,7 +146,7 @@ python3 run_all_math_checks.py --ignore-failures
 ```
 
 ### Running Unit Tests (pytest)
-Runs 54 comprehensive algebraic, numerical, regression, and symbolic tests:
+Runs 63 algebraic, numerical, regression, and symbolic tests:
 ```bash
 pytest tests/ -q
 ```

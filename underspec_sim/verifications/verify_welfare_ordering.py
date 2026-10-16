@@ -10,6 +10,9 @@ Regimes:
    - Screening dictates higher prompt effort (m_L=8.33 > 6.67, m_H=5.00 > 4.00 at lambda_A=2.5) to economize
      on provider friction, reducing user welfare (W_screen = 85.00 at 2.5; W_screen = 84.52 at 3.0).
    - Result: Pooling achieves HIGHER user welfare than screening (W_screen - W_pool < 0).
+   Pooling breakpoints are exact: a^{SE} = 1 for lambda_A <= 3.0, a^{SE} = 2/3 (kink where the
+   low-cost type leaves m = k) for 3.0 < lambda_A < 3.5, and a^{SE} = 0 for lambda_A >= 3.5.
+   At lambda_A = 3.0 the menu is (8.67, 1), (5.56, 0.97): kappa_L = c_Q^eff / k, outside Prop 7's hypotheses.
 2. Moderate Bias (\lambda_A in [3.5, 4.5]):
    - Pooling collapses to zero asking (a^{SE} = 0.0, W_pool = 80.00).
    - Screening preserves partial clarification for high-cost types (a_H in [0.70, 0.81], W_screen in [80.71, 82.45]).
@@ -86,7 +89,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     # User welfare comparison
     ax1.plot(df["lambda_A"], df["W_pool"], "b-o", label="Pooling User Welfare ($W_{\\text{pool}}$)")
     ax1.plot(df["lambda_A"], df["W_screen"], "r--s", label="Screening User Welfare ($W_{\\text{screen}}$)")
-    ax1.axvline(3.25, color="gray", linestyle=":", label="Regime Boundary")
+    ax1.axvline(3.0, color="gray", linestyle=":", label="Pooling leaves $a=1$ ($\\lambda_A=3.0$)")
     ax1.axvline(5.0, color="k", linestyle="--", label=r"Shutdown ($\tilde\rho \geq s$)")
     ax1.set_xlabel(r"Assistant Asking Friction $\lambda_A$")
     ax1.set_ylabel(r"User Welfare $W = \mathbb{E}[U]$")
