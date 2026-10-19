@@ -1,12 +1,12 @@
 # Strategic Under-Specification
 
-Numerical verification, simulation, and LLM-based experimentation framework for *"Strategic Under-Specification: A Stackelberg Game Between User and Assistant"* (Pranjal Agarwal, BITS Pilani).
+Numerical verification, simulation, and LLM-based experimentation framework for *"Strategic Under-Specification: Optimal Clarification Standards for AI Assistants"* (Pranjal Agarwal, BITS Pilani).
 
 ---
 
 ## 1. Overview & Architecture
 
-When users query AI coding assistants, they face a fundamental trade-off: spend cognitive effort specifying detailed constraints, edge cases, and architectural invariants, or leave them implicit and rely on the assistant to guess or ask clarifying questions. The assistant, in turn, commits to an asking policy: either a single population-wide ask rate (**Model I: Pooling**) or an incentive-compatible menu of asking rates conditioned on user specification effort (**Model II: Screening**).
+When users query AI coding assistants, they face a fundamental trade-off: spend cognitive effort specifying detailed constraints, edge cases, and architectural invariants, or leave them implicit and rely on the assistant to guess or ask clarifying questions. The assistant, in turn, commits to an asking policy: a single population-wide ask rate (**Model I: Pooling**), an incentive-compatible menu for two user types (**Model II: Screening**), or a schedule of clarification conditioned on prompt completeness for a continuum of users (**Model III: Continuum Screening**). The paper's main result is that, under moderate bias, the optimal schedule is a *minimum-specification standard*: ask about every open attribute once the prompt states at least $ar m^*$ requirements.
 
 This repository provides complete, end-to-end computational verification of the paper's theoretical framework:
 - **First-Best Benchmark (Section 4.2):** Fully-informed, welfare-aligned social optimum $(m^{FB}, a^{FB})$ where asking weakly dominates guessing across the physically feasible domain $m \in [0, k]$ (Proposition 3).
@@ -86,7 +86,7 @@ The computational verification suite evaluates the analytical claims across repr
 - The solver and automated verification suite agree with this closed-form selection rule across all tested configurations.
 
 ### 2. Corollary 2 (Friction Bias Suppresses Pooling Rate on Interior Branch)
-- On the interior branch ($\bar Q < 0$ with $a^{SE} \in (0, 1)$), direct differentiation of Proposition 4's closed form yields:
+- On the interior branch ($\alpha_2 < 0$ with $a^{SE} \in (0, 1)$), direct differentiation of Proposition 4's closed form yields:
   $$\frac{\partial a^{SE}}{\partial \lambda_A} = -\frac{\bar R_0}{\bar\gamma}\frac{\mu_A s}{(\mu_A s - 2b)^2} \le 0$$
   which is strictly non-positive on the valid domain $\bar R_0 \ge 0$.
 - Over a calibrated parameter sweep ($k=3, \Lambda=2.0, c_Q=1.0, \lambda_A \in [1.75, 1.95]$), $a^{SE}$ falls monotonically from $0.51$ to $0.06$, matching fine-grid optima within $0.5\%$ relative error.
@@ -129,6 +129,20 @@ The computational verification suite evaluates the analytical claims across repr
 
 ### 8. Constraint Co-activity ($\text{IC}_H$) Under Extreme Bias
 - Solving the 4D constrained screening menu problem under the exact conjunctive payoff $q^{k-m}$ confirms that under severe friction ($\lambda_A \ge 8.0$ at $\mu_A = 1.0$) or low altruism ($\mu_A \le 0.3$), $\text{IC}_H$ becomes co-active alongside $\text{IC}_L$.
+
+### 9. Theorem 1: The Minimum-Specification Standard (Continuum Screening)
+- With a continuum of user types, writing the value of clarification as $x = a\,s\,(k-m)$ makes user utility quasilinear, $U = U_0(m,\kappa) + x$ with $0 \le x \le s(k-m)$, and the leader's payoff $\mathbb{E}[U_0 + (1-r)x]$ with $r = \tilde\rho/s \in (0,1)$. The leader values the transfer it gives and is limited only by the cap.
+- Under moderate bias the optimum is the **standard** $a(m) = \mathbf{1}\{m \ge \bar m^*\}$ with $\bar m^* = c_Q^{eff}/\mathbb{E}[\kappa \mid \kappa \ge \kappa_b]$. Users with $\kappa < c_Q/\bar m^*$ write their first-best prompt $c_Q/\kappa$; the rest write exactly $\bar m^*$; everyone is fully clarified.
+- It is optimal **if and only if** a tail condition holds; for uniform types, iff $\bar m^* \le \Lambda/\bar\kappa$.
+- Computed check (`verify_continuum_standard.py`, exact optimal mechanism for 40 and 80 types, $k=10$, $\Lambda=5$, $c_Q=2$):
+  - Tail condition holds (4 cases): every type is fully clarified and the optimum exceeds the continuum standard only by an $O(1/N)$ term (extrapolated gap $\le 4\times10^{-4}$).
+  - Tail condition fails (uniform on $[0.22, 0.60]$, $r = 0.6$): the optimum beats the standard by $0.044$ and the tersest users get $a = 0.43$; their prompts follow the inverse-hazard formula $m = \Lambda/(\kappa + \frac{1-r}{r}\frac{1-F}{f})$ to within $0.03$.
+  - $\bar m^* = c_Q^{eff}/\mathbb{E}[\kappa \mid \text{pooled}]$ holds to $4\times10^{-5}$, and the wedge $\tilde\rho = \bar m^*\,\mathbb{E}[\kappa \mid \text{pooled}] - c_Q$ is recovered to $3\times10^{-5}$ (Corollary 8).
+- The welfare cost of bias is third order, $\frac{4}{3}f(\bar\kappa)\tilde\rho^3/c_Q$ (Corollary 7), against second order for two types (Corollary 6); `tests/test_continuum.py` checks the ratio converges to one as $\tilde\rho \to 0$.
+
+### 10. Lemma 4 and Proposition 8
+- **Lemma 4:** the screening menu is implementable by a continuous schedule $\alpha(m) = \min\{1, \bar a_L(m), \bar a_H(m)\}$ (no gain from any prompt in 212 menus), but a minimum-effort threshold fails in the saturation regimes and in Corollary 6.
+- **Proposition 8:** with ordered attribute stakes and an attribute-blind ask rate, diligent users guess and terse users ask, split at a unique $\hat\kappa$ (single sign change in 40/40 random stake profiles; benchmark $\hat\kappa = 0.313$, zero-bias gap $0.076$ on $V = 100$).
 
 ---
 
@@ -216,6 +230,7 @@ strategic-underspecification/
 │   ├── core/                           # Primitives, payoffs, best-response, first-best
 │   ├── model1_pooling/                 # Quadratic pooling payoff & closed-form solver
 │   ├── model2_screening/               # Constrained menu solver & active-set audit
+│   ├── model3_continuum/               # Continuum screening: standard, tail condition, N-type mechanism
 │   ├── comparison/                     # Regime dominance & welfare decomposition
 │   ├── verifications/                  # 23 standalone proposition & robustness runners
 │   ├── llm/                            # Anthropic client with retry, SQLite logging, dry-run
@@ -233,7 +248,7 @@ If you use this framework, reproduction code, or cite the formal Stackelberg mod
 
 ```bibtex
 @article{agarwal2026underspec,
-  title={Strategic Under-Specification: A Stackelberg Game Between User and Assistant},
+  title={Strategic Under-Specification: Optimal Clarification Standards for AI Assistants},
   author={Agarwal, Pranjal},
   journal={Working Paper, BITS Pilani},
   year={2026},

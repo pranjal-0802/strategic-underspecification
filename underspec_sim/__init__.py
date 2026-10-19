@@ -1,6 +1,6 @@
 """
 underspec_sim: Numerical verification and simulation framework for
-'Strategic Under-Specification: A Stackelberg Game Between User and Assistant'
+'Strategic Under-Specification: Optimal Clarification Standards for AI Assistants'
 (Agarwal, 2026).
 """
 
