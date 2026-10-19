@@ -204,7 +204,13 @@ def solve_menu(
         if best_res is None or (is_fallback_feasible and res.fun < best_val):
             best_res = res
 
-    opt_x = best_res.x
+    opt_x = np.array(best_res.x, dtype=float)
+    # At m = k no attribute is left open, so the ask rate is payoff-irrelevant; report it as 0,
+    # matching the paper's (k, 0) convention, instead of wherever the optimizer stopped.
+    if m_upper is not None:
+        for i_m, i_a in ((0, 1), (2, 3)):
+            if opt_x[i_m] >= k - 1e-7:
+                opt_x[i_m], opt_x[i_a] = k, 0.0
     mL, aL, mH, aH = float(opt_x[0]), float(opt_x[1]), float(opt_x[2]), float(opt_x[3])
 
     ic_L_val = float(ic_L_con(opt_x))

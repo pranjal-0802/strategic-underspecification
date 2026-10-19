@@ -98,11 +98,29 @@ def biased_first_best(
     r"""
     Compute leader's biased preferred bundle (m_B, a_B) = argmax_{m,a} \Pi_\kappa(m, a)
     per Section 6.3 in the paper.
+
+    With clip=True (feasible domain m in [0, k]): \partial\Pi/\partial a = \mu_A(\Lambda - c_Q^eff)(k - m),
+    so for \Lambda > c_Q^eff the leader prefers a_B = 1 with m_B = c_Q^eff / \kappa whenever that is
+    below k; at m_B = k asking is payoff-irrelevant and we report a_B = 0, matching the paper's
+    unconstrained menu ((k, 0), (m_H^B, 1)). For \Lambda <= c_Q^eff, a_B = 0 and m_B = min(k, \Lambda/\kappa).
+    With clip=False the legacy unclipped threshold \kappa^{*B} = (\Lambda + c_Q^eff)/(2k) is used.
     """
     kappa_star_B = params.kappa_star_biased
     Lambda = params.Lambda
     c_Q_eff = params.c_Q + (params.lambda_A - params.c_Q) / params.mu_A
     k = params.k
+
+    if clip:
+        kap_arr = np.asarray(kappa, dtype=float)
+        if Lambda > c_Q_eff:
+            m_B = np.minimum(k, c_Q_eff / kap_arr)
+            a_B = np.where(m_B < k, 1.0, 0.0)
+        else:
+            m_B = np.minimum(k, Lambda / kap_arr)
+            a_B = np.zeros_like(kap_arr)
+        if isinstance(kappa, np.ndarray):
+            return m_B, a_B
+        return float(m_B), float(a_B)
 
     if isinstance(kappa, np.ndarray):
         a_B = np.zeros_like(kappa, dtype=float)

@@ -213,7 +213,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     ax.set_xticklabels(categories)
     ax.set_ylabel("Ask Rate a")
     ax.set_ylim(-0.05, 1.15)
-    ax.set_title(f"Proposition 6: Downward Distortion under Bias (a_H: {res_biased.a_B_H:.2f} -> {res_biased.res.a_H:.2f})")
+    ax.set_title(f"Proposition 7: Downward Distortion under Bias (a_H: {res_biased.a_B_H:.2f} -> {res_biased.res.a_H:.2f})")
     ax.grid(True, alpha=0.3)
     ax.legend()
 
@@ -257,7 +257,7 @@ Across a 2D sweep of $\\lambda_A \\in [c_Q, 10 c_Q] = [2.0, 20.0]$ and $\\mu_A \
   *Rationale:* Under extreme friction or very low altruism, $\\Pi_{{\\kappa_H}}$ and $U(\\cdot;\\kappa_H)$ diverge substantially, causing both incentive compatibility constraints to bind simultaneously (pooling or boundary saturation at $m=k$).
 
 ### 3. Conclusion on Corrected Paper:
-The paper's updated proof sketch and Remark 2 accurately reflect these findings:
+The paper's updated proof sketch and Remark 10 (active constraints) accurately reflect these findings:
 1. In representative under-asking regions, $IC_L$ binds alone while $IR_H$ remains slack.
 2. Under extreme bias, $IC_H$ can also bind, confirming the paper's caveat that the active set is parameter-region specific.
 3. In all regions with under-asking bias, $a_H^{{SB}} < a_H^B$ holds strictly.

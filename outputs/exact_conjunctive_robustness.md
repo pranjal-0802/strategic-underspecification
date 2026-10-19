@@ -7,11 +7,12 @@
 1. **Corollary 4 (Corner Solution Property) Survives Universally:**
    - **Corner Solution Rate:** **100.0%** (In 30/30 grid points, a_SE in [0.0, 1.0]).
    - In no region did an interior compromise optimum (a_SE in (0.02, 0.98)) emerge.
-   - For small k <= 3, a_SE = 0 (never ask); for all k >= 5 across all g in [0.50, 0.95], a_SE = 1 (always ask).
+   - In 5 configurations the payoff is exactly flat in a (every type saturates at m = k under both a = 0 and a = 1), so asking is payoff-irrelevant; these are reported as ties, not as a preference for guessing. Of the 25 non-tied configurations, 25 select a_SE = 1.
 
 2. **Calibration Reconciliation with Linear Baselines:**
-   - **Taylor-Expansion Baseline (L = V = 100):** Agrees with the exact model in **25 of 30 configurations (83.3%)**. All 5 divergences occur exclusively at k=3, where compounding (q^3) makes autonomous guessing preferred over question friction. For all k >= 5, both models select a_SE = 1.0.
-   - **Additive Localized-Defect Baseline (L = 10):** Agrees in **17 of 30 configurations (56.7%)**. Divergences occur at high g >= 0.90 where localized attribute stakes make guessing cost-effective earlier than systemic failure stakes.
+   - **Taylor-Expansion Baseline (L = V = 100):** raw disagreements 5/30; strict divergences (both models strictly prefer different corners) 0/30. The raw disagreements are the ties above, broken in opposite directions by the two solvers.
+   - **Additive Localized-Defect Baseline (L = 10):** raw disagreements 13/30; strict divergences 10/30, of which 10 occur where Lambda = L(1-g) <= c_Q, i.e. outside the maintained assumption Lambda > c_Q. There the linear model rationally guesses, while the exact model (marginal stake V(1-g) > c_Q) keeps asking.
+   - Neither comparison exhibits a zero-bias instrument-restriction loss; see `verify_exact_firstbest_gap.py` for where one does arise.
 
 3. **Proposition 7 (Downward Distortion Under Bias) Robustness:**
    - **Downward Distortion Rate:** a_H_SB <= a_H_B holds everywhere, with strict downward distortion a_H_SB < a_H_B whenever m does not saturate at k (holding in **66.7%** of grid points: 20% at k in [3, 5], 80% at k in [8, 20], and 100% at k in [10, 15]).

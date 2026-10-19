@@ -175,7 +175,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
         ax1.axvline(res_valid.a_SE_closed, color="gold", ls=":", label=f"Prop 4 Formula: {res_valid.a_SE_closed:.3f}")
     ax1.set_xlabel("Pooling Ask Rate a")
     ax1.set_ylabel("Leader Payoff Pi(a)")
-    ax1.set_title("Prop 4: Valid Physical SOC Regime (Q_bar < 0)")
+    ax1.set_title(r"Proposition 4: Concave Regime ($\alpha_2 < 0$)")
     ax1.grid(True, alpha=0.3)
     ax1.legend()
 
@@ -184,7 +184,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     ax2.axvline(res_unbiased.a_SE_grid, color="crimson", ls="--", label=f"Grid Max: {res_unbiased.a_SE_grid:.3f}")
     ax2.set_xlabel("Pooling Ask Rate a")
     ax2.set_ylabel("Leader Payoff Pi(a)")
-    ax2.set_title("Prop 4: Unbiased Corner Regime (Q_bar > 0)")
+    ax2.set_title(r"Proposition 4: Unbiased Corner Regime ($\alpha_2 > 0$)")
     ax2.grid(True, alpha=0.3)
     ax2.legend()
 

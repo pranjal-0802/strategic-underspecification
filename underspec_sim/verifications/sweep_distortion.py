@@ -40,8 +40,13 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     csv_path = os.path.join(output_dir, "distortion_sweep_2d.csv")
     df.to_csv(csv_path, index=False)
 
-    # Plot 3 panels
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(19, 5))
+    # Plot: line panel on top, two heatmaps below (legible at page width)
+    plt.rcParams.update({"font.size": 13, "axes.titlesize": 14, "axes.labelsize": 13})
+    fig = plt.figure(figsize=(14, 11))
+    gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 1.15])
+    ax1 = fig.add_subplot(gs[0, :])
+    ax2 = fig.add_subplot(gs[1, 0])
+    ax3 = fig.add_subplot(gs[1, 1])
 
     # Panel 1: Distortion vs delta_kappa for each bias level
     for b in bias_values:
@@ -69,7 +74,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     for i in range(len(pivot_dist.index)):
         for j in range(len(pivot_dist.columns)):
             val = pivot_dist.values[i, j]
-            ax2.text(j, i, f"{val:.2f}", ha="center", va="center", color="black", fontsize=9)
+            ax2.text(j, i, f"{val:.2f}", ha="center", va="center", color="black", fontsize=12)
 
     # Panel 3: Heatmap of welfare gap (Pi_II - Pi_I) with pooling regime flagged
     pivot_gap = df.pivot(index="bias", columns="delta_kappa", values="payoff_gap")
@@ -81,7 +86,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     ax3.set_yticklabels([f"{r:.1f}" for r in pivot_gap.index])
     ax3.set_xlabel(r"Heterogeneity $\Delta\kappa$")
     ax3.set_ylabel(r"Bias ($\lambda_A - c_Q$)")
-    ax3.set_title(r"Welfare Gap ($\Pi_{II} - \Pi_I$) [Regime Flagged]")
+    ax3.set_title(r"Leader-Payoff Gap ($\Pi_{II} - \Pi_I$), Pooling Regime C/I")
     plt.colorbar(im3, ax=ax3, label=r"$\Pi_{II} - \Pi_I$")
 
     # Annotate gap and regime ("C" for corner, "I" for interior)
@@ -90,40 +95,49 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
             gap_val = pivot_gap.values[i, j]
             reg = pivot_regime.values[i, j]
             reg_code = "C" if reg == "corner" else "I"
-            ax3.text(j, i, f"{gap_val:.2f}\n({reg_code})", ha="center", va="center", color="white", fontsize=8, fontweight="bold")
+            ax3.text(j, i, f"{gap_val:.2f}\n({reg_code})", ha="center", va="center", color="white", fontsize=11, fontweight="bold")
 
     plt.tight_layout()
     png_path = os.path.join(output_dir, "distortion_sweep_2d.png")
     plt.savefig(png_path, dpi=150)
     plt.close()
+    plt.rcParams.update(plt.rcParamsDefault)
 
-    # Check downward distortion whenever type H's biased benchmark prefers asking (a_H_B = 1)
-    sub_h_asks = df[df["a_H_B"] > 0.5]
-    downward_when_asks = bool((sub_h_asks["distortion"] >= -1e-4).all()) if len(sub_h_asks) > 0 else True
+    # Distortion must be downward (a_H^SB <= a_H^B) wherever asking matters (m_H < k).
+    downward_when_asks = bool((df["distortion"] >= -1e-4).all())
+    pivot_table = pivot_dist.round(3).to_string()
+    # P7: in the saturation regime (type L at (k, 0)), positive distortion falls as heterogeneity widens.
+    sat = df[(df["m_L"] >= df["m_L"].max() - 1e-6) & (df["distortion"] > 1e-6)]
+    falls_with_het = {}
+    for b in bias_values:
+        d = sat[sat["bias"] == b].sort_values("delta_kappa")["distortion"].values
+        if len(d) > 1:
+            falls_with_het[b] = bool(np.all(np.diff(d) <= 1e-6))
+    n_relax = int(((df["m_L"] < df["m_L"].max() - 1e-6) & (df["distortion"] > 1e-6)).sum())
 
     # Check dominance
     all_dominate = bool((df["payoff_gap"] >= -1e-4).all())
     regimes_count = df["pooling_regime"].value_counts().to_dict()
 
-    passed = bool(all_dominate and downward_when_asks)
+    passed = bool(all_dominate and downward_when_asks and all(falls_with_het.values()))
     verdict = "PASS" if passed else "FAIL"
     md_content = fr"""# Verification Report: Heterogeneity vs Bias Distortion & Welfare Sweep
 
 **Status:** **{verdict}**
 
-### 1. Analysis of Section 7 Remark (Separability / Compounding):
-- **Heterogeneity Range:** $\\Delta\\kappa \\in [{df['delta_kappa'].min():.2f}, {df['delta_kappa'].max():.2f}]$.
-- **Bias Range:** $\\text{{Bias}} = \\lambda_A - c_Q \\in [{df['bias'].min():.1f}, {df['bias'].max():.1f}]$.
-- **Observed Behavior:**
-  - As predicted by the Remark in Section 7, distortion shrinks toward zero as heterogeneity $\\Delta\\kappa \\to 0$.
-  - Distortion is monotonically increasing in cost heterogeneity $\\Delta\\kappa$.
-  - The response to heterogeneity scales consistently across bias levels, supporting the paper's separability claim between bias and heterogeneity.
+### 1. Downward distortion $a_H^B - a_H^{{SB}}$ across heterogeneity and bias ($\\kappa_L = {kappa_L}$):
+```
+{pivot_table}
+```
+- **Direction:** distortion is non-negative in every cell (downward): **{downward_when_asks}**. Cells where $m_H^{{SB}} = k$ are recorded as zero, because no attribute is left open and $a_H$ is payoff-irrelevant.
+- **Zero cells:** under prohibitive friction (bias $\\ge 3$, i.e. $c_Q^{{eff}} \\ge \\Lambda = 5$) the leader never asks, and at narrow heterogeneity the high-cost type specifies fully (full-specification regime of Proposition 7).
+- **Heterogeneity:** in the saturation regime (type L at $(k, 0)$), positive distortion falls as $\\Delta\\kappa$ widens, by bias level: {falls_with_het}. This matches Proposition 7 and P7 (distortion intensifies as heterogeneity narrows). {n_relax} positive cells are in the boundary-relaxation regime (type L receives clarification, item 5 of Proposition 7), where no monotonicity in $\\Delta\\kappa$ is claimed.
 
-### 2. Welfare Gap (Screening vs Corrected Pooling) & Regime Flags:
+### 2. Leader-Payoff Gap (Screening vs Corrected Pooling) & Regime Flags:
 - **Dominance Holds:** **{all_dominate}** (Minimum gap: `{df['payoff_gap'].min():.4f}`).
 - **Pooling Regimes in Sweep:** `{regimes_count}`.
-- In this parameter region ($k=10, L=10, c_Q=2$), $\\Pi_I(a)$ is minimized in the interior and achieves its maximum at corner $a^{{SE}}=0$ (`regime: corner`).
-- The welfare advantage of screening ($\Pi_{{II}} - \Pi_I$) grows with heterogeneity $\Delta\kappa$ and persists across all bias levels.
+- Pooling ask rates in the sweep ($k=10, L=10, c_Q=2$): {sorted(df['a_SE'].round(3).unique().tolist())}.
+- The leader-payoff advantage of screening ($\Pi_{{II}} - \Pi_I$) is positive in {int((df['payoff_gap'] > 1e-4).sum())} of {len(df)} cells, all with bias $\le {df.loc[df['payoff_gap'] > 1e-4, 'bias'].max():.0f}$; under prohibitive friction both regimes shut down asking and tie.
 
 **Artifacts Generated:**
 - CSV: `distortion_sweep_2d.csv`

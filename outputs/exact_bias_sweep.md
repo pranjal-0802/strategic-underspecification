@@ -1,7 +1,7 @@
 # Verification Report: Constraint Binding Under Exact Conjunctive Payoff
 
 ## Overview
-- **Reference**: `paper/strategic_underspecification.tex`, Proposition 7, Remark 7, Section 10 (Discussion).
+- **Reference**: `paper/strategic_underspecification.tex`, Proposition 7, Remark 10 (active constraints), Section 10 (Discussion).
 - **Key Question**: Does the extreme-bias reversal (where $\text{IC}_H$ binds alongside $\text{IC}_L$ under severe bias) occur under the **EXACT** conjunctive payoff $q(a,g)^{k-m}$, or does the exact form prevent $\text{IC}_H$ from ever binding?
 - **Grid Swept**: $\lambda_A \in [c_Q, 10 c_Q] = [2.0, 20.0]$ (10 values), $\mu_A \in [0.1, 1.0]$ (10 values), totaling **100** screening menu optimizations.
 
@@ -16,7 +16,7 @@
      - **None bind** (unbiased / low bias, first-best implementable): **10 points (10.0%)**
      - **$\text{IC}_L$ alone binds** (standard Proposition 7 screening regime): **1 points (1.0%)**
      - **$\text{IC}_L + \text{IC}_H$ both bind** (extreme bias regime): **89 points (89.0%)**
-   - The paper's analysis in Remark 7 is confirmed under the exact conjunctive payoff.
+   - The paper's analysis in Remark 10 (active constraints) is confirmed under the exact conjunctive payoff.
 
 2. **Structural Concordance Between Exact and Linear-Risk Models**:
    - Both models partition the $(\mu_A, \lambda_A)$ plane into the identical three qualitative regimes:

@@ -23,9 +23,21 @@ Checks:
 - Follow-up 3 (Task 3): Constraint Binding Under Exact Bias Sweep
 - Prop 7 Regimes: exact grid audit of closed forms, saturation conditions, distortion bound, implementability lemma
 - Guessing Trap Incidence: share of random draws exhibiting the trap in the clipped pooling model
+- Exact FB Gap: zero-bias pooling-vs-screening gap under the exact conjunctive payoff (who asks, who guesses)
+- Lemma 4: continuous implementation of screening menus; failure of minimum-effort thresholds
+- Prop 8: heterogeneous attribute stakes (first-best asking threshold, zero-bias gap)
+- Theorem 1: continuum screening, the minimum-specification standard and its tail condition
 
 Prints a summary table with PASS / CAUTION / FAIL verdicts.
 """
+
+import os
+
+# The solvers work on small dense matrices, where multithreaded BLAS is much slower than one thread
+# (the continuum check takes ~45 s single-threaded and ~16 min with default threading).
+# This must run before numpy is imported.
+for _var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ.setdefault(_var, "1")
 
 import sys
 import time
@@ -51,6 +63,10 @@ from underspec_sim.verifications.verify_mu_lambda_corner import run_verification
 from underspec_sim.verifications.verify_exact_bias_sweep import run_verification as verify_exact_bias_sweep
 from underspec_sim.verifications.verify_prop7_regimes import run_verification as verify_prop7_regimes
 from underspec_sim.verifications.verify_guessing_trap_incidence import run_verification as verify_guessing_trap_incidence
+from underspec_sim.verifications.verify_exact_firstbest_gap import run_verification as verify_exact_firstbest_gap
+from underspec_sim.verifications.verify_continuous_implementation import run_verification as verify_continuous_implementation
+from underspec_sim.verifications.verify_heterogeneous_stakes import run_verification as verify_heterogeneous_stakes
+from underspec_sim.verifications.verify_continuum_standard import run_verification as verify_continuum_standard
 
 
 def main():
@@ -67,7 +83,7 @@ def main():
     results: List[Dict[str, Any]] = []
 
     # 1. Prop 3
-    print("[1/19] Verifying Proposition 3 (First-Best Asking Dominance)...")
+    print("[1/23] Verifying Proposition 3 (First-Best Asking Dominance)...")
     res_p3 = verify_prop3(output_dir=args.output_dir)
     results.append({
         "item": "Prop 3",
@@ -78,18 +94,18 @@ def main():
     })
 
     # 2. Prop 4
-    print("[2/19] Verifying Proposition 4 (Pooling Closed-Form vs Grid)...")
+    print("[2/23] Verifying Proposition 4 (Pooling Closed-Form vs Grid)...")
     res_p4 = verify_prop4(output_dir=args.output_dir)
     results.append({
         "item": "Prop 4",
         "name": "Pooling Equilibrium Closed Form",
         "verdict": "PASS" if res_p4["passed"] else "FAIL",
         "passed": res_p4["passed"],
-        "note": f"Matches grid under SOC Q_bar<0 (gap: {res_p4['res_valid'].discrepancy:.4f})",
+        "note": f"Matches grid under SOC alpha_2<0 (gap: {res_p4['res_valid'].discrepancy:.4f})",
     })
 
     # 3. Cor 2
-    print("[3/19] Verifying Corollary 2 (Bias Shifts Pooling Rate on Interior Branch)...")
+    print("[3/23] Verifying Corollary 2 (Bias Shifts Pooling Rate on Interior Branch)...")
     res_c2 = verify_cor2(output_dir=args.output_dir)
     results.append({
         "item": "Cor 2",
@@ -100,7 +116,7 @@ def main():
     })
 
     # 4. Cor 3
-    print("[4/19] Verifying Corollary 3 (Continuous Transition & Unbiased Corner)...")
+    print("[4/23] Verifying Corollary 3 (Continuous Transition & Unbiased Corner)...")
     res_c3 = verify_cor3(output_dir=args.output_dir)
     results.append({
         "item": "Cor 3",
@@ -111,7 +127,7 @@ def main():
     })
 
     # 5. Prop 5: Guessing Trap
-    print("[5/19] Verifying Proposition 5 (The Guessing Trap / Equilibrium Capability Reversal)...")
+    print("[5/23] Verifying Proposition 5 (The Guessing Trap / Equilibrium Capability Reversal)...")
     res_gt = verify_prop5_guessing_trap(output_dir=args.output_dir)
     df_gt = res_gt["df_sweep"]
     a_g50 = df_gt.loc[df_gt["g"] == 0.50, "a_SE"].values[0]
@@ -127,7 +143,7 @@ def main():
     })
 
     # 6. Table 1 (Unbiased Sensitivity & Physical Feasibility)
-    print("[6/19] Verifying Table 1 (Unbiased Pooling Sensitivity & Clipped Differences)...")
+    print("[6/23] Verifying Table 1 (Unbiased Pooling Sensitivity & Clipped Differences)...")
     df_t1 = run_table1_verification(output_dir=args.output_dir)
     t1_all_pos = bool((df_t1["clipped_delta"] > 0).all())
     results.append({
@@ -139,7 +155,7 @@ def main():
     })
 
     # 7. Prop 6 (Screening without bias)
-    print("[7/19] Verifying Proposition 6 (Screening Without Bias)...")
+    print("[7/23] Verifying Proposition 6 (Screening Without Bias)...")
     res_p6 = verify_prop6_screening_no_bias(output_dir=args.output_dir)
     results.append({
         "item": "Prop 6",
@@ -150,7 +166,7 @@ def main():
     })
 
     # 8. Prop 7 (Screening under bias)
-    print("[8/19] Verifying Proposition 7 (Screening Distortion Under Bias)...")
+    print("[8/23] Verifying Proposition 7 (Screening Distortion Under Bias)...")
     res_p7 = verify_prop7_screening_biased(output_dir=args.output_dir)
     active_str = ", ".join(res_p7["active_constraints"]) if res_p7["active_constraints"] else "None"
     results.append({
@@ -162,7 +178,7 @@ def main():
     })
 
     # 9. Sweep distortion
-    print("[9/19] Running Heterogeneity vs Bias 2D Sweep...")
+    print("[9/23] Running Heterogeneity vs Bias 2D Sweep...")
     res_sweep = sweep_distortion(output_dir=args.output_dir)
     results.append({
         "item": "Sweep 2D",
@@ -173,7 +189,7 @@ def main():
     })
 
     # 10. Compare regimes
-    print("[10/19] Running Model I vs Model II Regime Comparison...")
+    print("[10/23] Running Model I vs Model II Regime Comparison...")
     res_comp = compare_regimes_runner(output_dir=args.output_dir)
     results.append({
         "item": "Regimes",
@@ -184,7 +200,7 @@ def main():
     })
 
     # 11. Welfare Ordering
-    print("[11/19] Running User Welfare Ordering across Bias Bands...")
+    print("[11/23] Running User Welfare Ordering across Bias Bands...")
     res_welf = verify_welfare_ordering(output_dir=args.output_dir)
     df_welf = res_welf["df"]
     gap_mild = df_welf.loc[df_welf["lambda_A"] == 2.5, "W_gap"].values[0]
@@ -198,18 +214,18 @@ def main():
     })
 
     # 12. Robustness Check 1: Exact Conjunctive Success
-    print("[12/19] Running Robustness Check 1: Exact Conjunctive Model...")
+    print("[12/23] Running Robustness Check 1: Exact Conjunctive Model...")
     res_exact = verify_exact_conjunctive(output_dir=args.output_dir)
     results.append({
         "item": "Rob 1",
         "name": "Exact Conjunctive Robustness",
         "verdict": res_exact["verdict"],
         "passed": res_exact["passed"],
-        "note": f"Corner survived in {res_exact['corner_rate']*100:.0f}%; downward dist in {res_exact['downward_dist_rate']*100:.0f}%; IR_H slack everywhere",
+        "note": f"Corner/tie in {res_exact['corner_rate']*100:.0f}% ({res_exact['n_tie_exact']} ties); strict div. vs Taylor {res_exact['strict_div_taylor']}; downward dist {res_exact['downward_dist_rate']*100:.0f}%",
     })
 
     # 13. Robustness Check 2: Assumption 1 Characterization
-    print("[13/19] Running Robustness Check 2: Assumption 1 Regularity...")
+    print("[13/23] Running Robustness Check 2: Assumption 1 Regularity...")
     res_assump1 = verify_assumption1(output_dir=args.output_dir)
     results.append({
         "item": "Rob 2",
@@ -220,7 +236,7 @@ def main():
     })
 
     # 14. Robustness Check 3: mu_A Comparative Statics
-    print("[14/19] Running Robustness Check 3: mu_A Comparative Statics...")
+    print("[14/23] Running Robustness Check 3: mu_A Comparative Statics...")
     res_mu = verify_mu_comparative_statics(output_dir=args.output_dir)
     results.append({
         "item": "Rob 3",
@@ -231,7 +247,7 @@ def main():
     })
 
     # 15. Follow-up 1 (Task 1): Monotonicity Survival
-    print("[15/19] Running Follow-up Check 1: Monotonicity Under Assumption 1 & Tightness...")
+    print("[15/23] Running Follow-up Check 1: Monotonicity Under Assumption 1 & Tightness...")
     res_mono_surv = verify_monotonicity_survival(output_dir=args.output_dir)
     pct_ass1 = (res_mono_surv['ass1_holds_mono_holds'] / res_mono_surv['ass1_holds_total']) * 100 if res_mono_surv['ass1_holds_total'] > 0 else 0.0
     pct_outside = (res_mono_surv['ass1_fails_mono_fails'] / res_mono_surv['ass1_fails_total']) * 100 if res_mono_surv['ass1_fails_total'] > 0 else 0.0
@@ -244,7 +260,7 @@ def main():
     })
 
     # 16. Follow-up 2 (Task 2): Ray-Invariance in Corner Regime
-    print("[16/19] Running Follow-up Check 2: Ray-Invariance in Corner Regime...")
+    print("[16/23] Running Follow-up Check 2: Ray-Invariance in Corner Regime...")
     res_corner_ray = verify_mu_lambda_corner(output_dir=args.output_dir)
     results.append({
         "item": "Foll 2",
@@ -255,7 +271,7 @@ def main():
     })
 
     # 17. Follow-up 3 (Task 3): Exact Bias Sweep & Constraint Binding
-    print("[17/19] Running Follow-up Check 3: Constraint Binding Under Exact Bias Sweep...")
+    print("[17/23] Running Follow-up Check 3: Constraint Binding Under Exact Bias Sweep...")
     res_exact_sweep = verify_exact_bias_sweep(output_dir=args.output_dir)
     results.append({
         "item": "Foll 3",
@@ -266,7 +282,7 @@ def main():
     })
 
     # 18. Proposition 7 regime audit with an exact grid solver
-    print("[18/19] Running Proposition 7 Regime Audit (exact grid solver)...")
+    print("[18/23] Running Proposition 7 Regime Audit (exact grid solver)...")
     res_p7r = verify_prop7_regimes(output_dir=args.output_dir)
     sm = res_p7r["summary"]
     results.append({
@@ -278,7 +294,7 @@ def main():
     })
 
     # 19. Guessing trap incidence in the clipped pooling model
-    print("[19/19] Running Guessing Trap Incidence Sweep...")
+    print("[19/23] Running Guessing Trap Incidence Sweep...")
     res_trap = verify_guessing_trap_incidence(output_dir=args.output_dir)
     results.append({
         "item": "Trap %",
@@ -286,6 +302,50 @@ def main():
         "verdict": "PASS" if res_trap["passed"] else "FAIL",
         "passed": res_trap["passed"],
         "note": f"trap in {100*res_trap['share_all']:.1f}% of draws, {100*res_trap['share_interior']:.1f}% of {res_trap['n_interior']} interior draws",
+    })
+
+    # 20. Zero-bias instrument-restriction gap under the exact payoff
+    print("[20/23] Running Exact-Model First-Best Gap Scan...")
+    res_gap = verify_exact_firstbest_gap(output_dir=args.output_dir)
+    results.append({
+        "item": "Exact FB",
+        "name": "Exact-Model Zero-Bias Pooling Gap",
+        "verdict": res_gap["verdict"],
+        "passed": res_gap["passed"],
+        "note": f"gap in {res_gap['n_pos']}/{res_gap['n_draws']} draws (0 of {res_gap['n_short']} with k<=12); terse type guesses in {res_gap['terse_guesses']}/{res_gap['n_pos']}",
+    })
+
+    # 21. Continuous implementation of screening menus (Lemma 4)
+    print("[21/23] Running Continuous Implementation Audit (Lemma 4)...")
+    res_ci = verify_continuous_implementation(output_dir=args.output_dir)
+    results.append({
+        "item": "Lemma 4",
+        "name": "Continuous Menu Implementation",
+        "verdict": res_ci["verdict"],
+        "passed": res_ci["passed"],
+        "note": f"no gain under alpha(m) in {res_ci['n']} menus; threshold fails in {res_ci['thr_fail_binding']}/{res_ci['n_binding']} binding + {res_ci['thr_fail_cor6']}/{res_ci['n_cor6']} Cor 6",
+    })
+
+    # 22. Heterogeneous attribute stakes (Proposition 8)
+    print("[22/23] Running Heterogeneous Attribute Stakes Check (Proposition 8)...")
+    res_hs = verify_heterogeneous_stakes(output_dir=args.output_dir)
+    results.append({
+        "item": "Prop 8",
+        "name": "Heterogeneous Stakes Threshold",
+        "verdict": res_hs["verdict"],
+        "passed": res_hs["passed"],
+        "note": f"sign pattern {res_hs['n_ok']}/{res_hs['n_profiles']} profiles; benchmark kappa_hat={res_hs['kappa_hat']:.3f}, gap={res_hs['gap']:.3f}",
+    })
+
+    # 23. Continuum screening: the minimum-specification standard (Theorem 1)
+    print("[23/23] Running Continuum Screening Check (Theorem 1)...")
+    res_cs = verify_continuum_standard(output_dir=args.output_dir)
+    results.append({
+        "item": "Thm 1",
+        "name": "Minimum-Specification Standard",
+        "verdict": res_cs["verdict"],
+        "passed": res_cs["passed"],
+        "note": f"N-type optimum -> standard in {res_cs['n_hold']} tail-condition cases; beats it with a<1 when the condition fails",
     })
 
     elapsed = time.time() - start_time
@@ -300,7 +360,7 @@ def main():
             any_failed = True
         print(f"{r['item']:<8} | {r['name']:<36} | {r['verdict']:<9} | {r['note']}")
     print("=" * 105)
-    print(f"Total verification time: {elapsed:.2f} seconds (all 19 verifications completed)")
+    print(f"Total verification time: {elapsed:.2f} seconds (all 23 verifications completed)")
     print(f"Artifacts saved in: {args.output_dir}/")
 
     if any_failed:

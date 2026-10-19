@@ -44,7 +44,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     # Panel 1: a_SE vs lambda_A
     ax1.plot(df["lambda_A"], df["a_SE"], "o-", color="navy", linewidth=2, label=r"$a^{SE}$ (Pooling Ask Rate)")
     ax1.set_ylabel(r"Pooling Ask Rate $a^{SE}$")
-    ax1.set_title(r"Corollary 2: Bias Direction on Interior Branch ($\bar{Q} < 0$)" + "\n" + r"$\partial a^{SE}/\partial\lambda_A \leq 0$ on Feasible Domain")
+    ax1.set_title(r"Corollary 2: Bias Direction on Interior Branch ($\alpha_2 < 0$)" + "\n" + r"$\partial a^{SE}/\partial\lambda_A \leq 0$ on Feasible Domain")
     ax1.grid(True, alpha=0.3)
     ax1.legend()
 

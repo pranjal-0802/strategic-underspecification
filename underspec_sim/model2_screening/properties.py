@@ -237,7 +237,8 @@ def sweep_distortion_vs_heterogeneity(
                 params=eff_params,
                 unconstrained_m=unconstrained_m,
             )
-            distortion = float(a_B_H - sol.a_H)
+            # At m_H = k no attribute is left open and a_H is payoff-irrelevant, so there is no distortion.
+            distortion = 0.0 if sol.m_H >= eff_params.k - 1e-6 else float(a_B_H - sol.a_H)
 
             # Also compute Model I pooling equilibrium on this two-type population
             F_samples = [kappa_L] * 500 + [kap_H] * 500

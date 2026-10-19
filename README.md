@@ -11,8 +11,12 @@ When users query AI coding assistants, they face a fundamental trade-off: spend 
 This repository provides complete, end-to-end computational verification of the paper's theoretical framework:
 - **First-Best Benchmark (Section 4.2):** Fully-informed, welfare-aligned social optimum $(m^{FB}, a^{FB})$ where asking weakly dominates guessing across the physically feasible domain $m \in [0, k]$ (Proposition 3).
 - **Model I: Pooling Policy (Section 5):** The assistant commits to a single population-wide ask rate $a \in [0, 1]$. In the unbiased baseline, leader payoff is convex in $a$ even with clipped best responses, making pooling a corner solution ($a^{SE} \in \{0, 1\}$, Corollary 4); in the biased regime, strict concavity can produce an interior optimum, and perceived friction weakly suppresses clarification for any type distribution ($\partial a^{SE}/\partial\lambda_A < 0$ on the interior branch, Corollary 2). When the ask rate falls steeply enough in $g$, higher guessing accuracy lengthens user prompts and lowers welfare (The Guessing Trap, Proposition 5).
-- **Model II: Screening Policy (Section 6):** The assistant offers a menu $\{(m_L, a_L), (m_H, a_H)\}$ separating high- and low-cost specification types. Without bias, screening achieves First-Best (Proposition 6); under bias, asking rates are distorted downward by at most $\tilde\rho/s$, and the menu is implementable with free prompt choice (Proposition 7, Lemma 2).
-- **Regime Comparison (Section 7):** Weak dominance of screening over pooling in leader payoff and non-monotonic ranking of user welfare across bias bands (Corollary 5).
+- **Model II: Screening Policy (Section 6):** The assistant offers a menu $\{(m_L, a_L), (m_H, a_H)\}$ separating high- and low-cost specification types. Without bias, screening achieves First-Best (Proposition 6); under bias, asking rates are distorted downward by at most $\tilde\rho/s$, and the menu is implementable with free prompt choice (Proposition 7, Lemma 3). The implementing schedule can be continuous in prompt length (Lemma 4), but not monotone: a minimum-effort threshold fails in the saturation regimes where $\text{IC}_L$ binds and in Corollary 6.
+- **Regime Comparison (Section 7):** Weak dominance of screening over pooling in leader payoff (Corollary 5). Under mild bias, pooling gives users their first best and beats screening by exactly $\tilde\rho^2\mathbb{E}[1/\kappa]/2$ when the leader's preferred menu is incentive compatible (Corollary 6), a gap that is second order in the bias (third order with a continuum of users, Corollary 7). The user-welfare ranking reverses once pooling withdraws clarification. With ordered attribute stakes and an attribute-blind ask rate, the first best sorts users by a threshold in $\kappa$ (diligent users guess, terse users ask), so the zero-bias benchmark is no longer degenerate (Proposition 8); targeted asking removes the gap.
+- **Continuum Screening (Section 8, Theorem 1):** With a continuum of users the leader's problem is screening with a capped in-kind transfer it values. Under moderate bias the optimum is a minimum-specification standard: ask about every open attribute once $m \ge \bar m^* = c_Q^{eff}/\mathbb{E}[\kappa \mid \kappa \ge \kappa_b]$. Diligent users keep their first best, terse users pool at $\bar m^*$, and nobody is left to guesses. The standard is optimal iff a tail condition holds (for uniform types, iff $\bar m^* \le \Lambda/\bar\kappa$). Effort dictation needs pooling (Proposition 9), the welfare cost of bias is third order (Corollary 7), and the bunching point identifies $\tilde\rho$ (Corollary 8).
+- **Competition and Disclosure (Section 9, Proposition 10):** Competition raises clarification to the level users would choose only when ask rates are disclosed; under opacity it drives clarification to zero.
+- **Self-Confirming Under-Specification (Section 3.2, Lemma 1):** When wrong guesses go undetected, naive learning lowers specification monotonically to a fixed point below the correct-belief level.
+- **Welfare Notion (Remark 3):** "Welfare" means user welfare. It equals social welfare only when the assistant's wedge $\lambda_A - c_Q$ is pure bias rather than a real provider cost.
 - **LLM Experimentation Layer:** Simulated users with heterogeneous specification cost types $\kappa$ interact with assistants applying the derived policies, audited in SQLite (`runs.db`) with a deterministic `--dry-run` stub and optional live API execution.
 
 ```
@@ -20,6 +24,7 @@ underspec_sim/
 ├── core/                   # Primitives (k, g, L, c_Q, V, mu_A, lambda_A), payoffs, best response, first-best
 ├── model1_pooling/         # Quadratic pooling payoff Pi(a), closed-form solver, interiority & bias checks
 ├── model2_screening/       # General SLSQP constrained menu solver over (mL, aL, mH, aH), constraint audits
+├── model3_continuum/       # Continuum screening: minimum-specification standard, tail condition, N-type optimal mechanism
 ├── comparison/             # Weak dominance verification and 2D welfare gap decomposition
 ├── verifications/          # Standalone verification runners producing CSVs, PNGs, and Markdown reports
 ├── llm/                    # Anthropic client (safe env ANTHROPIC_API_KEY, retry, SQLite runs.db, dry-run stub)
@@ -35,24 +40,30 @@ The table below maps every proposition, corollary, and robustness check in the p
 | Paper Section | Proposition / Corollary | Script / Module | Test File | Primary Artifacts | Result |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Sec 4.2** | **Prop 3** (First-Best Policy on Feasible Domain) | `underspec_sim/verifications/verify_prop3.py` | `tests/test_first_best.py` | `outputs/prop3_first_best.csv`, `.png`, `.md` | **PASS** *(verified on grid)* |
-| **Sec 5.1** | **Prop 4** (Stackelberg Pooling Rate $a^{SE}$) | `underspec_sim/verifications/verify_prop4.py` | `tests/test_pooling.py` | `outputs/prop4_pooling_closed_form.csv`, `.png`, `.md` | **PASS** *(matches grid under SOC)* |
-| **Sec 5.1** | **Cor 2** (Friction Bias Suppresses Pooling Rate) | `underspec_sim/verifications/verify_cor2.py` | `tests/test_pooling.py` | `outputs/cor2_bias_direction.csv`, `.png`, `.md` | **PASS** *(strictly $\partial a^{SE}/\partial\lambda_A \le 0$ on valid domain)* |
-| **Sec 5.1** | **Lemma 1** (Welfare Friction Wedge & Ray Invariance) | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(derivative ratio $= -\tilde\rho$)* |
-| **Sec 5.1** | **Cor 3** (Continuous Transition Across Friction Regimes) | `underspec_sim/verifications/verify_mu_lambda_corner.py` | `tests/test_mu_lambda_corner.py` | `outputs/mu_lambda_corner.csv`, `.png`, `.md` | **PASS** *(transitions continuously across regimes)* |
-| **Sec 5.1** | **Cor 4** (Pooling is a Corner Solution in Unbiased Case) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `outputs/cor3_interiority.csv`, `.png`, `.md` | **PASS** *(unbiased is corner; biased is interior)* |
+| **Sec 5.2** | **Prop 4** (Stackelberg Pooling Rate $a^{SE}$) | `underspec_sim/verifications/verify_prop4.py` | `tests/test_pooling.py` | `outputs/prop4_pooling_closed_form.csv`, `.png`, `.md` | **PASS** *(matches grid under SOC)* |
+| **Sec 5.2** | **Cor 2** (Friction Bias Suppresses Pooling Rate) | `underspec_sim/verifications/verify_cor2.py` | `tests/test_pooling.py` | `outputs/cor2_bias_direction.csv`, `.png`, `.md` | **PASS** *(strictly $\partial a^{SE}/\partial\lambda_A \le 0$ on valid domain)* |
+| **Sec 5.2** | **Lemma 2** (Welfare Friction Wedge & Ray Invariance) | `underspec_sim/verifications/verify_mu_comparative_statics.py` | `tests/test_mu_comparative_statics.py` | `outputs/mu_comparative_statics.csv`, `.png`, `.md` | **PASS** *(derivative ratio $= -\tilde\rho$)* |
+| **Sec 5.2** | **Cor 3** (Continuous Transition Across Friction Regimes) | `underspec_sim/verifications/verify_mu_lambda_corner.py` | `tests/test_mu_lambda_corner.py` | `outputs/mu_lambda_corner.csv`, `.png`, `.md` | **PASS** *(transitions continuously across regimes)* |
+| **Sec 5.2** | **Cor 4** (Pooling is a Corner Solution in Unbiased Case) | `underspec_sim/verifications/verify_cor3.py` | `tests/test_pooling.py` | `outputs/cor3_interiority.csv`, `.png`, `.md` | **PASS** *(unbiased is corner; biased is interior)* |
 | **Sec 5.2** | **Prop 5** (The Guessing Trap: Capability Reversal) | `underspec_sim/verifications/verify_prop5_guessing_trap.py` | `tests/test_pooling.py` | `outputs/prop5_guessing_trap.csv`, `.png`, `.md` | **PASS** *($da^{SE}/dg < 0$, prompt lengthening verified)* |
-| **Sec 7.1** | **Table 1** (Unbiased Pooling Sensitivity & Clipped Differences) | `underspec_sim/verifications/generate_table1.py` | `tests/test_pooling.py` | `outputs/table1_unbiased_sensitivity.csv`, `.md` | **PASS** *(all 11 rows strictly positive in [+0.15, +20.10])* |
+| **App. C** | **Table 1** (Unbiased Pooling Sensitivity & Clipped Differences) | `underspec_sim/verifications/generate_table1.py` | `tests/test_pooling.py` | `outputs/table1_unbiased_sensitivity.csv`, `.md` | **PASS** *(all 11 rows strictly positive in [+0.15, +20.10])* |
 | **Sec 6.2** | **Prop 6** (Zero Distortion Without Bias) | `underspec_sim/verifications/verify_prop5.py` | `tests/test_screening.py` | `outputs/prop5_screening_no_bias.csv`, `.png`, `.md` | **PASS** *(recovers FB; IC slack)* |
 | **Sec 6.3** | **Prop 7** (Downward Distortion Under Bias) | `underspec_sim/verifications/verify_prop6.py` | `tests/test_screening.py` | `outputs/prop6_screening_biased.csv`, `.png`, `.md`, `outputs/prop6_bias_sweep_active_constraints.csv`, `.png` | **PASS** *(active set characterized)* |
-| **Sec 6.3** | **Prop 7 regimes, distortion bound, Lemma 2** (exact grid solver, independent of SLSQP) | `underspec_sim/verifications/verify_prop7_regimes.py` | `tests/test_review_strengthenings.py` | `outputs/prop7_regimes.csv`, `.md` | **PASS** *(closed forms 201/201 under saturation; effort-regime condition 82/82; implementable 270/270)* |
+| **Sec 6.3** | **Prop 7 regimes, distortion bound, Lemma 3** (exact grid solver, independent of SLSQP) | `underspec_sim/verifications/verify_prop7_regimes.py` | `tests/test_review_strengthenings.py` | `outputs/prop7_regimes.csv`, `.md` | **PASS** *(closed forms 201/201 under saturation; effort-regime condition 82/82; implementable 270/270)* |
 | **Sec 5.2** | **Guessing-trap incidence** (clipped pooling model, 2,000 draws) | `underspec_sim/verifications/verify_guessing_trap_incidence.py` | N/A | `outputs/guessing_trap_incidence.csv`, `.md` | **PASS** *(12.2% of draws; 51.6% of interior draws)* |
-| **Sec 6.3** | **Remark** (Heterogeneity vs Bias Separability) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `outputs/distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** *(2D sweep verified)* |
+| **Sec 6.3** | **Lemma 4** (Continuous Implementation; Minimum-Effort Thresholds Fail) | `underspec_sim/verifications/verify_continuous_implementation.py` | `tests/test_review_strengthenings.py` | `outputs/continuous_implementation.csv`, `.md` | **PASS** *(no gain under $\alpha(m)$ in 212 menus; threshold fails in 28/28 binding and 12/12 Cor 6 menus)* |
+| **Sec 6.3** | **Figure 4** (Distortion across Heterogeneity and Bias) | `underspec_sim/verifications/sweep_distortion.py` | `tests/test_screening.py` | `outputs/distortion_sweep_2d.csv`, `.png`, `.md` | **PASS** *(distortion downward in every cell; falls with heterogeneity in the saturation regime)* |
 | **Sec 7** | **Cor 5** (Dominance of Menus over Pooling) | `underspec_sim/verifications/compare_regimes_runner.py` | `tests/test_comparison.py` | `outputs/regime_comparison.csv`, `.png`, `.md` | **PASS** *(dominance verified across grid)* |
-| **Sec 7** | **Welfare Ordering** (User Welfare Ordering Across Bias Bands) | `underspec_sim/verifications/verify_welfare_ordering.py` | `tests/test_pooling.py` | `outputs/welfare_ordering.csv`, `.png`, `.md` | **PASS** *(mild bias: pool wins; mod bias: screen wins; tie at shutdown)* |
-| **Sec 10** | **Robustness 1** (Exact vs Linear-Risk Conjunctive Model) | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `outputs/exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner survives in 100% of tested points)* |
-| **Sec 10** | **Robustness 2** (Assumption 1 Regularity Grid Audit) | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `outputs/assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(corrected $\ge -1$ holds in 89.9%)* |
-| **Sec 10** | **Robustness 3** (Monotonicity Survival & Tightness) | `underspec_sim/verifications/verify_monotonicity_survival.py` | `tests/test_monotonicity_survival.py` | `outputs/monotonicity_survival.csv`, `.png`, `.md` | **PASS** *(mono holds 100% under Ass1; breaks in 96.7% outside)* |
-| **Sec 10** | **Robustness 4** (Exact Bias Sweep & $\text{IC}_H$ Binding) | `underspec_sim/verifications/verify_exact_bias_sweep.py` | `tests/test_exact_bias_sweep.py` | `outputs/exact_bias_sweep.csv`, `.png`, `.md` | **PASS** *(extreme-bias reversal observed under exact payoff)* |
+| **Sec 7** | **Welfare Ordering, Cor 6** (User Welfare Ordering Across Bias Bands; effort-dictation gap) | `underspec_sim/verifications/verify_welfare_ordering.py` | `tests/test_pooling.py`, `tests/test_review_strengthenings.py` | `outputs/welfare_ordering.csv`, `.png`, `.md` | **PASS** *(mild bias: pool wins by $\tilde\rho^2\mathbb{E}[1/\kappa]/2$; $\lambda_A = 3$ is a pooling tie; mod bias: screen wins; tie at shutdown)* |
+| **Sec 7.1** | **Prop 8** (Heterogeneous Attribute Stakes) | `underspec_sim/verifications/verify_heterogeneous_stakes.py` | `tests/test_review_strengthenings.py` | `outputs/heterogeneous_stakes.csv`, `.md` | **PASS** *(single sign change of $G$ in 40/40 stake profiles; benchmark $\hat\kappa = 0.313$, zero-bias gap 0.076)* |
+| **Sec 8** | **Theorem 1, Prop 9, Cors 7–8** (Minimum-Specification Standard) | `underspec_sim/verifications/verify_continuum_standard.py`, `underspec_sim/model3_continuum/` | `tests/test_continuum.py` | `outputs/continuum_standard.csv`, `.png`, `.md` | **PASS** *(N-type optimum converges to the standard when the tail condition holds; beats it with partial clarification when it fails)* |
+| **Sec 9** | **Prop 10** (Competition and Disclosure) | analytic | `tests/test_continuum.py` | N/A | **PASS** *(competitive rate maximizes user surplus net of real cost)* |
+| **Sec 12** | **Robustness 1** (Exact vs Linear-Risk Conjunctive Model) | `underspec_sim/verifications/verify_exact_conjunctive.py` | `tests/test_exact_conjunctive.py` | `outputs/exact_conjunctive_robustness.csv`, `.png`, `.md` | **CAUTION** *(corner or exact tie in 100% of points; 0 strict divergences from the Taylor baseline)* |
+| **Sec 12** | **Exact-Model Zero-Bias Gap** (who asks and who guesses at the first best) | `underspec_sim/verifications/verify_exact_firstbest_gap.py` | `tests/test_review_strengthenings.py` | `outputs/exact_firstbest_gap.csv`, `.md` | **PASS** *(gap in 61/1500 draws, none with $k \le 12$; terse type guesses in all 61)* |
+| **Sec 3.2** | **Lemma 1** (Self-Confirming Under-Specification) | proof in paper | `tests/test_review_strengthenings.py` | N/A | **PASS** *(monotone learning path, ordered in detection rate)* |
+| **Sec 12** | **Robustness 2** (Assumption 1 Regularity Grid Audit) | `underspec_sim/verifications/verify_assumption1.py` | `tests/test_assumption1.py` | `outputs/assumption1_regularity.csv`, `.png`, `.md` | **CAUTION** *(corrected $\ge -1$ holds in 89.9%)* |
+| **Sec 12** | **Robustness 3** (Monotonicity Survival & Tightness) | `underspec_sim/verifications/verify_monotonicity_survival.py` | `tests/test_monotonicity_survival.py` | `outputs/monotonicity_survival.csv`, `.png`, `.md` | **PASS** *(mono holds 100% under Ass1; breaks in 96.7% outside)* |
+| **Sec 12** | **Robustness 4** (Exact Bias Sweep & $\text{IC}_H$ Binding) | `underspec_sim/verifications/verify_exact_bias_sweep.py` | `tests/test_exact_bias_sweep.py` | `outputs/exact_bias_sweep.csv`, `.png`, `.md` | **PASS** *(extreme-bias reversal observed under exact payoff)* |
 
 ---
 
@@ -81,17 +92,21 @@ The computational verification suite evaluates the analytical claims across repr
 - Over a calibrated parameter sweep ($k=3, \Lambda=2.0, c_Q=1.0, \lambda_A \in [1.75, 1.95]$), $a^{SE}$ falls monotonically from $0.51$ to $0.06$, matching fine-grid optima within $0.5\%$ relative error.
 
 ### 3. Proposition 7 & Active Constraint Audit (Screening Under Bias)
-- **Three Operational Regimes & Active Constraint Audit:**
-  - *Small Bias Regime ($c_Q^{eff} \approx c_Q$):* Weak mimicry temptation ($k \le k_{\text{crit}}$), yielding negligible or zero distortion ($a_H^{SB} \approx a_H^B = 1$) with constraints slack.
-  - *Moderate Bias Regime ($c_Q < c_Q^{eff} < \Lambda$ with $k > k_{\text{crit}}$):* True adverse-selection downward distortion $a_H^{SB} < a_H^B = 1$. $\text{IC}_L$ binds alone, while $\text{IR}_H$, $\text{IC}_H$, and $\text{IR}_L$ remain strictly slack. Depressing follower utility directly hurts the leader's objective, keeping participation constraints slack. When $\kappa_L \le \bar\kappa_L$, type $L$'s bundle is $(k, 0)$ and closed-form distortion holds; when $\bar\kappa_L < \kappa_L \le c_Q^{eff}/k$, boundary relaxation grants clarification to $L$ ($a_L = 1, m_L < k$), dampening downward distortion on $H$.
-  - *Prohibitive Friction Regime ($c_Q^{eff} \ge \Lambda$, equivalently $\lambda_A - c_Q \ge \mu_A(\Lambda - c_Q)$):* Uniform clarification shutdown ($a_L = a_H = 0, m_L = m_H = k$) because the leader unconstrainedly prefers zero asking for all types ($\partial\Pi/\partial a \le 0$). Both types receive the identical bundle $(k, 0)$, so $\text{IC}_L$ and $\text{IC}_H$ hold with equality ($0 = 0$).
+- **Regimes of Proposition 7 & Active Constraint Audit** (five regimes plus shutdown; the paper's proof is in its Appendix):
+  - *Slack ($k \le k_{\text{slack}}$):* no mimicry temptation; both types get the leader's unconstrained bundles.
+  - *Effort distortion ($k_{\text{slack}} < k \le k_{\text{crit}}$):* $\text{IC}_L$ binds; $m_H$ is distorted downward while $a_H = 1$.
+  - *Asking distortion ($k > \max\{k_{\text{slack}}, k_{\text{crit}}\}$, $k \ge m_H^*$):* $a_H^{SB} \in (1 - \tilde\rho/s, 1)$. $\text{IC}_L$ binds and, against the endogenous outside option $\max_m U(m,0;\kappa)$, so does $\text{IR}_L$; $\text{IR}_H$ and $\text{IC}_H$ are slack (reversed rent pattern).
+  - *Full specification ($k_{\text{slack}} < k < m_H^*$):* both types specify fully.
+  - *Boundary relaxation:* when the regime's saturation condition fails (e.g. $\bar\kappa_L < \kappa_L < c_Q^{eff}/k$), type $L$ gets clarification ($a_L = 1, m_L < k$), dampening the distortion on $H$.
+  - *Prohibitive friction ($c_Q^{eff} \ge \Lambda$):* clarification shuts down ($a_L = a_H = 0$) and each type stays at its unassisted optimum $\min\{k, \Lambda/\kappa\}$; when both types saturate at $k$, $\text{IC}_L$ and $\text{IC}_H$ hold with equality ($0 = 0$).
 - **Extended Sweep:**
   - **Does $\text{IR}_H$ ever bind?** **NO** (Slack $\ge 75.0$ across all 100 tested configurations).
   - **Does $\text{IC}_H$ ever bind?** **YES** (Under prohibitive friction $\lambda_A \ge 5.0$ or severe discounting $\mu_A \le 0.5$, menus collapse to uniform clarification shutdown where both types receive identical service).
 
 ### 4. Exact Conjunctive Robustness
 - Evaluated whether headline results survive replacing the linear-risk approximation $L(1-q)(k-m)$ with the exact conjunctive probability $q(a,g)^{k-m}$:
-  - **Unbiased Pooling Corner Property:** Survives in tested $(k, g) \in [3, 20] \times [0.50, 0.95]$ configurations ($a^{SE}_{\text{exact}} \in \{0, 1\}$).
+  - **Unbiased Pooling Corner Property:** Survives in tested $(k, g) \in [3, 20] \times [0.50, 0.95]$ configurations ($a^{SE}_{\text{exact}} = 1$ for $k \ge 5$; at $k = 3$ the payoff is flat in $a$, a tie rather than a preference for guessing).
+  - **Zero-Bias Pooling Gap:** exists only on long tasks ($k \ge 13$ in 1,500 random draws), and there the *terse* type guesses while the diligent type asks.
   - **Screening Downward Distortion:** Survives with $a_H^{SB} < a_H^B$ whenever $m$ does not saturate at $k$. $\text{IR}_H$ remains strictly slack in all tested cases.
 
 ### 5. Regularity Assumption 1: Resolution & Monotonicity Survival
@@ -102,11 +117,11 @@ The computational verification suite evaluates the analytical claims across repr
   - Across tested finite-difference parameter intervals in $(k, q, \kappa) \in [5, 15] \times [0.70, 0.99] \times [0.20, 2.00]$, whenever Assumption 1 holds ($(k-m^*)\ln q \ge -1$), $m^*(g)$ is weakly decreasing in $g$ without exception.
   - Where Assumption 1 fails ($(k-m^*)\ln q < -1$), the cross-partial turns positive and monotonicity breaks in the vast majority of intervals, confirming the necessity of the regularity condition.
 
-### 6. Lemma 1: Leader Objective as User Welfare with an Asking Friction Wedge
+### 6. Lemma 2: Leader Objective as User Welfare with an Asking Friction Wedge
 - The leader objective satisfies $\Pi(m, a) = \mu_A [U(m, a) - \tilde\rho a(k-m)]$, pricing clarification at $c_Q^{eff} = c_Q + \tilde\rho$ from the leader's perspective, while followers continue to optimize against true private question cost $c_Q$.
 - On the interior branch, the marginal rate of substitution between bias parameters is:
   $$\frac{\partial a^{SE} / \partial \mu_A}{\partial a^{SE} / \partial \lambda_A} = -\frac{\lambda_A - c_Q}{\mu_A} = -\tilde\rho$$
-- Level curves of $a^{SE}$ form constant rays along $\tilde\rho = \text{constant}$, establishing observational equivalence along rays of normalized friction.
+- Level curves of $a^{SE}$ form constant rays along $\tilde\rho = \text{constant}$, establishing observational equivalence along rays of normalized friction. This non-identification is a property of the multiplicative specification $\mu_A U$; if $\mu_A$ discounts only the defect loss, the two wedges enter separately (Remark 7 in the paper).
 
 ### 7. Corollary 3: Continuous Transition Across Friction Regimes
 - On the strictly concave branch ($\alpha_2 < 0$), the optimal pooling policy transitions continuously across three friction regimes: universal asking ($a^{SE} = 1$) for $\tilde\rho \le \tilde\rho_1$, interior asking ($a^{SE} \in (0, 1)$) for $\tilde\rho_1 < \tilde\rho < s$, and shutdown ($a^{SE} = 0$) for $\tilde\rho \ge s$.
@@ -135,10 +150,10 @@ pip install -e .
 ```
 
 ### Running Non-LLM Mathematical Verifications
-Runs all 19 verification and follow-up robustness suites, generates all CSVs and PNGs in `outputs/`, and prints a formatted summary table (~4 min runtime):
+Runs all 23 verification and follow-up robustness suites, generates all CSVs and PNGs in `outputs/`, and prints a formatted summary table (about 3 minutes):
 
 ```bash
-# Strict mode: exits nonzero (1) if any proposition fails (offline, fast ~80s)
+# Strict mode: exits nonzero (1) if any proposition fails (offline)
 python3 run_all_math_checks.py
 
 # Non-strict reporting mode: prints table and exits 0
@@ -146,7 +161,7 @@ python3 run_all_math_checks.py --ignore-failures
 ```
 
 ### Running Unit Tests (pytest)
-Runs 63 algebraic, numerical, regression, and symbolic tests:
+Runs 80 algebraic, numerical, regression, and symbolic tests:
 ```bash
 pytest tests/ -q
 ```
@@ -202,12 +217,12 @@ strategic-underspecification/
 │   ├── model1_pooling/                 # Quadratic pooling payoff & closed-form solver
 │   ├── model2_screening/               # Constrained menu solver & active-set audit
 │   ├── comparison/                     # Regime dominance & welfare decomposition
-│   ├── verifications/                  # 17 standalone proposition & robustness runners
+│   ├── verifications/                  # 23 standalone proposition & robustness runners
 │   ├── llm/                            # Anthropic client with retry, SQLite logging, dry-run
 │   └── experiments_llm/                # Simulated user experiments
-├── tests/                              # Pytest test suite (54 unit, regression & symbolic tests)
+├── tests/                              # Pytest test suite (80 unit, regression & symbolic tests)
 ├── outputs/                            # Generated artifacts (CSVs, high-res PNGs, Markdown)
-└── run_all_math_checks.py              # Master runner executing all 17 mathematical checks
+└── run_all_math_checks.py              # Master runner executing all 23 mathematical checks
 ```
 
 ---

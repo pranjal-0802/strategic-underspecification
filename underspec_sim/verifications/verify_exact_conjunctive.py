@@ -120,8 +120,11 @@ def solve_exact_pooling_optimum(
     best_a = float(a_grid[best_idx])
     max_pi = float(pi_vals[best_idx])
 
-    # Regimes: corner (<= 0.02 or >= 0.98) vs interior
-    if best_a <= 0.02:
+    # Regimes: tie (payoff flat in a, e.g. every type saturates at m = k),
+    # corner (<= 0.02 or >= 0.98) vs interior
+    if float(pi_vals.max() - pi_vals.min()) < 1e-9:
+        regime = "tie"
+    elif best_a <= 0.02:
         regime = "corner_0"
     elif best_a >= 0.98:
         regime = "corner_1"
@@ -129,6 +132,25 @@ def solve_exact_pooling_optimum(
         regime = "interior"
 
     return best_a, max_pi, regime, a_grid, pi_vals
+
+
+def linear_pooling_is_tie(
+    F_samples: np.ndarray,
+    g: float,
+    k: float,
+    L: float,
+    c_Q: float,
+) -> bool:
+    """True when the unbiased linear-risk pooling payoff is flat in a.
+
+    Under linear risk U(m, a) is affine in a with slope (Lambda - c_Q)(k - m), so
+    the payoff is flat exactly when every type saturates at m = k under both
+    a = 0 and a = 1 (or when Lambda = c_Q).
+    """
+    Lam = L * (1.0 - g)
+    m0 = np.minimum(k, Lam / F_samples)
+    m1 = np.minimum(k, c_Q / F_samples)
+    return bool(np.all(m0 >= k - 1e-12) and np.all(m1 >= k - 1e-12)) or abs(Lam - c_Q) < 1e-12
 
 
 def solve_exact_screening_menu(
@@ -309,7 +331,11 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
                 "a_SE_approx": a_SE_approx,
                 "regime_approx": regime_approx,
                 "a_SE_taylor": a_SE_taylor,
-                "corner_property_survives": (regime_exact in ("corner_0", "corner_1")),
+                "tie_exact": regime_exact == "tie",
+                "tie_additive": linear_pooling_is_tie(F_samples, g_val, k_val, L_val, c_Q),
+                "tie_taylor": linear_pooling_is_tie(F_samples, g_val, k_val, V, c_Q),
+                "additive_Lambda_below_cQ": bool(L_val * (1.0 - g_val) <= c_Q),
+                "corner_property_survives": (regime_exact in ("corner_0", "corner_1", "tie")),
                 "screen_a_B_H": screen_exact["a_B_H"],
                 "screen_a_H": screen_exact["a_H"],
                 "distortion_exact": screen_exact["distortion"],
@@ -383,6 +409,17 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 
     # Determine findings
     corner_rate = float(df["corner_property_survives"].mean())
+    n_tie_exact = int(df["tie_exact"].sum())
+    n_strict_ask = int(((~df["tie_exact"]) & (df["a_SE_exact"] == 1.0)).sum())
+    # A strict divergence requires both models to have a strict preference.
+    strict_t = ~(df["tie_exact"] | df["tie_taylor"])
+    div_taylor = int((strict_t & (df["a_SE_exact"] != df["a_SE_taylor"])).sum())
+    strict_a = ~(df["tie_exact"] | df["tie_additive"])
+    div_add_mask = strict_a & (df["a_SE_exact"] != df["a_SE_approx"])
+    div_add = int(div_add_mask.sum())
+    div_add_low_stake = int((div_add_mask & df["additive_Lambda_below_cQ"]).sum())
+    raw_div_add = int((df["a_SE_exact"] != df["a_SE_approx"]).sum())
+    raw_div_taylor = int((df["a_SE_exact"] != df["a_SE_taylor"]).sum())
     downward_dist_rate = float(df["downward_distortion_holds"].mean())
     ir_h_never_binds = not bool(df["IR_H_active"].any())
 
@@ -404,11 +441,12 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
 1. **Corollary 4 (Corner Solution Property) Survives Universally:**
    - **Corner Solution Rate:** **{corner_rate * 100:.1f}%** (In {int(df['corner_property_survives'].sum())}/{len(df)} grid points, a_SE in [0.0, 1.0]).
    - In no region did an interior compromise optimum (a_SE in (0.02, 0.98)) emerge.
-   - For small k <= 3, a_SE = 0 (never ask); for all k >= 5 across all g in [0.50, 0.95], a_SE = 1 (always ask).
+   - In {n_tie_exact} configurations the payoff is exactly flat in a (every type saturates at m = k under both a = 0 and a = 1), so asking is payoff-irrelevant; these are reported as ties, not as a preference for guessing. Of the {len(df) - n_tie_exact} non-tied configurations, {n_strict_ask} select a_SE = 1.
 
 2. **Calibration Reconciliation with Linear Baselines:**
-   - **Taylor-Expansion Baseline (L = V = 100):** Agrees with the exact model in **25 of 30 configurations (83.3%)**. All 5 divergences occur exclusively at k=3, where compounding (q^3) makes autonomous guessing preferred over question friction. For all k >= 5, both models select a_SE = 1.0.
-   - **Additive Localized-Defect Baseline (L = 10):** Agrees in **17 of 30 configurations (56.7%)**. Divergences occur at high g >= 0.90 where localized attribute stakes make guessing cost-effective earlier than systemic failure stakes.
+   - **Taylor-Expansion Baseline (L = V = 100):** raw disagreements {raw_div_taylor}/{len(df)}; strict divergences (both models strictly prefer different corners) {div_taylor}/{len(df)}. The raw disagreements are the ties above, broken in opposite directions by the two solvers.
+   - **Additive Localized-Defect Baseline (L = 10):** raw disagreements {raw_div_add}/{len(df)}; strict divergences {div_add}/{len(df)}, of which {div_add_low_stake} occur where Lambda = L(1-g) <= c_Q, i.e. outside the maintained assumption Lambda > c_Q. There the linear model rationally guesses, while the exact model (marginal stake V(1-g) > c_Q) keeps asking.
+   - Neither comparison exhibits a zero-bias instrument-restriction loss; see `verify_exact_firstbest_gap.py` for where one does arise.
 
 3. **Proposition 7 (Downward Distortion Under Bias) Robustness:**
    - **Downward Distortion Rate:** a_H_SB <= a_H_B holds everywhere, with strict downward distortion a_H_SB < a_H_B whenever m does not saturate at k (holding in **{downward_dist_rate * 100:.1f}%** of grid points: 20% at k in [3, 5], 80% at k in [8, 20], and 100% at k in [10, 15]).
@@ -436,6 +474,11 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
         "corner_rate": corner_rate,
         "downward_dist_rate": downward_dist_rate,
         "ir_h_never_binds": ir_h_never_binds,
+        "n_tie_exact": n_tie_exact,
+        "n_strict_ask": n_strict_ask,
+        "strict_div_taylor": div_taylor,
+        "strict_div_additive": div_add,
+        "strict_div_additive_low_stake": div_add_low_stake,
         "csv_path": csv_path,
         "png_path": png_path,
         "md_path": md_path,

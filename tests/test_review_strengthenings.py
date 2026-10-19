@@ -91,3 +91,112 @@ def test_prop7_closed_form_and_implementability(seed):
         val, x = solve_menu_exact(*p, nm=501, na=11)
         assert val - _leader(cand, *p) <= 2e-3
         assert _U(x[2], x[3], kH, k, Lam, c_Q, 100.0) >= _U(min(k, Lam / kH), 0.0, kH, k, Lam, c_Q, 100.0) - 1e-6
+
+
+def test_effort_dictation_gap_is_second_order():
+    """Corollary 6: leader-preferred interior bundles are optimal and IC; W_screen = W_FB - rho^2 E[1/kappa]/2."""
+    rng = np.random.default_rng(5)
+    checked = 0
+    while checked < 6:
+        k = 10.0; Lam = rng.uniform(4, 10); c_Q = rng.uniform(0.5, 2.5)
+        s = Lam - c_Q
+        if s < 0.2 * c_Q:
+            continue
+        kL = rng.uniform(0.2, 0.8); kH = kL * rng.uniform(1.2, 4)
+        rho = rng.uniform(0.05, 1.0) * min(0.9 * s, c_Q * (kH - kL) / (kH + kL))
+        ceff = c_Q + rho
+        if kL < ceff / k:
+            continue
+        checked += 1
+        p = (k, Lam, c_Q, 1.0, c_Q + rho, kL, kH, 0.5)
+        menu = (ceff / kL, 1.0, ceff / kH, 1.0)
+        U = lambda m, a, kap: _U(m, a, kap, k, Lam, c_Q, 100.0)
+        assert U(menu[0], 1, kL) >= U(menu[2], 1, kL) - 1e-9
+        assert U(menu[2], 1, kH) >= U(menu[0], 1, kH) - 1e-9
+        val, _ = solve_menu_exact(*p, nm=801, na=11)
+        assert val - _leader(menu, *p) <= 2e-3
+        gap = 0.5 * sum(U(c_Q / kap, 1, kap) - U(ceff / kap, 1, kap) for kap in (kL, kH))
+        assert gap == pytest.approx(rho ** 2 / 2 * 0.5 * (1 / kL + 1 / kH), rel=1e-9)
+
+
+def test_exact_model_small_task_is_a_tie_not_guessing():
+    """At k = 3 every type saturates under both policies, so the exact pooling payoff is flat in a."""
+    from underspec_sim.verifications.verify_exact_conjunctive import solve_exact_pooling_optimum
+    _, _, regime, _, pi = solve_exact_pooling_optimum(np.linspace(0.2, 0.6, 20), g=0.5, k=3, c_Q=2.0, V=100.0)
+    assert regime == "tie"
+    assert float(np.ptp(pi)) < 1e-9
+
+
+def test_exact_firstbest_gap_terse_type_guesses(tmp_path):
+    """Where the exact model has a zero-bias pooling gap, the terse type guesses and the diligent type asks."""
+    from underspec_sim.verifications.verify_exact_firstbest_gap import run_verification
+    res = run_verification(output_dir=str(tmp_path), n_draws=400, seed=11)
+    assert res["n_pos"] > 0
+    assert res["diligent_guesses"] == 0
+    assert res["terse_guesses"] == res["n_pos"]
+    assert res["n_pos_short"] == 0
+
+
+def test_self_confirming_learning_path():
+    """Lemma 1: the naive learning path falls monotonically to a fixed point below m*(a), ordered in d."""
+    k, Lam, c_Q, kap, a = 10.0, 5.0, 2.0, 0.6, 0.3
+    m_star = min(k, (Lam * (1 - a) + a * c_Q) / kap)
+
+    def path(d0):
+        d = lambda m: d0 + (1 - d0) * m / k
+        T = lambda m: min(k, (Lam * d(m) * (1 - a) + a * c_Q) / kap)
+        ms = [m_star]
+        for _ in range(500):
+            ms.append(T(ms[-1]))
+        return np.array(ms), T
+
+    lo, T_lo = path(0.3)
+    hi, T_hi = path(0.7)
+    for ms, T in ((lo, T_lo), (hi, T_hi)):
+        assert np.all(np.diff(ms) <= 1e-12)
+        assert abs(T(ms[-1]) - ms[-1]) < 1e-9
+        assert ms[-1] < m_star
+    assert lo[-1] <= hi[-1]
+
+
+def test_continuous_schedule_implements_dictation_menu_but_threshold_does_not():
+    """Lemma 4 on the Corollary 6 menu: alpha(m) implements it; a minimum-effort threshold lets type L shorten."""
+    from underspec_sim.verifications.verify_continuous_implementation import audit, C_Q
+    kL, kH, ce = 0.3, 0.5, 2.5
+    res = audit(((ce / kL, 1.0), (ce / kH, 1.0)), kL, kH)
+    assert res["gain_L"] <= 1e-9 and res["gain_H"] <= 1e-9
+    assert res["attain"] >= -1e-9
+    # Under the threshold, type L picks c_Q / kappa_L with a = 1 and gains rho^2 / (2 kappa_L).
+    assert res["thr_gain_L"] == pytest.approx((ce - C_Q) ** 2 / (2 * kL), abs=1e-4)
+
+
+def test_continuous_implementation_audit(tmp_path):
+    """Lemma 4 (i)-(v) on solver menus, including menus with binding IC_L."""
+    from underspec_sim.verifications.verify_continuous_implementation import run_verification
+    res = run_verification(output_dir=str(tmp_path), n_draws=60, seed=7)
+    assert res["passed"]
+    assert res["n_binding"] > 0
+    assert res["thr_fail_binding"] == res["n_binding"]
+
+
+def test_heterogeneous_stakes_threshold(tmp_path):
+    """Proposition 8: diligent users guess, terse users ask, with a single sign change of G at kappa_hat."""
+    from underspec_sim.verifications.verify_heterogeneous_stakes import run_verification
+    res = run_verification(output_dir=str(tmp_path), n_profiles=10, seed=13)
+    assert res["passed"]
+    assert res["n_ok"] == res["n_profiles"]
+    assert 0 < res["gap"] < res["target_gain"]
+
+
+def test_biased_first_best_on_feasible_domain_has_no_spurious_threshold():
+    """With clip=True the leader's preferred bundle is (min{k, c_eff/kappa}, 1) whenever c_eff < Lambda."""
+    from underspec_sim.core.params import ModelParams
+    from underspec_sim.core.first_best import biased_first_best
+    p = ModelParams(k=10.0, g=0.5, L=10.0, c_Q=2.0, V=100.0, mu_A=1.0, lambda_A=3.0)  # c_eff = 3 < Lambda = 5
+    for kap in (0.31, 0.35, 0.39, 0.5, 1.0):  # 0.35 lies below the unclipped threshold (Lambda + c_eff)/(2k) = 0.4
+        m, a = biased_first_best(kap, p, clip=True)
+        assert a == 1.0 and m == pytest.approx(3.0 / kap)
+    m, a = biased_first_best(0.25, p, clip=True)  # c_eff / kappa >= k: full specification, asking irrelevant
+    assert m == 10.0 and a == 0.0
+    m, a = biased_first_best(np.array([0.25, 0.35]), p, clip=True)
+    assert np.allclose(m, [10.0, 3.0 / 0.35]) and np.allclose(a, [0.0, 1.0])

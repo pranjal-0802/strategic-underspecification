@@ -104,7 +104,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     ax.set_xticklabels(x_labels)
     ax.set_ylabel("Ask Rate a")
     ax.set_ylim(-0.05, 1.15)
-    ax.set_title("Proposition 5: Unbiased Screening Recovers First Best (Zero Distortion)")
+    ax.set_title("Proposition 6: Unbiased Screening Recovers First Best (Zero Distortion)")
     ax.grid(True, alpha=0.3)
     ax.legend()
 

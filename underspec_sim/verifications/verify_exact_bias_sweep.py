@@ -262,7 +262,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
             ax2.scatter(group["mu_A"], group["lambda_A"], label=label, color=c, s=70, edgecolors="black")
         ax2.set_xlabel(r"Altruism Parameter $\mu_A$")
         ax2.set_ylabel(r"Friction Parameter $\lambda_A$")
-        ax2.set_title(r"Linear-Risk Model (Proposition 6):" + "\n" + r"Active Constraints in $(\mu_A, \lambda_A)$")
+        ax2.set_title(r"Linear-Risk Model (Proposition 7):" + "\n" + r"Active Constraints in $(\mu_A, \lambda_A)$")
         ax2.grid(True, alpha=0.3)
         ax2.legend(title="Active Constraints")
     else:
@@ -309,7 +309,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
     md_content = f"""# Verification Report: Constraint Binding Under Exact Conjunctive Payoff
 
 ## Overview
-- **Reference**: `paper/strategic_underspecification.tex`, Proposition 7, Remark 7, Section 10 (Discussion).
+- **Reference**: `paper/strategic_underspecification.tex`, Proposition 7, Remark 10 (active constraints), Section 10 (Discussion).
 - **Key Question**: Does the extreme-bias reversal (where $\\text{{IC}}_H$ binds alongside $\\text{{IC}}_L$ under severe bias) occur under the **EXACT** conjunctive payoff $q(a,g)^{{k-m}}$, or does the exact form prevent $\\text{{IC}}_H$ from ever binding?
 - **Grid Swept**: $\\lambda_A \\in [c_Q, 10 c_Q] = [2.0, 20.0]$ (10 values), $\\mu_A \\in [0.1, 1.0]$ (10 values), totaling **{total_points}** screening menu optimizations.
 
@@ -324,7 +324,7 @@ def run_verification(output_dir: str = "outputs") -> Dict[str, Any]:
      - **None bind** (unbiased / low bias, first-best implementable): **{none_active_count} points ({none_active_count/total_points*100:.1f}%)**
      - **$\\text{{IC}}_L$ alone binds** (standard Proposition 7 screening regime): **{ic_l_only_count} points ({ic_l_only_count/total_points*100:.1f}%)**
      - **$\\text{{IC}}_L + \\text{{IC}}_H$ both bind** (extreme bias regime): **{both_ic_count} points ({both_ic_count/total_points*100:.1f}%)**
-   - The paper's analysis in Remark 7 is confirmed under the exact conjunctive payoff.
+   - The paper's analysis in Remark 10 (active constraints) is confirmed under the exact conjunctive payoff.
 
 2. **Structural Concordance Between Exact and Linear-Risk Models**:
    - Both models partition the $(\\mu_A, \\lambda_A)$ plane into the identical three qualitative regimes:
